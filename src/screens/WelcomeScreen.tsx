@@ -4,18 +4,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { StyledButton } from "../components/StyledButton";
 import { Ionicons } from "@expo/vector-icons";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "src/types/RootStackParamList";
 
-export function Introduce() {
+type ScreenNavigationProp = NavigationProp<RootStackParamList, "Welcome">;
+
+export function WelcomeScreen() {
+  const navigation = useNavigation<ScreenNavigationProp>();
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={[styles.title, styles.welcomeTitle]}> Bem-Vindo ao </Text>
       <Text style={[styles.title, styles.nameTitle]}> Sua Cidade + Limpa </Text>
-      <StyledButton onPress={() => {}} style={styles.button}>
-        <Text style={{
-          color: "#fff",
-          fontSize: 30
-        }}> Prosseguir </Text>
-        <Ionicons name="arrow-forward" size={32} color="white"></Ionicons>
+      <StyledButton onPress={() => {navigation.navigate("Address and Terms")}} style={styles.button}>
+        <Text style={styles.buttonText}> Prosseguir </Text>
+        <Ionicons name="arrow-forward" size={32} color="black"></Ionicons>
       </StyledButton>
     </SafeAreaView>
   );
@@ -41,6 +44,10 @@ const styles = StyleSheet.create({
   },
   button: {
     flexDirection: "row",
-    marginTop: 10
+    marginTop: 13
+  },
+  buttonText: {
+    color: "black",
+    fontSize: 30
   },
 });

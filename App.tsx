@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-
-import { Introduce } from './src/screens/Introduce';
+import { AppRoutes } from 'src/routes/Routes';
+import { AddressAndTerms } from 'src/screens/AddressAndTermsScreen';
 
 export default function App() {
   return (
-    <Introduce />
+    <AppRoutes />
   );
 }
 
