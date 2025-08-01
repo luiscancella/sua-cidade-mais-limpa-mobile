@@ -1,7 +1,11 @@
 import React, { useRef } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, TouchableOpacityProps } from "react-native";
 
-export function StyledInput(props: TouchableOpacityProps) {
+interface StyledInputProps extends TouchableOpacityProps {
+    placeholder?: string
+}
+
+export function StyledInput(props: StyledInputProps) {
     const inputRef = useRef<TextInput>(null);
 
     const focusInput = () => {
@@ -15,6 +19,7 @@ export function StyledInput(props: TouchableOpacityProps) {
             <TextInput
                 ref={inputRef}
                 style={styles.textInput}
+                placeholder={props.placeholder}
             />
         </TouchableOpacity>
     )

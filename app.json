@@ -30,6 +30,15 @@
       "eas": {
         "projectId": "804d6293-1977-4b0b-8863-1bb26e3a3945"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ]
+    ]
   }
 }

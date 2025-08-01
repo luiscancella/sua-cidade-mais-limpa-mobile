@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 import { NavigationProp, useNavigation, usePreventRemove } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,14 +8,19 @@ import { StyledButton } from "src/components/StyledButton";
 import Checkbox from "expo-checkbox";
 import { StyledInput } from "src/components/StyledInput";
 
+import * as Location from "expo-location";
+import { GlobalContext } from "src/hooks/GlobalContext";
+
 type ScreenNavigationProp = NavigationProp<RootStackParamList, "Home">;
 
 export function AddressAndTerms() {
+    const { location, getLocation, saveLocation } = useContext(GlobalContext);
+    
     const [isChecked, setChecked] = useState(false);
 
     const navigation = useNavigation<ScreenNavigationProp>();
 
-    // usePreventRemove(true, () => {});
+    usePreventRemove(true, () => {});
 
     function handleProsseguirButton() {
         if (!isChecked) {
@@ -25,16 +30,30 @@ export function AddressAndTerms() {
             );
             return;
         }
-        navigation.navigate("Home", [1.1, 2.2]);
     }
+
+    useEffect(() => {
+        async function getCurrentLocation() {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('', 'Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            saveLocation(location);
+        }
+
+        if (location == undefined) getCurrentLocation();
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Digite seu endereço</Text>
-            <StyledInput />
+            <StyledInput placeholder="Digite seu endereço aqui"/>
             <TouchableOpacity style={styles.termsContainer} onPress={() => setChecked(!isChecked)}>
                 <Checkbox color={"black"} value={isChecked} onValueChange={setChecked} />
-                <Text>Aceito os Termos e Serviços</Text>
+                <Text>Aceito os Termos e Serviços {location ? JSON.stringify(location) : "VIXI"}</Text>
             </TouchableOpacity>
             <StyledButton
                 onPress={handleProsseguirButton}

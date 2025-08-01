@@ -1,14 +1,15 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MapView from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import MapView from "react-native-maps";
+
 import { StyledInput } from "src/components/StyledInput";
 import { RootStackParamList } from "src/types/RootStackParamList";
 
 type ScreenRouteProps = RouteProp<RootStackParamList, "Home">;
 
-export function Home() {
+export function HomeScreen() {
   const props = useRoute<ScreenRouteProps>();
 
   const [estimatedTime, setEstimatedTime] = useState(10);
@@ -19,7 +20,7 @@ export function Home() {
       <MapView style={styles.map} />
       <SafeAreaView>
         <View style={styles.topBox}>
-          <StyledInput style={styles.addresInput} />
+          <StyledInput style={styles.addresInputBox} placeholder="Digite seu endereço aqui"/>
           <Text style={styles.estimatedTimeText}>A coleta de lixo irá chegar em: <Text style={styles.estimatedTimeValue}>{estimatedTime} {estimatedTimeSufix}</Text></Text>
         </View>
       </SafeAreaView>
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     borderRadius: 20,
   },
-  addresInput: {
+  addresInputBox: {
     width: "90%",
     backgroundColor: "#ffffff",
     marginHorizontal: "auto",
