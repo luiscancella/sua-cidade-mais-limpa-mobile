@@ -1,10 +1,11 @@
 import * as React from "react";
 import * as Location from "expo-location";
 import * as SecureStore from "expo-secure-store"
+import { LocationDTO } from "src/types/LocationDTO";
 
 interface GlobalContextData {
-    location: Location.LocationObject | undefined,
-    saveLocation(value: Location.LocationObject) : void,
+    location: LocationDTO | undefined,
+    saveLocation(value: LocationDTO): void,
     getLocation(): void,
     isLoading: Boolean
 }
@@ -17,26 +18,37 @@ export const GlobalContext = React.createContext<GlobalContextData>({} as Global
 
 export const GlobalProvider = ({ children }: GlobalContextProps) => {
     const [isLoading, setLoading] = React.useState(true);
-    const [location, setLocation] = React.useState<Location.LocationObject>();
+    const [location, setLocation] = React.useState<LocationDTO>();
 
-    async function saveLocation(value: Location.LocationObject) {
+    async function saveLocation(value: LocationDTO) {
+        if (JSON.stringify(value).length > 2048) {
+            console.error("Location too long to be saved");
+            return;
+        }
         await SecureStore.setItemAsync("location", JSON.stringify(value));
+        console.log("Location saved");
         setLocation(value);
     }
 
-    async function getLocation() {
+    async function getLocation() : Promise<LocationDTO | undefined> {
         let result = await SecureStore.getItemAsync("location");
         if (result) {
             alert("🔐 Here's your value 🔐 \n" + result);
-            setLocation(JSON.parse(result));
+            return JSON.parse(result) as LocationDTO;
         } else {
             alert('No values stored under that key.');
+            return;
         }
-        setLoading(false);
     }
 
     React.useEffect(() => {
-        getLocation();
+        function clearLocation() {
+            SecureStore.deleteItemAsync("location");
+            setLocation(undefined);
+        }
+        // getLocation();
+        clearLocation();
+        setLoading(false);
     }, []);
 
     return (
@@ -46,7 +58,7 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
             getLocation,
             isLoading
         }}>
-            { children }
+            {children}
         </GlobalContext.Provider>
     )
 }

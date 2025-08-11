@@ -1,15 +1,16 @@
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+
+import { GlobalContext } from "src/hooks/GlobalContext";
 
 import { WelcomeScreen } from "src/screens/WelcomeScreen";
 import { AddressAndTerms } from "src/screens/AddressAndTermsScreen";
 import { HomeScreen } from "src/screens/HomeScreen";
-import { SplashScreen } from "src/screens/SplashScreen";
-import { GlobalContext } from "src/hooks/GlobalContext";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ConfigsScreen } from "src/screens/ConfigsScreen";
-import { Ionicons } from "@expo/vector-icons";
+import { SplashScreen } from "src/screens/SplashScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -46,7 +47,7 @@ export function AppRoutes() {
                         component={HomeScreen}
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "map", "map-outline")),
-                            tabBarActiveTintColor: 'tomato',
+                            tabBarActiveTintColor: 'darkblue',
                             tabBarInactiveTintColor: 'gray',
                         }}
                     />

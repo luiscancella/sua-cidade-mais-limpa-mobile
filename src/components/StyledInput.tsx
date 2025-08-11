@@ -38,5 +38,6 @@ const styles = StyleSheet.create({
     },
     textInput: {
         maxWidth: "90%",
+        minWidth: "60%",
     }
 })
