@@ -13,7 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "process.env.AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +24,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.suacidademaislimpa"
+      "package": "com.anonymous.suacidademaislimpa",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +43,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
+          "locationAlwaysAndWhenInUsePermission": "Permitir que $(PRODUCT_NAME) use sua localização.",
           "isAndroidForegroundServiceEnabled": true
         }
       ]

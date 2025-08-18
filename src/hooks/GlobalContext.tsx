@@ -1,10 +1,9 @@
 import * as React from "react";
-import * as Location from "expo-location";
 import * as SecureStore from "expo-secure-store"
 import { LocationDTO } from "src/types/LocationDTO";
 
 interface GlobalContextData {
-    location: LocationDTO | undefined,
+    location?: LocationDTO,
     saveLocation(value: LocationDTO): void,
     getLocation(): void,
     isLoading: Boolean
@@ -30,14 +29,14 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
         setLocation(value);
     }
 
-    async function getLocation() : Promise<LocationDTO | undefined> {
+    async function getLocation() : Promise<LocationDTO> {
         let result = await SecureStore.getItemAsync("location");
         if (result) {
-            alert("🔐 Here's your value 🔐 \n" + result);
+            // alert("🔐 Here's your value 🔐 \n" + result);
             return JSON.parse(result) as LocationDTO;
         } else {
-            alert('No values stored under that key.');
-            return;
+            // alert('No values stored under that key.');
+            return Promise.reject("No location found");
         }
     }
 
@@ -47,7 +46,8 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
             setLocation(undefined);
         }
         // getLocation();
-        clearLocation();
+        // clearLocation();
+        getLocation().then((loc) => { setLocation(loc) });
         setLoading(false);
     }, []);
 

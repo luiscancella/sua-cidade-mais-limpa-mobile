@@ -9,8 +9,9 @@ import { GlobalContext } from "src/hooks/GlobalContext";
 import { WelcomeScreen } from "src/screens/WelcomeScreen";
 import { AddressAndTerms } from "src/screens/AddressAndTermsScreen";
 import { HomeScreen } from "src/screens/HomeScreen";
-import { ConfigsScreen } from "src/screens/ConfigsScreen";
 import { SplashScreen } from "src/screens/SplashScreen";
+import { ConfigsTabs } from "./ConfigsRoutes";
+import { ConfigsListScreen } from "src/screens/ConfigsListScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -53,7 +54,7 @@ export function AppRoutes() {
                     />
                     <Tab.Screen
                         name="Configs"
-                        component={ConfigsScreen}
+                        component={ConfigsTabs}
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "layers", "layers-outline"))
                         }}

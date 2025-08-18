@@ -3,5 +3,5 @@ export type LocationDTO = {
     latitude: number;
     longitude: number;
     full_address: string;
-    short_address: string;
+    short_address?: string;
 }
