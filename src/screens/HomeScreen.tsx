@@ -130,14 +130,15 @@ const styles = StyleSheet.create({
   },
   topBox: {
     backgroundColor: "#D9D9D9",
-    width: "90%",
-    marginTop: 17,
+    width: "95%",
+    marginTop: 12,
     alignSelf: "center",
     borderRadius: 20,
+    padding: 10
   },
   addresInputBox: {
-    width: "90%",
-    backgroundColor: "#ffffff",
+    width: "100%",
+    backgroundColor: "#fff",
     marginHorizontal: "auto",
     marginTop: 12,
   },

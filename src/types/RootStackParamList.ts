@@ -4,5 +4,6 @@ export type RootStackParamList = {
   Home: undefined,
   ConfigsList: undefined,
   NotificationConfig: undefined,
-  AddressConfig: undefined
+  AddressConfig: undefined,
+  Configuration: undefined
 };

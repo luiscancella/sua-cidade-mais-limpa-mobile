@@ -43,6 +43,7 @@ export function NotificationConfigScreen() {
                     onValueChange={(value) => setNewsEnabled(value)}
                 />
             </View>
+            
         </SafeAreaView>
     );
 }

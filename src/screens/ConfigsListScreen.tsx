@@ -25,7 +25,7 @@ export function ConfigsListScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.listElementBox}
-                    onPress={() => {}}
+                    onPress={() => { navigation.navigate("Configuration") }}
                 >
                     <Text style={styles.listElementText}>Termos e Serviços</Text>
                 </TouchableOpacity>
