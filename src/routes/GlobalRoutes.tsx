@@ -12,6 +12,7 @@ import { HomeScreen } from "src/screens/HomeScreen";
 import { SplashScreen } from "src/screens/SplashScreen";
 import { ConfigsTabs } from "./ConfigsRoutes";
 import { ConfigsListScreen } from "src/screens/ConfigsListScreen";
+import { SetupScreen } from "src/screens/SetupScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,19 +38,24 @@ export function AppRoutes() {
     return (
         <NavigationContainer>
             {location == null ? (
-                <Stack.Navigator initialRouteName={"Welcome"} screenOptions={{ headerShown: false }}>
+                <Stack.Navigator initialRouteName={"Setup"} screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Welcome" component={WelcomeScreen} />
                     <Stack.Screen name="Address and Terms" component={AddressAndTerms} />
+                    <Stack.Screen name="Setup" component={SetupScreen} />
                 </Stack.Navigator>
             ) : (
-                <Tab.Navigator initialRouteName={"Home"} screenOptions={{ headerShown: false }}>
+                <Tab.Navigator
+                    initialRouteName={"Home"}
+                    screenOptions={{
+                        headerShown: false,
+                        tabBarActiveTintColor: "#0FAD83"
+                    }}
+                >
                     <Tab.Screen
                         name="Home"
                         component={HomeScreen}
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "map", "map-outline")),
-                            tabBarActiveTintColor: 'darkblue',
-                            tabBarInactiveTintColor: 'gray',
                         }}
                     />
                     <Tab.Screen

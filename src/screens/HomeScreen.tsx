@@ -3,7 +3,7 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
-import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
+import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 
 import { GlobalContext } from "src/hooks/GlobalContext";
 
@@ -11,7 +11,8 @@ import { RootStackParamList } from "src/types/RootStackParamList";
 import { SearchAddress } from "src/components/SearchAddress";
 import { StyledButton } from "src/components/StyledButton";
 import { LocationDTO } from "src/types/LocationDTO";
-import { set } from "zod";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
 type ScreenRouteProps = RouteProp<RootStackParamList, "Home">;
 
@@ -34,14 +35,6 @@ export function HomeScreen() {
       ref.current?.setAddressText(selectedPageLocation.short_address || selectedPageLocation.full_address || "NÃO ENCONTRADO!");
     }
   }
-
-  useEffect(() => {
-    if (selectedPageLocation) {
-      if (ref.current) {
-        ref.current.setAddressText(selectedPageLocation.short_address || selectedPageLocation.full_address || "NÃO ENCONTRADO!");
-      }
-    }
-  }, []);
 
   useEffect(() => {
     if (selectedPageLocation) {
@@ -69,44 +62,32 @@ export function HomeScreen() {
           }}
         />
       </MapView>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.topBox}>
-          <SearchAddress
-            ref={ref}
-            onPress={(data, details) => {
-              // console.log(data, null, 2);
-              // console.log(details, null, 2);
-              handleLocationSelected(data, details);
-            }}
-            placeholder="Altere o endereço aqui"
-          />
-          <Text style={styles.estimatedTimeText}>A coleta de lixo irá chegar em: <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText}</Text></Text>
-          <Modal
-            animationType="fade"
-            transparent
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(!modalVisible)}
-          >
-            <View style={styles.modalContainer}>
-              <Text>Deseja alterar o endereço?</Text>
-              <View style={styles.modalButtonContainer}>
-                <StyledButton
-                  style={styles.modalButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text>Sim</Text>
-                </StyledButton>
-                <StyledButton
-                  style={styles.modalButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text>Não</Text>
-                </StyledButton>
+      <View style={styles.container}>
+        <LinearGradient
+          colors={["#1CB788", "#19AB89"]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.topCardContainer}
+        >
+          <SafeAreaView>
+            <SearchAddress
+              ref={ref}
+              icon={<Ionicons name="location-outline" size={24} color="white" />}
+              styles={searchAddressStyles}
+              textInputProps={{
+                placeholderTextColor: "#fff",
+              }}
+            />
+            <View style={styles.estimatedTimeCardContainer}>
+              <Ionicons name="time" size={24} color="white" />
+              <View style={styles.estimatedTimeTextContainer}>
+                <Text style={styles.estimatedTimeText}>A coleta de lixo irá chegar em:</Text>
+                <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText}</Text>
               </View>
             </View>
-          </Modal>
-        </View>
-      </SafeAreaView>
+          </SafeAreaView>
+        </LinearGradient>
+      </View>
     </>
   )
 }
@@ -126,50 +107,56 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     zIndex: -1,
-    position: "relative",
   },
-  topBox: {
+  topCardContainer: {
     backgroundColor: "#D9D9D9",
-    width: "95%",
-    marginTop: 12,
-    alignSelf: "center",
-    borderRadius: 20,
-    padding: 10
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+    borderBottomLeftRadius: 37,
+    borderBottomRightRadius: 37,
   },
-  addresInputBox: {
-    width: "100%",
-    backgroundColor: "#fff",
-    marginHorizontal: "auto",
-    marginTop: 12,
+  estimatedTimeCardContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#49C5A0",
+    marginTop: 15,
+    borderWidth: 1,
+    borderRadius: 16,
+    borderColor: "rgba(255, 255, 255, 0.5)",
+    padding: 8,
+    paddingLeft: 12,
+  },
+  estimatedTimeTextContainer: {
+    // borderWidth: 1,
+    marginLeft: 12,
   },
   estimatedTimeText: {
-    width: "95%",
-    marginHorizontal: "auto",
-    marginVertical: 14,
-    textAlign: "center",
-    fontSize: 17,
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "300",
   },
   estimatedTimeValue: {
-    fontWeight: "bold",
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "700",
   },
-  modalContainer: {
-    width: 320,
-    backgroundColor: "#ffffff",
-    marginHorizontal: "auto",
-    top: "20%",
-    borderWidth: 1,
-    borderColor: "#000000",
-    borderRadius: 18,
-    padding: 19,
-  },
-  modalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    marginTop: 12,
-  },
-  modalButton: {
-    backgroundColor: "#D9D9D9",
-    paddingHorizontal: 30,
-    paddingVertical: 8,
-  }
 });
+
+const searchAddressStyles: Partial<Styles> = {
+  container: {
+    marginTop: 15,
+  },
+  textInputContainer: {
+    backgroundColor: "#49C5A0",
+    borderColor: "rgba(255, 255, 255, 0.5)",
+  },
+  textInput: {
+    // borderWidth: 1
+    fontSize: 16,
+    fontWeight: "300",
+    color: "#fff",
+  },
+  listView: {
+
+  },
+};

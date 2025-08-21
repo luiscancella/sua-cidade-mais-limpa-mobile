@@ -13,14 +13,10 @@ export function StyledButton(props: StyledButtonProps) {
             {...props}
             activeOpacity={0.5}
             style={[{
-                backgroundColor: "#D9D9D9",
+                backgroundColor: "#0FAD83",
                 borderRadius: 20,
                 paddingHorizontal: 35,
                 paddingVertical: 20,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "3px 3px 5px rgba(0, 0, 0, 0.25)",
             }, props.style]}
         >
             {children}
