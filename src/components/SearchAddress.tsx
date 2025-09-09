@@ -8,7 +8,7 @@ interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
 }
 
 export const SearchAddress = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
-    ({ icon, iconStyles, styles: propsStyleZ = {}, ...props }, ref) => {
+    ({ icon, iconStyles, styles: propsStyle = {}, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
         const googlePlacesRef = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
@@ -24,7 +24,6 @@ export const SearchAddress = React.forwardRef<GooglePlacesAutocompleteRef, Searc
             textInputContainer: {
                 backgroundColor: "#fff",
                 height: 54,
-                elevation: 5,
                 borderWidth: 1,
                 borderRadius: 15,
                 borderColor: "#DDD",
@@ -67,7 +66,7 @@ export const SearchAddress = React.forwardRef<GooglePlacesAutocompleteRef, Searc
             return merged;
         }
 
-        const mergedStyles = mergeStyles(defaultStyles, propsStyleZ);
+        const mergedStyles = mergeStyles(defaultStyles, propsStyle);
 
         return (
             <GooglePlacesAutocomplete

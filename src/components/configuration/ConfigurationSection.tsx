@@ -14,14 +14,16 @@ interface ConfigurationSectionProps {
 
 export function ConfigurationSection({ nameIcon, title, description, styleProps, onPress, children }: ConfigurationSectionProps) {
     const [collapsed, setCollapsed] = React.useState(false);
-
+        
     const uncollapseIconName = "caret-forward-outline";
     const collapseIconName = "caret-down-outline";
 
     return (
         <>
-            <TouchableOpacity style={[styles.section, styleProps]} onPress={() => onPress ? onPress() : setCollapsed(!collapsed)}>
-                <Ionicons name={nameIcon} size={24} color="black" style={styles.sectionMainIcon} />
+            <TouchableOpacity style={[styles.section, styleProps, collapsed && styles.sectionCollapsed]} onPress={() => onPress ? onPress() : setCollapsed(!collapsed)}>
+                <View style={styles.iconContainer}>
+                    <Ionicons name={nameIcon} size={18} color="white" style={styles.icon} />
+                </View>
                 <View style={styles.topicContainer}>
                     <Text style={styles.topicTitle}>{title}</Text>
                     {description && <Text style={styles.topicDescription}>{description}</Text>}
@@ -43,24 +45,32 @@ const styles = StyleSheet.create({
         width: "90%",
         height: "auto",
         minHeight: 68,
+        backgroundColor: "#EFEFEF",
+        borderRadius: 11,
+        borderBottomLeftRadius: 11,
+        borderBottomRightRadius: 11,
+        marginTop: 12,
         alignSelf: "center",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        borderColor: "#00000040",
-        borderBottomWidth: 1,
         paddingVertical: 10,
     },
-    firstSection: {
-        borderTopWidth: 1,
-        marginTop: 8,
+    sectionCollapsed: {
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
     },
-    sectionMainIcon: {
-        marginLeft: 10,
+    iconContainer: {
+        marginLeft: 12,
+        backgroundColor: "#4AB469",
+        borderRadius: 50,
+        padding: 6,
+    },
+    icon: {
     },
     topicContainer: {
         width: "78%",
-        marginLeft: 6,
+        marginLeft: 9,
     },
     topicTitle: {
         fontSize: 15,
@@ -74,11 +84,12 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     childrenContainer: {
-        backgroundColor: "rgba(0, 0, 0, 0.04)",
+        backgroundColor: "#EFEFEF",
         width: "90%",
-        paddingVertical: 10,
+        paddingTop: 10,
+        paddingBottom: 2,
         alignSelf: "center",
-        borderBottomWidth: 1,
-        borderColor: "#00000040",
+        borderBottomLeftRadius: 11,
+        borderBottomRightRadius: 11,
     },
 });
