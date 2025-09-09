@@ -62,7 +62,7 @@ export function AppRoutes() {
                         name="Configs"
                         component={ConfigsTabs}
                         options={{
-                            tabBarIcon: ((props) => setTabIcon(props, "layers", "layers-outline"))
+                            tabBarIcon: ((props) => setTabIcon(props, "settings", "settings-outline"))
                         }}
                     />
                 </Tab.Navigator>

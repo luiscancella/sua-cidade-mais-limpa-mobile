@@ -46,7 +46,7 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
             setLocation(undefined);
         }
         // getLocation();
-        clearLocation();
+        // clearLocation();
         getLocation().then((loc) => { setLocation(loc) });
         setLoading(false);
     }, []);
