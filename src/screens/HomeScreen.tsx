@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
@@ -9,7 +9,6 @@ import { GlobalContext } from "src/hooks/GlobalContext";
 
 import { RootStackParamList } from "src/types/RootStackParamList";
 import { SearchAddress } from "src/components/SearchAddress";
-import { StyledButton } from "src/components/StyledButton";
 import { LocationDTO } from "src/types/LocationDTO";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,26 +18,21 @@ type ScreenRouteProps = RouteProp<RootStackParamList, "Home">;
 export function HomeScreen() {
   const props = useRoute<ScreenRouteProps>();
   const { location, } = React.useContext(GlobalContext);
-  const [modalVisible, setModalVisible] = useState(false);
   const [selectedPageLocation, setSelectedPageLocation] = useState<LocationDTO | undefined>(location);
   const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("10 minutos");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
   function handleLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
-    console.log("handleLocationSelected called");
-    console.log("Selected location:", data);
-    console.log("Location details:", details);
-  }
-
-  function setAddressSearchBarText() {
-    if (selectedPageLocation) {
-      ref.current?.setAddressText(selectedPageLocation.short_address || selectedPageLocation.full_address || "NÃO ENCONTRADO!");
-    }
+    
   }
 
   useEffect(() => {
     if (selectedPageLocation) {
-      setAddressSearchBarText();
+      ref.current?.setAddressText(
+        selectedPageLocation.short_address ||
+        selectedPageLocation.full_address ||
+        "NÃO ENCONTRADO!"
+      );
     }
   }, [selectedPageLocation]);
 
@@ -77,6 +71,7 @@ export function HomeScreen() {
               textInputProps={{
                 placeholderTextColor: "#fff",
               }}
+              onPress={handleLocationSelected}
             />
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />

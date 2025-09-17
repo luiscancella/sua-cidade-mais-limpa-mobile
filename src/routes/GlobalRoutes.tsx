@@ -10,9 +10,8 @@ import { WelcomeScreen } from "src/screens/WelcomeScreen";
 import { AddressAndTerms } from "src/screens/AddressAndTermsScreen";
 import { HomeScreen } from "src/screens/HomeScreen";
 import { SplashScreen } from "src/screens/SplashScreen";
-import { ConfigsTabs } from "./ConfigsRoutes";
-import { ConfigsListScreen } from "src/screens/ConfigsListScreen";
 import { SetupScreen } from "src/screens/SetupScreen";
+import { ConfigurationScreen } from "src/screens/ConfigurationScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -60,7 +59,7 @@ export function AppRoutes() {
                     />
                     <Tab.Screen
                         name="Configs"
-                        component={ConfigsTabs}
+                        component={ConfigurationScreen}
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "settings", "settings-outline"))
                         }}

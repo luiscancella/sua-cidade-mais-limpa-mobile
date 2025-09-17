@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { StyleProp, StyleSheet, Text, TouchableOpacity, TouchableOpacityProps, View, ViewProps, ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ConfigurationSectionProps {
