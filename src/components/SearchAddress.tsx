@@ -10,7 +10,6 @@ interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
 export const SearchAddress = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
     ({ icon, iconStyles, styles: propsStyle = {}, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
-        const googlePlacesRef = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
         const renderedIcon = React.isValidElement(icon)
             ? React.cloneElement(icon, { style: [styles.icon, iconStyles] } as React.CSSProperties)

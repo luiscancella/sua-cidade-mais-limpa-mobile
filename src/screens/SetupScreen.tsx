@@ -9,21 +9,21 @@ import { GlobalContext } from "src/hooks/GlobalContext";
 import * as MapsApiService from "src/service/MapsApiService";
 
 export function SetupScreen() {
-    const { location, getLocation, saveLocation } = useContext(GlobalContext);
+    const { saveLocation } = useContext(GlobalContext);
 
     const [isChecked, setChecked] = useState(false);
-    const [selectedPageLocation, setSelectedPageLocation] = useState<LocationDTO>();
+    const [selectedLocation, setSelectedLocation] = useState<LocationDTO>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
     useEffect(() => {
-        if (selectedPageLocation !== undefined && ref.current) {
+        if (selectedLocation !== undefined && ref.current) {
             ref.current.setAddressText(
-                selectedPageLocation.short_address ?
-                    selectedPageLocation.short_address :
-                    selectedPageLocation.full_address
+                selectedLocation.short_address ?
+                    selectedLocation.short_address :
+                    selectedLocation.full_address
             );
         }
-    }, [selectedPageLocation]);
+    }, [selectedLocation]);
 
     useEffect(() => {
         MapsApiService.askForLocation()
@@ -31,7 +31,7 @@ export function SetupScreen() {
                 if (ref?.current?.getAddressText) {
                     MapsApiService.getAddressByCoords(coords)
                         .then(locationData => {
-                            if (selectedPageLocation === undefined) setSelectedPageLocation(locationData);
+                            if (selectedLocation === undefined) setSelectedLocation(locationData);
                         })
                         .catch(error => console.error("Erro ao obter endereço:", error));
                 }
@@ -41,11 +41,10 @@ export function SetupScreen() {
 
     function handleLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
         let locationData = MapsApiService.handleAddressRequestToAutocompleteGoogleAPI(data, details);
-        setSelectedPageLocation(locationData);
+        setSelectedLocation(locationData);
     };
 
     function handleProsseguirButton() {
-        console.log("Aqui")
         if (!isChecked) {
             Alert.alert(
                 'Atenção',
@@ -53,16 +52,16 @@ export function SetupScreen() {
             );
             return;
         }
-        if (!selectedPageLocation) {
-            console.log("Location data is not set:", selectedPageLocation);
+        if (!selectedLocation) {
+            console.log("Location data is not set:", selectedLocation);
             Alert.alert(
                 'Atenção',
                 'É necessário selecionar um endereço!',
             );
             return;
         }
-        console.log("Location data salvando no contexto:", selectedPageLocation);
-        saveLocation(selectedPageLocation);
+        console.log("Location data salvando no contexto:", selectedLocation);
+        saveLocation(selectedLocation);
     }
 
     return (
@@ -74,6 +73,7 @@ export function SetupScreen() {
                 <Text style={styles.title}>Sua Cidade <Text style={styles.coloredText}>+ Limpa</Text></Text>
                 <Text style={styles.inputLabel}>Digite seu endereço:</Text>
                 <SearchAddress
+                    ref={ref}
                     styles={searchAddressStyles}
                     placeholder="Rua das Flores, 123 - Belo Horizonte"
                     onPress={(data, details) => {
