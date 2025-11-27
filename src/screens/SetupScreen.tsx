@@ -37,7 +37,7 @@ export function SetupScreen() {
                     const googleResponse : GoogleReverseGeocodingApiResponse = await MapsApiService.reverseGoogleGeocoding(coords);
                     const firstResult : GoogleReverseGeocodingApiPlace = googleResponse.results[0];
                     const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
-                    console.log("Usuário localização mapeada:", userLocation);
+                    console.log("Endereço mapeado pela localização do telefone:", userLocation);
                     // console.log("Endereço obtido via Google Reverse Geocoding:");
                     // console.log(JSON.stringify(googleResponse, null, 2));
                     if (!userLocation) {
@@ -60,9 +60,14 @@ export function SetupScreen() {
         fetchCurrentLocationAndAddress();
     }, []);
 
-    function handleLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
-        let locationData = MapsApiService.handleAddressRequestToAutocompleteGoogleAPI(data, details);
-        setSelectedLocation(locationData);
+    function handleAutocompleteLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
+        let userLocation = UserMapper.fromGoogleAutocomplete(data, details);
+        if (!userLocation) {
+            console.error("Erro ao mapear localização do autocomplete");
+            return;
+        }
+        console.log("Localização selecionada no autocomplete:", userLocation);
+        setSelectedLocation(userLocation);
     };
 
     function handleProsseguirButton() {
@@ -97,11 +102,7 @@ export function SetupScreen() {
                     ref={ref}
                     styles={searchAddressStyles}
                     placeholder="Rua das Flores, 123 - Belo Horizonte"
-                    onPress={(data, details) => {
-                        // console.log(JSON.stringify(data, null, 2));
-                        // console.log(JSON.stringify(details, null, 2));
-                        handleLocationSelected(data, details);
-                    }}
+                    onPress={(data, details) => handleAutocompleteLocationSelected(data, details)}
                 />
                 <View style={styles.checkboxContainer}>
                     <Checkbox

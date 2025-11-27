@@ -39,22 +39,3 @@ export async function reverseGoogleGeocoding(coords: Location.LocationObject): P
         return Promise.reject("Erro ao buscar ou parsear dados da localização");
     }
 }
-
-export function handleAddressRequestToAutocompleteGoogleAPI(data: GooglePlaceData, details: GooglePlaceDetail | null): LocationDTO | undefined {
-    if (details === null) {
-        console.error('Atenção', 'Não foi possível obter os detalhes do endereço selecionado');
-        return;
-    }
-
-    const { lat: latitude, lng: longitude } = details.geometry.location;
-    const { place_id, description: full_address, structured_formatting: { main_text: short_address } } = data;
-
-    var locationData : LocationDTO = {
-        place_id,
-        latitude,
-        longitude,
-        full_address,
-        short_address,
-    }
-    return locationData;
-}
