@@ -11,8 +11,7 @@ export const CreateUserLocationRequestSchema = z.object({
 });
 
 export const UserLocationSchema = z.object({
-    // phone_id: z.uuid().default(() => uuid.v4() as string),
-    phone_id: z.string().default("2"),
+    phone_id: z.uuid().default(() => uuid.v4() as string),
     place_id: z.string(),
     latitude: z.number(),
     longitude: z.number(),
