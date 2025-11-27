@@ -37,13 +37,16 @@ export function SetupScreen() {
                     const googleResponse : GoogleReverseGeocodingApiResponse = await MapsApiService.reverseGoogleGeocoding(coords);
                     const firstResult : GoogleReverseGeocodingApiPlace = googleResponse.results[0];
                     const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
-                    //console.log("Endereço obtido via Google Reverse Geocoding:");
+                    console.log("Usuário localização mapeada:", userLocation);
+                    // console.log("Endereço obtido via Google Reverse Geocoding:");
                     // console.log(JSON.stringify(googleResponse, null, 2));
                     if (!userLocation) {
                         console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
                         return;
                     }
-                    setSelectedLocation(userLocation);
+                    if (ref?.current?.getAddressText() === "") {
+                        setSelectedLocation(userLocation);
+                    }
                 } catch (error) {
                     console.error("Erro ao obter endereço reverso:", error);
                     return;

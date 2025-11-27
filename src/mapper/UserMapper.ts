@@ -41,6 +41,7 @@ class UserMapper {
         }
 
         const userLocation : Partial<UserLocation> = {
+            place_id: data.place_id,
             latitude: data.geometry.location.lat,
             longitude: data.geometry.location.lng,
             full_address: data.formatted_address,

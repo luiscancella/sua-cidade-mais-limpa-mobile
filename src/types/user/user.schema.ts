@@ -1,7 +1,5 @@
-import z from "zod";
-import 'react-native-get-random-values';
-import { v4 as uuidv4 } from 'uuid';
-
+import z from "zod";    
+import uuid from 'react-native-uuid';
 
 export const CreateUserLocationRequestSchema = z.object({
     latitude: z.number(),
@@ -13,7 +11,7 @@ export const CreateUserLocationRequestSchema = z.object({
 });
 
 export const UserLocationSchema = z.object({
-    phone_id: z.uuid().default(() => uuidv4()),
+    phone_id: z.uuid().default(() => uuid.v4() as string),
     place_id: z.string(),
     latitude: z.number(),
     longitude: z.number(),
