@@ -44,9 +44,10 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
         // Dev purposes: clear stored location
         function clearLocation() {
             SecureStore.deleteItemAsync("location");
+            SecureStore.deleteItemAsync("userCreatedOnServer");
             setLocation(undefined);
         }
-        // clearLocation();
+        clearLocation();
 
         // Load location from storage on app start
         getLocation().then((loc) => { setLocation(loc) });
@@ -60,19 +61,24 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
             if (!location) return;
 
             const userCreated = await SecureStore.getItemAsync("userCreatedOnServer");
-            if (userCreated) return;
+            if (userCreated) {
+                console.log("User already created on server");
+                return;
+            }
 
             try {
+                console.log("Attempting to create user on server...");
                 const userToCreate = UserMapper.toCreateUserLocationRequest(location);
-                await UserService.createUser(location.phone_id, userToCreate);
+                const response = await UserService.createUser(location.phone_id, userToCreate);
                 await SecureStore.setItemAsync("userCreatedOnServer", "true");
-                console.log("User successfully created on server");
+                console.log("✓ User successfully created on server");
             } catch (error) {
-                console.error("Erro ao criar usuário no servidor:", error);
+                console.error("✗ Failed to create user on server:", error);
+                console.log("Retrying in 30 seconds...");
 
                 retryTimeout = setTimeout(() => {
                     checkUserCreatedOnServer();
-                }, 10000);
+                }, 30000);
             }
         }
 

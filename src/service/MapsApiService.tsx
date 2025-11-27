@@ -1,5 +1,4 @@
 import * as Location from 'expo-location';
-import { GooglePlaceData, GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { GoogleReverseGeocodingApiResponse, UserLocation } from 'src/types';
 import { GoogleReverseGeocodingApiResponseSchema } from 'src/types';
 
@@ -21,7 +20,7 @@ export async function reverseGoogleGeocoding(coords: Location.LocationObject): P
 
     const url = `https://maps.googleapis.com/maps/api/geocode/json?${new URLSearchParams(params)}`;
 
-    console.debug("Fetching address from:", url);
+    // console.debug("Fetching address from:", url);
 
     try {
         const response = await fetch(url);

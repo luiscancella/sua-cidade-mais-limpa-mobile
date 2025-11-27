@@ -31,13 +31,13 @@ export function SetupScreen() {
             try {
                 console.log("Solicitando coordenadas do usuário...");
                 const coords = await MapsApiService.askForLocation();
-                console.log("Coordenadas obtidas:");
+                // console.log("Coordenadas obtidas:");
                 // console.log(JSON.stringify(coords, null, 2));
                 try {
                     const googleResponse : GoogleReverseGeocodingApiResponse = await MapsApiService.reverseGoogleGeocoding(coords);
                     const firstResult : GoogleReverseGeocodingApiPlace = googleResponse.results[0];
                     const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
-                    console.log("Endereço mapeado pela localização do telefone:", userLocation);
+                    // console.log("Endereço mapeado pela localização do telefone:", userLocation);
                     // console.log("Endereço obtido via Google Reverse Geocoding:");
                     // console.log(JSON.stringify(googleResponse, null, 2));
                     if (!userLocation) {

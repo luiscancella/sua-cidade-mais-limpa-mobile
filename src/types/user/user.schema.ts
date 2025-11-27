@@ -11,14 +11,15 @@ export const CreateUserLocationRequestSchema = z.object({
 });
 
 export const UserLocationSchema = z.object({
-    phone_id: z.uuid().default(() => uuid.v4() as string),
+    // phone_id: z.uuid().default(() => uuid.v4() as string),
+    phone_id: z.string().default("2"),
     place_id: z.string(),
     latitude: z.number(),
     longitude: z.number(),
     full_address: z.string(),
     short_address: z.string(),
     street: z.string(),
-    houseNumber: z.number(),
+    houseNumber: z.string(),
     neighborhood: z.string(),
     city: z.string(),
 });
