@@ -1,23 +1,7 @@
 import * as Location from 'expo-location';
 import { GooglePlaceData, GooglePlaceDetail } from 'react-native-google-places-autocomplete';
-import { LocationDTO } from 'src/types/LocationDTO';
-import * as z from "zod";
-
-const GoogleReverseGeocodingApiResponseSchema = z.object({
-    results: z.array(
-        z.object({
-            formatted_address: z.string(),
-            geometry: z.object({
-                location: z.object({
-                    lat: z.number(),
-                    lng: z.number(),
-                }),
-            }),
-            place_id: z.string(),
-        })
-    ),
-    status: z.string(),
-});
+import { GoogleReverseGeocodingApiResponse, UserLocation } from 'src/types';
+import { GoogleReverseGeocodingApiResponseSchema } from 'src/types';
 
 export async function askForLocation(): Promise<Location.LocationObject> {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -28,7 +12,7 @@ export async function askForLocation(): Promise<Location.LocationObject> {
     return location;
 }
 
-export async function getAddressByCoords(coords: Location.LocationObject): Promise<LocationDTO> {
+export async function reverseGoogleGeocoding(coords: Location.LocationObject): Promise<GoogleReverseGeocodingApiResponse> {
     const params = {
         latlng: `${coords.coords.latitude},${coords.coords.longitude}`,
         key: "AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE",
@@ -42,20 +26,16 @@ export async function getAddressByCoords(coords: Location.LocationObject): Promi
     try {
         const response = await fetch(url);
         const data = await response.json();
-        const result = await GoogleReverseGeocodingApiResponseSchema.parseAsync(data);
 
-        if (result.results.length === 0) return Promise.reject("No results found");
+        if (data['status'] !== 'OK') {
+            console.error("Erro na resposta da API do Google:", data);
+            return Promise.reject(`Google API error: ${data['status']}`);
+        }
 
-        const locationData: LocationDTO = {
-            place_id: result.results[0].place_id,
-            latitude: result.results[0].geometry.location.lat,
-            longitude: result.results[0].geometry.location.lng,
-            full_address: result.results[0].formatted_address,
-        };
-        console.log("Parsed location data:", locationData);
-        return locationData;
+        const result : GoogleReverseGeocodingApiResponse = await GoogleReverseGeocodingApiResponseSchema.parseAsync(data);
+        return Promise.resolve(result);
     } catch (error) {
-        console.error("Erro ao buscar ou parsear dados da localização:", error);
+        console.error("Erro ao tentar utilizar a API do Google:", error);
         return Promise.reject("Erro ao buscar ou parsear dados da localização");
     }
 }

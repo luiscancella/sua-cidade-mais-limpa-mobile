@@ -4,15 +4,16 @@ import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef, Styles
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import { SearchAddress } from "src/components/SearchAddress";
-import { LocationDTO } from "src/types/LocationDTO";
 import { GlobalContext } from "src/hooks/GlobalContext";
 import * as MapsApiService from "src/service/MapsApiService";
+import { GoogleReverseGeocodingApiPlace, GoogleReverseGeocodingApiResponse, UserLocation } from "src/types";
+import UserMapper from "src/mapper/UserMapper";
 
 export function SetupScreen() {
     const { saveLocation } = useContext(GlobalContext);
 
     const [isChecked, setChecked] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState<LocationDTO>();
+    const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
     useEffect(() => {
@@ -26,17 +27,34 @@ export function SetupScreen() {
     }, [selectedLocation]);
 
     useEffect(() => {
-        MapsApiService.askForLocation()
-            .then(coords => {
-                if (ref?.current?.getAddressText) {
-                    MapsApiService.getAddressByCoords(coords)
-                        .then(locationData => {
-                            if (selectedLocation === undefined) setSelectedLocation(locationData);
-                        })
-                        .catch(error => console.error("Erro ao obter endereço:", error));
+        async function fetchCurrentLocationAndAddress() {
+            try {
+                console.log("Solicitando coordenadas do usuário...");
+                const coords = await MapsApiService.askForLocation();
+                console.log("Coordenadas obtidas:");
+                // console.log(JSON.stringify(coords, null, 2));
+                try {
+                    const googleResponse : GoogleReverseGeocodingApiResponse = await MapsApiService.reverseGoogleGeocoding(coords);
+                    const firstResult : GoogleReverseGeocodingApiPlace = googleResponse.results[0];
+                    const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
+                    //console.log("Endereço obtido via Google Reverse Geocoding:");
+                    // console.log(JSON.stringify(googleResponse, null, 2));
+                    if (!userLocation) {
+                        console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
+                        return;
+                    }
+                    setSelectedLocation(userLocation);
+                } catch (error) {
+                    console.error("Erro ao obter endereço reverso:", error);
+                    return;
                 }
-            })
-            .catch(error => console.error("Erro ao obter coordenadas:", error));
+            } catch (error) {
+                console.error("Erro ao obter coordenadas do usuário:", error);
+                return;
+            }
+        }
+
+        fetchCurrentLocationAndAddress();
     }, []);
 
     function handleLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
@@ -77,8 +95,8 @@ export function SetupScreen() {
                     styles={searchAddressStyles}
                     placeholder="Rua das Flores, 123 - Belo Horizonte"
                     onPress={(data, details) => {
-                        console.log(JSON.stringify(data, null, 2));
-                        console.log(JSON.stringify(details, null, 2));
+                        // console.log(JSON.stringify(data, null, 2));
+                        // console.log(JSON.stringify(details, null, 2));
                         handleLocationSelected(data, details);
                     }}
                 />

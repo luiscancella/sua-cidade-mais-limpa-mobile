@@ -1,8 +1,10 @@
 import apiBackend from "src/lib/apiBackend";
-import { CreateUserRequest } from "src/types/user/user.schema";
+import { CreateUserLocationRequest } from "src/types";
 
-export class UserService {
-    async createUser(newUser: CreateUserRequest): Promise<void> {
-        apiBackend.post("/users", newUser)
+class UserService {
+    async createUser(id: string, newUser: CreateUserLocationRequest): Promise<void> {
+        apiBackend.post("/users/address", newUser, { params: { id } });
     }
 }
+
+export default new UserService();
