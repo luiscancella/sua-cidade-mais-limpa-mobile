@@ -48,6 +48,7 @@ class TruckWebSocketService {
             try {
                 const result = TruckDistanceSchema.parse(data);
                 this.onPositionUpdate?.(result);
+                console.log("[Socket.IO] Mensagem recebida:", result);
             } catch (error) {
                 console.error("Erro ao processar mensagem Socket.IO:", error);
             }

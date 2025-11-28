@@ -9,6 +9,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { UserLocation } from "src/types";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
+import { is } from "zod/locales";
 
 export function HomeScreen() {
   const { location, } = React.useContext(GlobalContext);
@@ -27,8 +28,8 @@ export function HomeScreen() {
   }, [TruckDistance]);
 
   useEffect(() => {
-    console.error("Erro desconhecido na conexão com o caminhão.", error);
-  }, [error, reconnect]);
+    if(!isConnected) console.error("Erro desconhecido na conexão com o caminhão.", error);
+  }, [isConnected]);
 
   function handleLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
 
