@@ -1,29 +1,37 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { use, useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RouteProp, useRoute } from "@react-navigation/native";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
-
 import { GlobalContext } from "src/hooks/GlobalContext";
-
-import { RootStackParamList } from "src/types/RootStackParamList";
 import { SearchAddress } from "src/components/SearchAddress";
-import { LocationDTO } from "src/types/LocationDTO";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-
-type ScreenRouteProps = RouteProp<RootStackParamList, "Home">;
+import { UserLocation } from "src/types";
+import { useTruckDistances } from "src/hooks/useTruckPositions";
 
 export function HomeScreen() {
-  const props = useRoute<ScreenRouteProps>();
   const { location, } = React.useContext(GlobalContext);
-  const [selectedPageLocation, setSelectedPageLocation] = useState<LocationDTO | undefined>(location);
-  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("10 minutos");
+  const [selectedPageLocation, setSelectedPageLocation] = useState<UserLocation | undefined>(location);
+  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
+  const { TruckDistance, isConnected, error, reconnect } = useTruckDistances({ phone_id: location?.phone_id });
+
+  useEffect(() => {
+    setEstimatedTimePreviewText(
+      TruckDistance
+        ? `${TruckDistance.etaMinutes} minutos`
+        : "Calculando..."
+    );
+  }, [TruckDistance]);
+
+  useEffect(() => {
+    console.error("Erro desconhecido na conexão com o caminhão.", error);
+  }, [error, reconnect]);
+
   function handleLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
-    
+
   }
 
   useEffect(() => {

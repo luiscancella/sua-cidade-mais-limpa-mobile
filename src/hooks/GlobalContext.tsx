@@ -47,7 +47,7 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
             SecureStore.deleteItemAsync("userCreatedOnServer");
             setLocation(undefined);
         }
-        clearLocation();
+        // clearLocation();
 
         // Load location from storage on app start
         getLocation().then((loc) => { setLocation(loc) });
@@ -69,7 +69,7 @@ export const GlobalProvider = ({ children }: GlobalContextProps) => {
             try {
                 console.log("Attempting to create user on server...");
                 const userToCreate = UserMapper.toCreateUserLocationRequest(location);
-                const response = await UserService.createUser(location.phone_id, userToCreate);
+                await UserService.createUser(location.phone_id, userToCreate);
                 await SecureStore.setItemAsync("userCreatedOnServer", "true");
                 console.log("✓ User successfully created on server");
             } catch (error) {
