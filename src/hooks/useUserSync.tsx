@@ -7,13 +7,14 @@ import UserService from "src/service/UserService";
 interface UserSyncProviderProps {
     children: React.ReactNode;
     location?: UserLocation;
+    onUserCreated?: () => void;
 }
 
 /**
  * Provider responsável por sincronizar o usuário com o servidor.
  * Tenta criar o usuário no servidor quando a localização está disponível.
  */
-export const UserSyncProvider = ({ children, location }: UserSyncProviderProps) => {
+export const UserSyncProvider = ({ children, location, onUserCreated }: UserSyncProviderProps) => {
     React.useEffect(() => {
         let retryTimeout: NodeJS.Timeout;
 
@@ -32,6 +33,9 @@ export const UserSyncProvider = ({ children, location }: UserSyncProviderProps) 
                 await UserService.createUser(location.phone_id, userToCreate);
                 await SecureStore.setItemAsync("userCreatedOnServer", "true");
                 console.log("✓ User successfully created on server");
+                
+                // Notifica que o usuário foi criado
+                onUserCreated?.();
             } catch (error) {
                 console.error("✗ Failed to create user on server:", error);
                 console.log("Retrying in 30 seconds...");
@@ -49,7 +53,7 @@ export const UserSyncProvider = ({ children, location }: UserSyncProviderProps) 
                 clearTimeout(retryTimeout);
             }
         };
-    }, [location]);
+    }, [location, onUserCreated]);
 
     return <>{children}</>;
 };

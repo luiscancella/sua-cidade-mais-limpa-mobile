@@ -11,23 +11,18 @@ import { UserLocation } from "src/types";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 
 export function HomeScreen() {
-  const { currentLocation, isUserSavedOnServer } = useCurrentLocation();
+  const { currentLocation, userCreatedOnServer, clearData } = useCurrentLocation();
   const [selectedPageLocation, setSelectedPageLocation] = useState<UserLocation | undefined>(currentLocation);
   const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
-  const [userSavedOnServer, setUserSavedOnServer] = useState(false);
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
   useEffect(() => {
-    async function checkUserStatus() {
-      const isSaved = await isUserSavedOnServer();
-      setUserSavedOnServer(isSaved);
-    }
-    checkUserStatus();
-  }, [currentLocation]);
+    // clearData();
+  }, []);
 
   const { TruckDistance, isConnected, error, reconnect } = useTruckDistances({ 
     phone_id: currentLocation?.phone_id,
-    isUserSavedOnServer: userSavedOnServer 
+    isUserSavedOnServer: userCreatedOnServer 
   });
 
   useEffect(() => {
@@ -37,10 +32,6 @@ export function HomeScreen() {
         : "Calculando..."
     );
   }, [TruckDistance]);
-
-  useEffect(() => {
-    if(!isConnected) console.error("Erro desconhecido na conexão com o caminhão.", error);
-  }, [isConnected]);
 
   useEffect(() => {
     if (selectedPageLocation) {

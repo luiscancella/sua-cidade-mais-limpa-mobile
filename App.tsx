@@ -7,10 +7,13 @@ import { UserSyncProvider } from 'src/hooks/useUserSync';
 import { AppRoutes } from 'src/routes/GlobalRoutes';
 
 function AppContent() {
-  const { currentLocation } = useCurrentLocation();
+  const { currentLocation, setUserCreatedOnServer } = useCurrentLocation();
   
   return (
-    <UserSyncProvider location={currentLocation}>
+    <UserSyncProvider 
+      location={currentLocation}
+      onUserCreated={() => setUserCreatedOnServer(true)}
+    >
       <AppRoutes />
     </UserSyncProvider>
   );

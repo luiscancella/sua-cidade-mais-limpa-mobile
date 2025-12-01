@@ -7,9 +7,12 @@ interface CurrentLocationContextData {
     saveCurrentLocation(value: UserLocation): Promise<boolean>,
     loadCurrentLocation(): Promise<boolean>,
     isUserSavedOnServer(): Promise<boolean>,
+    userCreatedOnServer: boolean,
+    setUserCreatedOnServer: (value: boolean) => void,
     isCurrentLocationSaved?: boolean,
     isLoading: boolean,
     error: string | null,
+    clearData(): Promise<void>,
 }
 
 const CurrentLocationContext = React.createContext<CurrentLocationContextData>({} as CurrentLocationContextData);
@@ -18,6 +21,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
     const [currentLocation, setCurrentLocation] = React.useState<UserLocation>();
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [error, setError] = React.useState<string | null>(null);
+    const [userCreatedOnServer, setUserCreatedOnServer] = React.useState<boolean>(false);
 
     async function saveCurrentLocation(value: UserLocation): Promise<boolean> {
         if (JSON.stringify(value).length > 2048) {
@@ -70,8 +74,22 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
         }
     }
 
+    async function clearData() {
+        try {
+            await SecureStore.deleteItemAsync("location");
+            await SecureStore.deleteItemAsync("userCreatedOnServer");
+            setCurrentLocation(undefined);
+            console.log("Cleared location and user data from secure store");
+        } catch (error) {
+            console.error("Failed to clear data:", error);
+        }
+    }
+
     React.useEffect(() => {
         loadCurrentLocation();
+        
+        // Carregar estado do servidor
+        isUserSavedOnServer().then(setUserCreatedOnServer);
     }, []);
 
     return (
@@ -81,8 +99,11 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 saveCurrentLocation,
                 loadCurrentLocation,
                 isUserSavedOnServer,
+                userCreatedOnServer,
+                setUserCreatedOnServer,
                 isLoading,
-                error
+                error,
+                clearData,
             }}
         >
             {children}
