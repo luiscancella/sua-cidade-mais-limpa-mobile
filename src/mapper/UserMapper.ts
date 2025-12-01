@@ -66,7 +66,6 @@ class UserMapper {
         }
 
         const addressComponent = details.address_components;
-        console.log(JSON.stringify(addressComponent, null, 2));
         
         const houseNumberComponent = addressComponent.find(component => component.types.includes("street_number"));
         const streetComponent = addressComponent.find(component => component.types.includes("route"));

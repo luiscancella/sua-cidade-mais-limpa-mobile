@@ -1,5 +1,5 @@
-import React, { use, useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
@@ -12,8 +12,8 @@ import { useTruckDistances } from "src/hooks/useTruckPositions";
 
 export function HomeScreen() {
   const { currentLocation, userCreatedOnServer, clearData } = useCurrentLocation();
-  const [selectedPageLocation, setSelectedPageLocation] = useState<UserLocation | undefined>(currentLocation);
-  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
+  const [ selectedPageLocation, setSelectedPageLocation ] = useState<UserLocation | undefined>(currentLocation);
+  const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
   useEffect(() => {

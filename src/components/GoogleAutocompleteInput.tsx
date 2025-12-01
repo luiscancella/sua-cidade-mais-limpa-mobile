@@ -1,6 +1,6 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
-import { GooglePlacesAutocomplete, GooglePlacesAutocompleteProps, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
+import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteProps, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
 
@@ -14,7 +14,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
     ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
 
-        const handleLocationPress = (data: any, details: any) => {
+        function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null) {
             const userLocation = UserMapper.fromGoogleAutocomplete(data, details);
             
             if (!userLocation) {
