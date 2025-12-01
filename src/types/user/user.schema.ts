@@ -4,10 +4,10 @@ import uuid from 'react-native-uuid';
 export const CreateUserLocationRequestSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
-    street: z.string(),
-    houseNumber: z.string(),
-    neighborhood: z.string(),
-    city: z.string(),
+    street: z.string().default("None"),
+    houseNumber: z.string().default("None"),
+    neighborhood: z.string().default("None"),
+    city: z.string().default("None"),
 });
 
 export const UserLocationSchema = z.object({
