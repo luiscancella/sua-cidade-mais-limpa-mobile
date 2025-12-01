@@ -17,10 +17,10 @@ export const UserLocationSchema = z.object({
     longitude: z.number(),
     full_address: z.string(),
     short_address: z.string(),
-    street: z.string(),
-    houseNumber: z.string(),
-    neighborhood: z.string(),
-    city: z.string(),
+    street: z.string().default("None"),
+    houseNumber: z.string().default("None"),
+    neighborhood: z.string().default("None"),
+    city: z.string().default("None"),
 });
 
 export type CreateUserLocationRequest = z.infer<typeof CreateUserLocationRequestSchema>;
