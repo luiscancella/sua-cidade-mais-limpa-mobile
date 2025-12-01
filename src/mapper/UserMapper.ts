@@ -72,20 +72,10 @@ class UserMapper {
         const neighborhoodComponent = addressComponent.find(component => component.types.includes("sublocality") || component.types.includes("neighborhood"));
         const cityComponent = addressComponent.findLast(component => component.types.includes("administrative_area_level_2"));
         
-        const houseNumber = houseNumberComponent?.long_name ?? houseNumberComponent?.short_name;
-        const street = streetComponent?.long_name ?? streetComponent?.short_name;
-        const neighborhood = neighborhoodComponent?.long_name ?? neighborhoodComponent?.short_name;
-        const city = cityComponent?.long_name ?? cityComponent?.short_name;
-
-        if (!street || !houseNumber || !neighborhood || !city) {
-            console.error("Erro ao mapear endereço do local selecionado: componentes faltando", {
-                street,
-                houseNumber,
-                neighborhood,
-                city,
-            });
-            return;
-        }
+        const houseNumber = houseNumberComponent?.long_name ?? houseNumberComponent?.short_name ?? "None";
+        const street = streetComponent?.long_name ?? streetComponent?.short_name ?? "None";
+        const neighborhood = neighborhoodComponent?.long_name ?? neighborhoodComponent?.short_name ?? "None";
+        const city = cityComponent?.long_name ?? cityComponent?.short_name ?? "None";
 
         const userLocation = {
             place_id: data.place_id,
