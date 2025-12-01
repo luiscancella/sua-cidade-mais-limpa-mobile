@@ -6,6 +6,8 @@ interface CurrentLocationContextData {
     currentLocation?: UserLocation,
     saveCurrentLocation(value: UserLocation): Promise<boolean>,
     loadCurrentLocation(): Promise<boolean>,
+    isUserSavedOnServer(): Promise<boolean>,
+    isCurrentLocationSaved?: boolean,
     isLoading: boolean,
     error: string | null,
 }
@@ -44,9 +46,9 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 setIsLoading(false);
                 return false;
             }
-
+            
             const location = JSON.parse(result) as UserLocation;
-
+            
             setCurrentLocation(location);
             setIsLoading(false);
             return true;
@@ -54,6 +56,16 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             console.error("Failed to load location:", error);
             setError("Falha ao carregar a localização");
             setIsLoading(false);
+            return false;
+        }
+    }
+
+    async function isUserSavedOnServer(): Promise<boolean> {
+        try {
+            const userCreated = await SecureStore.getItemAsync("userCreatedOnServer");
+            return userCreated === "true";
+        } catch (error) {
+            console.error("Failed to check if user is saved on server:", error);
             return false;
         }
     }
@@ -68,6 +80,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 currentLocation,
                 saveCurrentLocation,
                 loadCurrentLocation,
+                isUserSavedOnServer,
                 isLoading,
                 error
             }}

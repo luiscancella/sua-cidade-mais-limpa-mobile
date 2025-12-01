@@ -16,7 +16,6 @@ class TruckWebSocketService {
             return;
         }
         
-        // Desconectar socket anterior se existir
         if (this.socket) {
             console.log("Desconectando socket anterior...");
             this.socket.disconnect();
