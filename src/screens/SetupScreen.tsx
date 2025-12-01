@@ -4,13 +4,13 @@ import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef, Styles
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import { SearchAddress } from "src/components/SearchAddress";
-import { GlobalContext } from "src/hooks/GlobalContext";
+import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import * as MapsApiService from "src/service/MapsApiService";
 import { GoogleReverseGeocodingApiPlace, GoogleReverseGeocodingApiResponse, UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
 
 export function SetupScreen() {
-    const { saveLocation } = useContext(GlobalContext);
+    const { saveCurrentLocation } = useCurrentLocation();
 
     const [isChecked, setChecked] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
@@ -70,7 +70,7 @@ export function SetupScreen() {
         setSelectedLocation(userLocation);
     };
 
-    function handleProsseguirButton() {
+    async function handleProsseguirButton() {
         if (!isChecked) {
             Alert.alert(
                 'Atenção',
@@ -87,7 +87,7 @@ export function SetupScreen() {
             return;
         }
         console.log("Location data salvando no contexto:", selectedLocation);
-        saveLocation(selectedLocation);
+        await saveCurrentLocation(selectedLocation);
     }
 
     return (

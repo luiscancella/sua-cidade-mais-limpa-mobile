@@ -5,10 +5,10 @@ import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ConfigurationSection } from "src/components/ConfigurationSection";
 import { SearchAddress } from "src/components/SearchAddress";
-import { GlobalContext } from "src/hooks/GlobalContext";
+import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 
 export function ConfigurationScreen() {
-    const { location } = useContext(GlobalContext);
+    const { currentLocation } = useCurrentLocation();
     const [garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled] = useState(false);
     const [newsEnabled, setNewsEnabled] = useState(false);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
@@ -24,10 +24,10 @@ export function ConfigurationScreen() {
     }, [newsEnabled]);
 
     useEffect(() => {
-        if (location && ref.current) {
-          ref.current?.setAddressText(location.short_address || location.full_address || "NÃO ENCONTRADO!");
+        if (currentLocation && ref.current) {
+          ref.current?.setAddressText(currentLocation.short_address || currentLocation.full_address || "NÃO ENCONTRADO!");
         }
-      }, [location]);
+      }, [currentLocation]);
 
     return (
         <SafeAreaView style={styles.container}>

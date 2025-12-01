@@ -3,21 +3,20 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
-import { GlobalContext } from "src/hooks/GlobalContext";
+import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { SearchAddress } from "src/components/SearchAddress";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { UserLocation } from "src/types";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
-import { is } from "zod/locales";
 
 export function HomeScreen() {
-  const { location, } = React.useContext(GlobalContext);
-  const [selectedPageLocation, setSelectedPageLocation] = useState<UserLocation | undefined>(location);
+  const { currentLocation } = useCurrentLocation();
+  const [selectedPageLocation, setSelectedPageLocation] = useState<UserLocation | undefined>(currentLocation);
   const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
-  const { TruckDistance, isConnected, error, reconnect } = useTruckDistances({ phone_id: location?.phone_id });
+  const { TruckDistance, isConnected, error, reconnect } = useTruckDistances({ phone_id: currentLocation?.phone_id });
 
   useEffect(() => {
     setEstimatedTimePreviewText(
@@ -50,8 +49,8 @@ export function HomeScreen() {
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: location?.latitude ?? 0,
-          longitude: location?.longitude ?? 0,
+          latitude: currentLocation?.latitude ?? 0,
+          longitude: currentLocation?.longitude ?? 0,
           latitudeDelta: 0.0143,
           longitudeDelta: 0.0134,
         }}
@@ -60,8 +59,8 @@ export function HomeScreen() {
       >
         <Marker
           coordinate={{
-            latitude: location?.latitude ?? 0,
-            longitude: location?.longitude ?? 0,
+            latitude: currentLocation?.latitude ?? 0,
+            longitude: currentLocation?.longitude ?? 0,
           }}
         />
       </MapView>

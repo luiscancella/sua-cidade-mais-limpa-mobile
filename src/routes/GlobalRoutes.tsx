@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { GlobalContext } from "src/hooks/GlobalContext";
+import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { HomeScreen } from "src/screens/HomeScreen";
 import { SplashScreen } from "src/screens/SplashScreen";
 import { SetupScreen } from "src/screens/SetupScreen";
@@ -13,7 +13,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export function AppRoutes() {
-    const { location, getLocation, saveLocation, isLoading } = React.useContext(GlobalContext);
+    const { currentLocation, isLoading } = useCurrentLocation();
 
     if (isLoading) {
         return (<SplashScreen />)
@@ -32,7 +32,7 @@ export function AppRoutes() {
 
     return (
         <NavigationContainer>
-            {location == null ? (
+            {currentLocation == null ? (
                 <Stack.Navigator initialRouteName={"Setup"} screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Setup" component={SetupScreen} />
                 </Stack.Navigator>

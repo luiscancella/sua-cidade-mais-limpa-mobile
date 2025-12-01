@@ -1,15 +1,26 @@
 import { StyleSheet, Text, View } from 'react-native';
 import 'react-native-get-random-values';
 
-import { GlobalContext, GlobalProvider } from 'src/hooks/GlobalContext';
+import { CurrentLocationProvider, useCurrentLocation } from 'src/hooks/useCurrentLocation';
+import { UserSyncProvider } from 'src/hooks/useUserSync';
 
 import { AppRoutes } from 'src/routes/GlobalRoutes';
 
+function AppContent() {
+  const { currentLocation } = useCurrentLocation();
+  
+  return (
+    <UserSyncProvider location={currentLocation}>
+      <AppRoutes />
+    </UserSyncProvider>
+  );
+}
+
 export default function App() {
   return (
-    <GlobalProvider>
-      <AppRoutes />
-    </GlobalProvider>
+    <CurrentLocationProvider>
+      <AppContent />
+    </CurrentLocationProvider>
   );
 }
 
