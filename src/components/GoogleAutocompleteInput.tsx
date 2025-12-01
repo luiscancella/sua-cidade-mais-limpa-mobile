@@ -1,15 +1,30 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import { GooglePlacesAutocomplete, GooglePlacesAutocompleteProps, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
+import { UserLocation } from "src/types";
+import UserMapper from "src/mapper/UserMapper";
 
 interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
     iconStyles?: React.CSSProperties;
+    onLocationSelected?: (location: UserLocation) => void;
 }
 
-export const SearchAddress = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
-    ({ icon, iconStyles, styles: propsStyle = {}, ...props }, ref) => {
+export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
+    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
+
+        const handleLocationPress = (data: any, details: any) => {
+            const userLocation = UserMapper.fromGoogleAutocomplete(data, details);
+            
+            if (!userLocation) {
+                console.error("Erro ao mapear localização do autocomplete");
+                return;
+            }
+
+            console.log("Localização selecionada no autocomplete:", userLocation);
+            onLocationSelected?.(userLocation);
+        };
 
         const renderedIcon = React.isValidElement(icon)
             ? React.cloneElement(icon, { style: [styles.icon, iconStyles] } as React.CSSProperties)
@@ -96,6 +111,7 @@ export const SearchAddress = React.forwardRef<GooglePlacesAutocompleteRef, Searc
                 onFail={(error) => console.error(error)}
                 onTimeout={() => console.error("TIMEOUT")}
                 onNotFound={() => console.warn("NOT FOUND SIMILAR ADDRESS")}
+                onPress={handleLocationPress}
                 keyboardShouldPersistTaps="handled"
                 styles={mergedStyles}
                 {...props}

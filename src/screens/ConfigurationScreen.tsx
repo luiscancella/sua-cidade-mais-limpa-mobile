@@ -1,17 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Switch, Text, View, } from "react-native";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ConfigurationSection } from "src/components/ConfigurationSection";
-import { SearchAddress } from "src/components/SearchAddress";
+import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { UserLocation } from "src/types";
 
 export function ConfigurationScreen() {
-    const { currentLocation } = useCurrentLocation();
+    const { currentLocation, saveCurrentLocation } = useCurrentLocation();
     const [garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled] = useState(false);
     const [newsEnabled, setNewsEnabled] = useState(false);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
+
+    const handleLocationChange = async (location: UserLocation) => {
+        await saveCurrentLocation(location);
+        console.log("Endereço principal atualizado:", location);
+    };
 
     useEffect(() => {
         // TODO: Implementar logica de mudança de botão
@@ -33,11 +39,12 @@ export function ConfigurationScreen() {
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Configurações</Text>
             <Text style={styles.addressSearchLabel}>Endereço Principal</Text>
-            <SearchAddress
+            <GoogleAutocompleteInput
                 ref={ref}
                 icon={<Ionicons name="location" size={24} color="#4AB469" />}
                 placeholder={"Buscar endereço"}
                 styles={searchAddressStyles}
+                onLocationSelected={handleLocationChange}
             />
             <ConfigurationSection
                 nameIcon="notifications"

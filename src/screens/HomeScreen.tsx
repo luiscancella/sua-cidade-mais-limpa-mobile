@@ -2,9 +2,9 @@ import React, { use, useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
-import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
+import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
-import { SearchAddress } from "src/components/SearchAddress";
+import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { UserLocation } from "src/types";
@@ -29,10 +29,6 @@ export function HomeScreen() {
   useEffect(() => {
     if(!isConnected) console.error("Erro desconhecido na conexão com o caminhão.", error);
   }, [isConnected]);
-
-  function handleLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
-
-  }
 
   useEffect(() => {
     if (selectedPageLocation) {
@@ -72,14 +68,14 @@ export function HomeScreen() {
           style={styles.topCardContainer}
         >
           <SafeAreaView>
-            <SearchAddress
+            <GoogleAutocompleteInput
               ref={ref}
               icon={<Ionicons name="location-outline" size={24} color="white" />}
               styles={searchAddressStyles}
               textInputProps={{
                 placeholderTextColor: "#fff",
               }}
-              onPress={handleLocationSelected}
+              onLocationSelected={setSelectedPageLocation}
             />
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />

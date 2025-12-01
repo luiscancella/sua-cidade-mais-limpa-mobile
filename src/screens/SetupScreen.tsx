@@ -1,27 +1,24 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
+import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
-import { SearchAddress } from "src/components/SearchAddress";
+import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import * as MapsApiService from "src/service/MapsApiService";
-import { GoogleReverseGeocodingApiPlace, GoogleReverseGeocodingApiResponse, UserLocation } from "src/types";
+import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
 
 export function SetupScreen() {
     const { saveCurrentLocation } = useCurrentLocation();
-
     const [isChecked, setChecked] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
     useEffect(() => {
-        if (selectedLocation !== undefined && ref.current) {
+        if (selectedLocation && ref.current) {
             ref.current.setAddressText(
-                selectedLocation.short_address ?
-                    selectedLocation.short_address :
-                    selectedLocation.full_address
+                selectedLocation.short_address || selectedLocation.full_address
             );
         }
     }, [selectedLocation]);
@@ -31,44 +28,26 @@ export function SetupScreen() {
             try {
                 console.log("Solicitando coordenadas do usuário...");
                 const coords = await MapsApiService.askForLocation();
-                // console.log("Coordenadas obtidas:");
-                // console.log(JSON.stringify(coords, null, 2));
-                try {
-                    const googleResponse : GoogleReverseGeocodingApiResponse = await MapsApiService.reverseGoogleGeocoding(coords);
-                    const firstResult : GoogleReverseGeocodingApiPlace = googleResponse.results[0];
-                    const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
-                    // console.log("Endereço mapeado pela localização do telefone:", userLocation);
-                    // console.log("Endereço obtido via Google Reverse Geocoding:");
-                    // console.log(JSON.stringify(googleResponse, null, 2));
-                    if (!userLocation) {
-                        console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
-                        return;
-                    }
-                    if (ref?.current?.getAddressText() === "") {
-                        setSelectedLocation(userLocation);
-                    }
-                } catch (error) {
-                    console.error("Erro ao obter endereço reverso:", error);
+                
+                const googleResponse = await MapsApiService.reverseGoogleGeocoding(coords);
+                const firstResult = googleResponse.results[0];
+                const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
+                
+                if (!userLocation) {
+                    console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
                     return;
                 }
+                
+                if (ref?.current?.getAddressText() === "") {
+                    setSelectedLocation(userLocation);
+                }
             } catch (error) {
-                console.error("Erro ao obter coordenadas do usuário:", error);
-                return;
+                console.error("Erro ao obter localização:", error);
             }
         }
 
         fetchCurrentLocationAndAddress();
     }, []);
-
-    function handleAutocompleteLocationSelected(data: GooglePlaceData, details: GooglePlaceDetail | null) {
-        let userLocation = UserMapper.fromGoogleAutocomplete(data, details);
-        if (!userLocation) {
-            console.error("Erro ao mapear localização do autocomplete");
-            return;
-        }
-        console.log("Localização selecionada no autocomplete:", userLocation);
-        setSelectedLocation(userLocation);
-    };
 
     async function handleProsseguirButton() {
         if (!isChecked) {
@@ -98,11 +77,11 @@ export function SetupScreen() {
                 </View>
                 <Text style={styles.title}>Sua Cidade <Text style={styles.coloredText}>+ Limpa</Text></Text>
                 <Text style={styles.inputLabel}>Digite seu endereço:</Text>
-                <SearchAddress
+                <GoogleAutocompleteInput
                     ref={ref}
                     styles={searchAddressStyles}
                     placeholder="Rua das Flores, 123 - Belo Horizonte"
-                    onPress={(data, details) => handleAutocompleteLocationSelected(data, details)}
+                    onLocationSelected={setSelectedLocation}
                 />
                 <View style={styles.checkboxContainer}>
                     <Checkbox
