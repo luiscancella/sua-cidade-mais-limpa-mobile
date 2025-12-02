@@ -8,10 +8,6 @@ interface AppProviderProps {
     children: ReactNode;
 }
 
-/**
- * Componente interno que consome o contexto de localização
- * e fornece os dados para o UserSyncProvider
- */
 function AppProviderContent({ children }: AppProviderProps) {
     const { currentLocation, setUserCreatedOnServer } = useCurrentLocation();
 
@@ -26,13 +22,6 @@ function AppProviderContent({ children }: AppProviderProps) {
     );
 }
 
-/**
- * Provider composto que agrupa todos os contexts da aplicação.
- * Ordem de providers (externo para interno):
- * 1. ErrorProvider - Gerenciamento global de erros
- * 2. CurrentLocationProvider - Gerenciamento de localização do usuário
- * 3. UserSyncProvider - Sincronização do usuário com o servidor
- */
 export function AppProvider({ children }: AppProviderProps) {
     return (
         <ErrorProvider>

@@ -6,8 +6,6 @@ export function GlobalErrorModal() {
     const { clearError, getState } = React.useContext(ErrorContext);
     const errorState = getState();
 
-    console.log("🟢 GlobalErrorModal renderizado, estado:", errorState);
-
     return (
         <ErrorModal
             visible={errorState.visible}

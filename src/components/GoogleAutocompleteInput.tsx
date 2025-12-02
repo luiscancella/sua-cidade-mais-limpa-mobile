@@ -8,10 +8,11 @@ interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
     iconStyles?: React.CSSProperties;
     onLocationSelected?: (location: UserLocation) => void;
+    onError?: (message: string) => void;
 }
 
 export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
-    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, ...props }, ref) => {
+    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null) {
@@ -19,6 +20,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
             
             if (!userLocation) {
                 console.error("Erro ao mapear localização do autocomplete");
+                onError?.("Não foi possível processar o endereço selecionado");
                 return;
             }
 

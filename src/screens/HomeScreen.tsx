@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { useError } from "src/hooks/useError";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,8 +12,8 @@ import { UserLocation } from "src/types";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 
 export function HomeScreen() {
-  const { currentLocation, userCreatedOnServer, clearData } = useCurrentLocation();
-  const [ selectedPageLocation, setSelectedPageLocation ] = useState<UserLocation | undefined>(currentLocation);
+  const { currentLocation, userCreatedOnServer, saveCurrentLocation } = useCurrentLocation();
+  const { showError } = useError();
   const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
@@ -34,14 +35,12 @@ export function HomeScreen() {
   }, [TruckDistance]);
 
   useEffect(() => {
-    if (selectedPageLocation) {
+    if (currentLocation) {
       ref.current?.setAddressText(
-        selectedPageLocation.short_address ||
-        selectedPageLocation.full_address ||
-        "NÃO ENCONTRADO!"
+        currentLocation.short_address
       );
     }
-  }, [selectedPageLocation]);
+  }, [currentLocation]);
 
   return (
     <>
@@ -78,7 +77,7 @@ export function HomeScreen() {
               textInputProps={{
                 placeholderTextColor: "#fff",
               }}
-              onLocationSelected={setSelectedPageLocation}
+              onLocationSelected={saveCurrentLocation}
             />
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />

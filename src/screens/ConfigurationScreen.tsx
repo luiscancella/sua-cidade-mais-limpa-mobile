@@ -6,17 +6,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ConfigurationSection } from "src/components/ConfigurationSection";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { useError } from "src/hooks/useError";
 import { UserLocation } from "src/types";
 
 export function ConfigurationScreen() {
     const { currentLocation, saveCurrentLocation } = useCurrentLocation();
-    const [garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled] = useState(false);
-    const [newsEnabled, setNewsEnabled] = useState(false);
+    const { showError } = useError();
+    const [ garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled ] = useState(false);
+    const [ newsEnabled, setNewsEnabled ] = useState(false);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
 
     const handleLocationChange = async (location: UserLocation) => {
-        await saveCurrentLocation(location);
-        console.log("Endereço principal atualizado:", location);
+        const success = await saveCurrentLocation(location);
+        if (!success) {
+            showError("Erro ao salvar endereço", [
+                "Não foi possível salvar o novo endereço. Tente novamente mais tarde."
+            ]);
+        } else {
+            console.log("Endereço principal atualizado:", location);
+        }
     };
 
     useEffect(() => {
@@ -31,7 +39,7 @@ export function ConfigurationScreen() {
 
     useEffect(() => {
         if (currentLocation && ref.current) {
-          ref.current?.setAddressText(currentLocation.short_address || currentLocation.full_address || "NÃO ENCONTRADO!");
+          ref.current?.setAddressText(currentLocation.short_address);
         }
       }, [currentLocation]);
 

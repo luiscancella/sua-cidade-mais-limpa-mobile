@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         marginTop: 10,
-        marginBottom: 20,
+        marginBottom: 16,
     },
     title: {
         fontSize: 20,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     },
     messageContainer: {
         width: '100%',
-        marginBottom: 25,
+        marginBottom: 20,
     },
     messageText: {
         fontSize: 14,

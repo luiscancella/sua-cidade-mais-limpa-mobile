@@ -37,14 +37,27 @@ export function SetupScreen() {
                 
                 if (!userLocation) {
                     console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
+                    showError("Erro ao obter localização", [
+                        "Não foi possível determinar seu endereço automaticamente. Por favor, digite seu endereço manualmente."
+                    ]);
                     return;
                 }
                 
                 if (ref?.current?.getAddressText() === "") {
                     setSelectedLocation(userLocation);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Erro ao obter localização:", error);
+                
+                if (error?.code === 'PERMISSION_DENIED') {
+                    showError("Permissão Necessária", [
+                        "Permissão de localização negada, digite seu endereço manualmente."
+                    ]);
+                } else {
+                    showError("Erro ao obter localização", [
+                        "Não foi possível obter sua localização automaticamente. Por favor, digite seu endereço manualmente."
+                    ]);
+                }
             }
         }
 
