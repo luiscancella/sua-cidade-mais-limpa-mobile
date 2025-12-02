@@ -8,11 +8,13 @@ import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import * as MapsApiService from "src/service/MapsApiService";
 import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
+import { useError } from "src/hooks/useError";
 
 export function SetupScreen() {
     const { saveCurrentLocation } = useCurrentLocation();
-    const [isChecked, setChecked] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
+    const { showError } = useError();
+    const [ isChecked, setChecked ] = useState(false);
+    const [ selectedLocation, setSelectedLocation ] = useState<UserLocation>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
     useEffect(() => {
@@ -50,23 +52,30 @@ export function SetupScreen() {
     }, []);
 
     async function handleProsseguirButton() {
+        const errors: string[] = [];
+        
         if (!isChecked) {
-            Alert.alert(
-                'Atenção',
-                'É necessário aceitar os termos e serviços!',
-            );
-            return;
+            errors.push("É necessário aceitar os termos e serviços!");
         }
         if (!selectedLocation) {
-            console.log("Location data is not set:", selectedLocation);
-            Alert.alert(
-                'Atenção',
-                'É necessário selecionar um endereço!',
-            );
+            errors.push("É necessário selecionar um endereço!");
+        }
+
+        if (errors.length > 0) {
+            showError("Atenção!", errors);
             return;
         }
-        console.log("Location data salvando no contexto:", selectedLocation);
-        await saveCurrentLocation(selectedLocation);
+
+        if (selectedLocation) {
+            console.log("Location data salvando no contexto:", selectedLocation);
+            let result = await saveCurrentLocation(selectedLocation);
+
+            if (!result) {
+                showError("Erro ao salvar localização", [
+                    "Não foi possível salvar sua localização. Tente novamente mais tarde."
+                ]);
+            }
+        }
     }
 
     return (
