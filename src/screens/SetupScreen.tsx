@@ -37,9 +37,9 @@ export function SetupScreen() {
                 
                 if (!userLocation) {
                     console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
-                    showError("Erro ao obter localização", [
-                        "Não foi possível determinar seu endereço automaticamente. Por favor, digite seu endereço manualmente."
-                    ]);
+                    showError(
+                        "Erro ao obter localização",
+                        "Não foi possível determinar seu endereço automaticamente. Por favor, digite seu endereço manualmente.");
                     return;
                 }
                 

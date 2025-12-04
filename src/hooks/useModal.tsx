@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface ModalContextData {
-    showError: (title: string, messages: string[]) => void;
+    showError: (title: string, messages: string[] | string) => void;
     clearError: () => void;
     getErrorState: () => ErrorState;
     showConfirmation: (title: string, message: string, target: string, onConfirm: () => void, onCancel?: () => void) => void;
@@ -12,7 +12,7 @@ interface ModalContextData {
 interface ErrorState {
     visible: boolean;
     title: string;
-    messages: string[];
+    messages: string[] | string;
 }
 
 interface ConfirmationState {
@@ -47,8 +47,8 @@ export function ModalProvider({ children }: ModalProviderProps) {
 
     const getErrorState = () => error;
 
-    const showError = (title: string, messages: string[]) => {
-        if (messages.length === 0) {
+    const showError = (title: string, messages: string[] | string) => {
+        if ((Array.isArray(messages) && messages.length === 0) || (typeof messages === 'string' && messages.trim() === '')) {
             console.error("Nenhuma mensagem de erro fornecida para exibir.");
             return;
         }

@@ -4,6 +4,7 @@ import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePla
 import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
 import { useModal } from "src/hooks/useModal";
+import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 
 interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
@@ -17,6 +18,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
     ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ignoreAlert = false, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
         const { showConfirmation } = useModal();
+        const { currentLocation } = useCurrentLocation();
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null) {
             const userLocation = UserMapper.fromGoogleAutocomplete(data, details);
@@ -31,14 +33,18 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 onLocationSelected?.(userLocation);
                 return;
             }
-            
+
             showConfirmation(
                 "Confirmação",
                 "Deseja alterar seu endereço para o endereço selecionado?",
                 userLocation.short_address,
                 () => onLocationSelected?.(userLocation),
-                () => { 
+                () => {
                     if (ref && typeof ref !== 'function' && ref.current) {
+                        if (currentLocation) {
+                            ref.current.setAddressText(currentLocation.short_address);
+                            return;
+                        }
                         ref.current.setAddressText('');
                     }
                 }
