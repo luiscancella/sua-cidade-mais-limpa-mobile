@@ -104,6 +104,7 @@ export function SetupScreen() {
                     styles={searchAddressStyles}
                     placeholder="Rua das Flores, 123 - Belo Horizonte"
                     onLocationSelected={setSelectedLocation}
+                    ignoreAlert={true}
                 />
                 <View style={styles.checkboxContainer}>
                     <Checkbox

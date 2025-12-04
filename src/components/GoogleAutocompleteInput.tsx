@@ -10,10 +10,11 @@ interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     iconStyles?: React.CSSProperties;
     onLocationSelected?: (location: UserLocation) => void;
     onError?: (message: string) => void;
+    ignoreAlert?: boolean;
 }
 
 export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
-    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ...props }, ref) => {
+    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ignoreAlert = false, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
         const { showConfirmation } = useModal();
 
@@ -26,6 +27,11 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 return;
             }
 
+            if (ignoreAlert) {
+                onLocationSelected?.(userLocation);
+                return;
+            }
+            
             showConfirmation(
                 "Confirmação",
                 "Deseja alterar seu endereço para o endereço selecionado?",
