@@ -1,12 +1,12 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { StyledButton } from './StyledButton';
+import { StyledButton } from '../../StyledButton';
 
 interface ErrorModalProps {
     visible: boolean;
     title: string;
-    message: string[];
+    message: string[] | string;
     onSuccess?: () => void;
     onClose?: () => void;
 }
@@ -44,17 +44,25 @@ export default function ErrorModal({ visible, title, message, onSuccess, onClose
                     </View>
 
                     <Text style={styles.title}>{title}</Text>
-
-                    <View style={styles.messageContainer}>
-                        {message.map((msg, index) => (
-                            <Text key={index} style={styles.messageText}>
-                                • {msg}
-                            </Text>
-                        ))}
-                    </View>
-
-                    <StyledButton 
-                        onPress={handleSuccess} 
+                    {
+                        typeof message === 'string' ? (
+                            <View style={styles.messageContainer}>
+                                <Text style={styles.messageText}>{message}</Text>
+                            </View>
+                        ) : (
+                            <View style={styles.messageContainer}>
+                                {
+                                    message.map((msg, index) => (
+                                        <Text key={index} style={styles.messageText}>
+                                            • {msg}
+                                        </Text>
+                                    ))
+                                }
+                            </View>
+                        )
+                    }
+                    <StyledButton
+                        onPress={handleSuccess}
                         style={styles.button}
                     >
                         <Text style={styles.buttonText}>Entendido</Text>

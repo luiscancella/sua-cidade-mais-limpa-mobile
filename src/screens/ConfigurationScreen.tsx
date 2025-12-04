@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ConfigurationSection } from "src/components/ConfigurationSection";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
-import { useError } from "src/hooks/useError";
+import { useError } from "src/hooks/useModal";
 import { UserLocation } from "src/types";
 
 export function ConfigurationScreen() {

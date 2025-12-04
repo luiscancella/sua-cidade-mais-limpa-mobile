@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
-import { useError } from "src/hooks/useError";
+import { useError } from "src/hooks/useModal";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,7 +12,7 @@ import { UserLocation } from "src/types";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 
 export function HomeScreen() {
-  const { currentLocation, userCreatedOnServer, saveCurrentLocation } = useCurrentLocation();
+  const { currentLocation, userCreatedOnServer, saveCurrentLocation, clearData } = useCurrentLocation();
   const { showError } = useError();
   const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);

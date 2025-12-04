@@ -1,10 +1,10 @@
 import React from 'react';
-import { ErrorContext } from 'src/hooks/useError';
+import { useModal } from 'src/hooks/useModal';
 import ErrorModal from './ErrorModal';
 
 export function GlobalErrorModal() {
-    const { clearError, getState } = React.useContext(ErrorContext);
-    const errorState = getState();
+    const { clearError, getErrorState } = useModal();
+    const errorState = getErrorState();
 
     return (
         <ErrorModal

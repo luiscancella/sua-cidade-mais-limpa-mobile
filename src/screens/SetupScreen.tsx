@@ -8,7 +8,7 @@ import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import * as MapsApiService from "src/service/MapsApiService";
 import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
-import { useError } from "src/hooks/useError";
+import { useError } from "src/hooks/useModal";
 
 export function SetupScreen() {
     const { saveCurrentLocation } = useCurrentLocation();

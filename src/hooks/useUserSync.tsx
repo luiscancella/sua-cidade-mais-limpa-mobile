@@ -10,16 +10,13 @@ interface UserSyncProviderProps {
     onUserCreated?: () => void;
 }
 
-/**
- * Provider responsável por sincronizar o usuário com o servidor.
- * Tenta criar o usuário no servidor quando a localização está disponível.
- */
 export const UserSyncProvider = ({ children, location, onUserCreated }: UserSyncProviderProps) => {
     React.useEffect(() => {
         let retryTimeout: NodeJS.Timeout;
 
         async function checkUserCreatedOnServer() {
-            if (!location) return;
+            if (!location || location === undefined) return;
+            else console.log("Location available for user sync:", location);
 
             const userCreated = await SecureStore.getItemAsync("userCreatedOnServer");
             if (userCreated) {
@@ -39,7 +36,7 @@ export const UserSyncProvider = ({ children, location, onUserCreated }: UserSync
             } catch (error) {
                 console.error("✗ Failed to create user on server:", error);
                 console.log("Retrying in 30 seconds...");
-
+                
                 retryTimeout = setTimeout(() => {
                     checkUserCreatedOnServer();
                 }, 30000);

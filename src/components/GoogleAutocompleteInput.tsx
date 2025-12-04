@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteProps, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
+import { useModal } from "src/hooks/useModal";
 
 interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
@@ -14,19 +15,30 @@ interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
 export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
     ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
+        const { showConfirmation } = useModal();
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null) {
             const userLocation = UserMapper.fromGoogleAutocomplete(data, details);
-            
+
             if (!userLocation) {
                 console.error("Erro ao mapear localização do autocomplete");
                 onError?.("Não foi possível processar o endereço selecionado");
                 return;
             }
 
-            console.log("Localização selecionada no autocomplete:", userLocation);
-            onLocationSelected?.(userLocation);
+            showConfirmation(
+                "Confirmação",
+                "Deseja alterar seu endereço para o endereço selecionado?",
+                userLocation.short_address,
+                () => onLocationSelected?.(userLocation),
+                () => { 
+                    if (ref && typeof ref !== 'function' && ref.current) {
+                        ref.current.setAddressText('');
+                    }
+                }
+            );
         };
+
 
         const renderedIcon = React.isValidElement(icon)
             ? React.cloneElement(icon, { style: [styles.icon, iconStyles] } as React.CSSProperties)
