@@ -49,7 +49,7 @@ export function HomeScreen() {
   useEffect(() => {
     setEstimatedTimePreviewText(
       TruckDistance
-        ? `${TruckDistance.etaMinutes} minutos`
+        ? `${Math.round(TruckDistance.etaMinutes)} minutos`
         : "Calculando..."
     );
   }, [TruckDistance]);
