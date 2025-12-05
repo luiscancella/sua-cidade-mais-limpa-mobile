@@ -3,6 +3,7 @@ import { CurrentLocationProvider } from 'src/hooks/useCurrentLocation';
 import { ModalProvider } from 'src/hooks/useModal';
 import { GlobalErrorModal } from 'src/components/modal/error/GlobalErrorModal';
 import { GlobalConfirmationModal } from 'src/components/modal/confirmation/GlobalConfirmationModal';
+import Toast from 'react-native-toast-message';
 
 interface AppProviderProps {
     children: ReactNode;
@@ -15,6 +16,7 @@ export function AppProvider({ children }: AppProviderProps) {
                 {children}
                 <GlobalErrorModal />
                 <GlobalConfirmationModal />
+                <Toast />
             </CurrentLocationProvider>
         </ModalProvider>
     );

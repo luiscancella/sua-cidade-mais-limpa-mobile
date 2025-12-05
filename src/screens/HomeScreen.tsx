@@ -9,6 +9,7 @@ import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput"
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
+import Toast from "react-native-toast-message";
 
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
@@ -20,9 +21,30 @@ export function HomeScreen() {
     // clearData();
   }, []);
 
-  const { TruckDistance, isConnected, error, reconnect } = useTruckDistances({ 
+  const { TruckDistance, isConnected, hasConnectedBefore } = useTruckDistances({ 
     phone_id: currentLocation?.phone_id
   });
+
+  useEffect(() => {
+    if (!isConnected && hasConnectedBefore) {
+      Toast.show({
+        type: 'error',
+        text1: 'Conexão perdida',
+        text2: 'A conexão com o caminhão de coleta de lixo foi perdida. Estamos tentando reconectar...',
+        position: 'top',
+        visibilityTime: 10000,
+      });
+    }
+    if (isConnected && hasConnectedBefore) {
+      Toast.show({
+        type: 'success',
+        text1: 'Conexão restabelecida',
+        text2: 'A conexão com o caminhão de coleta de lixo foi restabelecida.',
+        position: 'top',
+        visibilityTime: 10000,
+      });
+    }
+  }, [isConnected, hasConnectedBefore]);
 
   useEffect(() => {
     setEstimatedTimePreviewText(
