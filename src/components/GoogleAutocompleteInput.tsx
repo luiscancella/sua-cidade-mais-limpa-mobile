@@ -5,6 +5,8 @@ import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
 import { useModal } from "src/hooks/useModal";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import UserService from "src/service/UserService";
+import Toast from "react-native-toast-message";
 
 interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
@@ -21,7 +23,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
         const { currentLocation } = useCurrentLocation();
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null) {
-            const userLocation = UserMapper.fromGoogleAutocomplete(data, details);
+            const userLocation = UserMapper.fromGoogleAutocomplete(data, details, currentLocation);
 
             if (!userLocation) {
                 console.error("Erro ao mapear localização do autocomplete");
@@ -31,9 +33,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
 
             if (ignoreConfirmation) {
                 onLocationSelected?.(userLocation);
-                if (userLocation && ref && typeof ref !== 'function' && ref.current) {
-                    ref.current.setAddressText(userLocation.short_address);
-                }
+                changeInputText(userLocation.short_address);
                 return;
             }
 
@@ -41,18 +41,35 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 "Confirmação",
                 "Deseja alterar seu endereço para o endereço selecionado?",
                 userLocation.short_address,
-                () => onLocationSelected?.(userLocation),
                 () => {
-                    if (ref && typeof ref !== 'function' && ref.current) {
-                        if (currentLocation) {
-                            ref.current.setAddressText(currentLocation.short_address);
-                            return;
-                        }
-                        ref.current.setAddressText('');
-                    }
-                }
+                    UserService.createUser(
+                        userLocation.phone_id,
+                        userLocation
+                    ).then(() => {
+                        Toast.show({
+                            type: "success",
+                            text1: "Endereço atualizado com sucesso!"
+                        });
+                        onLocationSelected?.(userLocation)
+                        changeInputText(userLocation.short_address);
+                    }).catch((error) => {
+                        Toast.show({
+                            type: "error",
+                            text1: "Erro ao atualizar o endereço.",
+                            text2: error.message || "Tente novamente mais tarde."
+                        });
+                        changeInputText(currentLocation?.short_address ?? '');
+                    });
+                },
+                () => changeInputText(currentLocation?.short_address ?? '')
             );
         };
+
+        function changeInputText(address: string) {
+            if (ref && typeof ref !== 'function' && ref.current) {
+                ref.current.setAddressText(address);
+            }
+        }
 
         React.useEffect(() => {
             if (currentLocation && ref && typeof ref !== 'function' && ref.current) {

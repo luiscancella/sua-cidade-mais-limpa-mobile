@@ -59,7 +59,7 @@ class UserMapper {
         return UserLocationSchema.parse(userLocation);
     }
 
-    fromGoogleAutocomplete(data: GooglePlaceData, details: GooglePlaceDetail | null) {
+    fromGoogleAutocomplete(data: GooglePlaceData, details: GooglePlaceDetail | null, currentLocation?: UserLocation): UserLocation | undefined {
         if (details === null) {
             console.error('Atenção', 'Não foi possível obter os detalhes do endereço selecionado');
             return;
@@ -78,6 +78,7 @@ class UserMapper {
         const city = cityComponent?.long_name ?? cityComponent?.short_name;
 
         const userLocation = {
+            phone_id: currentLocation?.phone_id,
             place_id: data.place_id,
             latitude: details.geometry.location.lat,
             longitude: details.geometry.location.lng,

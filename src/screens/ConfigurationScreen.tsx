@@ -22,17 +22,6 @@ export function ConfigurationScreen() {
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const navigation = useNavigation<SetupScreenNavigationProp>();
 
-    const handleLocationChange = async (location: UserLocation) => {
-        const success = await saveCurrentLocation(location);
-        if (!success) {
-            showError("Erro ao salvar endereço", [
-                "Não foi possível salvar o novo endereço. Tente novamente mais tarde."
-            ]);
-        } else {
-            console.log("Endereço principal atualizado:", location);
-        }
-    };
-
     useEffect(() => {
         // TODO: Implementar logica de mudança de botão
         console.log("Mudando o estado da notificação:", garbageCollectionNotificationEnabled);
@@ -52,7 +41,8 @@ export function ConfigurationScreen() {
                 icon={<Ionicons name="location" size={24} color="#4AB469" />}
                 placeholder={"Buscar endereço"}
                 styles={searchAddressStyles}
-                onLocationSelected={handleLocationChange}
+                onLocationSelected={saveCurrentLocation}
+                onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
             />
             <ConfigurationSection
                 nameIcon="notifications"
