@@ -85,7 +85,7 @@ export function ConfigurationScreen() {
             <ConfigurationSection
                 nameIcon="information-circle"
                 title="Termos e Serviços"
-                onPress={() => console.log("Clicou em termos e serviços")}
+                onPress={() => navigation.navigate("TermsOfService")}
             >
             </ConfigurationSection>
         </SafeAreaView>

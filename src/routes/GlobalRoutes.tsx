@@ -3,12 +3,13 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { CommonActions } from "@react-navigation/native";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { HomeScreen } from "src/screens/HomeScreen";
 import { SplashScreen } from "src/screens/SplashScreen";
 import { SetupScreen } from "src/screens/SetupScreen";
-import { ConfigurationScreen } from "src/screens/ConfigurationScreen";
 import { TermsOfService } from "src/screens/TermsOfService";
+import ConfigurationRoute from "./ConfigurationRoute";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -35,8 +36,8 @@ export function AppRoutes() {
         <NavigationContainer>
             {currentLocation == null ? (
                 <Stack.Navigator initialRouteName={"Setup"} screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="Setup" component={SetupScreen} />
-                    <Stack.Screen name="TermsOfService" component={TermsOfService} />
+                    <Stack.Screen name="Setup" component={ SetupScreen } />
+                    <Stack.Screen name="TermsOfService" component={ TermsOfService } />
                 </Stack.Navigator>
             ) : (
                 <Tab.Navigator
@@ -48,17 +49,28 @@ export function AppRoutes() {
                 >
                     <Tab.Screen
                         name="Home"
-                        component={HomeScreen}
+                        component={ HomeScreen }
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "map", "map-outline")),
                         }}
                     />
                     <Tab.Screen
                         name="Configs"
-                        component={ConfigurationScreen}
+                        component={ ConfigurationRoute }
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "settings", "settings-outline"))
                         }}
+                        listeners={({ navigation }) => ({
+                            tabPress: (e) => {
+                                e.preventDefault();
+                                navigation.dispatch(
+                                    CommonActions.reset({
+                                        index: 0,
+                                        routes: [{ name: 'Configs' }],
+                                    })
+                                );
+                            },
+                        })}
                     />
                 </Tab.Navigator>
             )}
