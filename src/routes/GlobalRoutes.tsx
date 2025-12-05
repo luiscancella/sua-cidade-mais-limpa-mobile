@@ -60,17 +60,6 @@ export function AppRoutes() {
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "settings", "settings-outline"))
                         }}
-                        listeners={({ navigation }) => ({
-                            tabPress: (e) => {
-                                e.preventDefault();
-                                navigation.dispatch(
-                                    CommonActions.reset({
-                                        index: 0,
-                                        routes: [{ name: 'Configs' }],
-                                    })
-                                );
-                            },
-                        })}
                     />
                 </Tab.Navigator>
             )}
