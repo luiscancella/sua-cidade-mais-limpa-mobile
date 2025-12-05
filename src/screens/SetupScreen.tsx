@@ -12,14 +12,15 @@ import { useError } from "src/hooks/useModal";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "src/types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import UserService from "src/service/UserService";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
 export function SetupScreen() {
-    const { saveCurrentLocation } = useCurrentLocation();
+    const { saveCurrentLocation, clearData } = useCurrentLocation();
     const { showError } = useError();
-    const [isChecked, setChecked] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
+    const [ isChecked, setChecked ] = useState(false);
+    const [ selectedLocation, setSelectedLocation ] = useState<UserLocation>();
     const navigation = useNavigation<SetupScreenNavigationProp>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
@@ -87,13 +88,23 @@ export function SetupScreen() {
 
         if (selectedLocation) {
             console.log("Location data salvando no contexto:", selectedLocation);
-            let result = await saveCurrentLocation(selectedLocation);
+            try {
+                let result = await saveCurrentLocation(selectedLocation);
+                if (!result) {
+                    showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Tente novamente mais tarde.");
+                    console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");
+                    return;
+                }
 
-            if (!result) {
-                showError("Erro ao salvar localização", [
-                    "Não foi possível salvar sua localização. Tente novamente mais tarde."
-                ]);
+                await UserService.createUser(selectedLocation.phone_id, selectedLocation);
+                console.log("Usuário criado no servidor com sucesso.");
+            } catch (error) {
+                console.error("Erro ao criar usuário no servidor:", error);
+                showError("Erro ao salvar localização", "Não foi possível salvar sua localização no servidor. Tente novamente mais tarde.");
+                clearData();
+                return;
             }
+
         }
     }
 
@@ -109,8 +120,9 @@ export function SetupScreen() {
                     ref={ref}
                     styles={searchAddressStyles}
                     placeholder="Rua das Flores, 123 - Belo Horizonte"
+                    onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
                     onLocationSelected={setSelectedLocation}
-                    ignoreAlert={true}
+                    ignoreConfirmation={true}
                 />
                 <TouchableOpacity style={styles.checkboxContainer} onPress={() => setChecked(!isChecked)}>
                     <Checkbox

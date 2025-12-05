@@ -40,11 +40,11 @@ export function AppRoutes() {
                 </Stack.Navigator>
             ) : (
                 <Tab.Navigator
-                    initialRouteName={"Home"}
-                    screenOptions={{
-                        headerShown: false,
-                        tabBarActiveTintColor: "#0FAD83"
-                    }}
+                initialRouteName={"Home"}
+                screenOptions={{
+                    headerShown: false,
+                    tabBarActiveTintColor: "#0FAD83"
+                }}
                 >
                     <Tab.Screen
                         name="Home"

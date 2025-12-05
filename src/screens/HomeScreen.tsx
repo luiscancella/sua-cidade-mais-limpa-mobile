@@ -8,11 +8,10 @@ import { useError } from "src/hooks/useModal";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { UserLocation } from "src/types";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 
 export function HomeScreen() {
-  const { currentLocation, userCreatedOnServer, saveCurrentLocation, clearData } = useCurrentLocation();
+  const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
   const { showError } = useError();
   const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
@@ -22,8 +21,7 @@ export function HomeScreen() {
   }, []);
 
   const { TruckDistance, isConnected, error, reconnect } = useTruckDistances({ 
-    phone_id: currentLocation?.phone_id,
-    isUserSavedOnServer: userCreatedOnServer 
+    phone_id: currentLocation?.phone_id
   });
 
   useEffect(() => {
@@ -33,14 +31,6 @@ export function HomeScreen() {
         : "Calculando..."
     );
   }, [TruckDistance]);
-
-  useEffect(() => {
-    if (currentLocation) {
-      ref.current?.setAddressText(
-        currentLocation.short_address
-      );
-    }
-  }, [currentLocation]);
 
   return (
     <>
@@ -77,6 +67,7 @@ export function HomeScreen() {
               textInputProps={{
                 placeholderTextColor: "#fff",
               }}
+              onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
               onLocationSelected={saveCurrentLocation}
             />
             <View style={styles.estimatedTimeCardContainer}>

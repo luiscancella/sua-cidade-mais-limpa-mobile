@@ -10,12 +10,12 @@ interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
     iconStyles?: React.CSSProperties;
     onLocationSelected?: (location: UserLocation) => void;
-    onError?: (message: string) => void;
-    ignoreAlert?: boolean;
+    onError?: () => void;
+    ignoreConfirmation?: boolean;
 }
 
 export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
-    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ignoreAlert = false, ...props }, ref) => {
+    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ignoreConfirmation = false, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
         const { showConfirmation } = useModal();
         const { currentLocation } = useCurrentLocation();
@@ -25,12 +25,15 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
 
             if (!userLocation) {
                 console.error("Erro ao mapear localização do autocomplete");
-                onError?.("Não foi possível processar o endereço selecionado");
+                onError?.();
                 return;
             }
 
-            if (ignoreAlert) {
+            if (ignoreConfirmation) {
                 onLocationSelected?.(userLocation);
+                if (userLocation && ref && typeof ref !== 'function' && ref.current) {
+                    ref.current.setAddressText(userLocation.short_address);
+                }
                 return;
             }
 
@@ -50,6 +53,12 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 }
             );
         };
+
+        React.useEffect(() => {
+            if (currentLocation && ref && typeof ref !== 'function' && ref.current) {
+                ref.current.setAddressText(currentLocation.short_address);
+            }
+        }, [currentLocation, ref]);
 
 
         const renderedIcon = React.isValidElement(icon)

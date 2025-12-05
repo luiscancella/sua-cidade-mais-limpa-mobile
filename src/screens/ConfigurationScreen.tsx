@@ -1,4 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Switch, Text, View, } from "react-native";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
@@ -8,6 +10,9 @@ import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput"
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { useError } from "src/hooks/useModal";
 import { UserLocation } from "src/types";
+import { RootStackParamList } from "src/types/navigation";
+
+type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Configuration'>;
 
 export function ConfigurationScreen() {
     const { currentLocation, saveCurrentLocation } = useCurrentLocation();
@@ -15,6 +20,7 @@ export function ConfigurationScreen() {
     const [ garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled ] = useState(false);
     const [ newsEnabled, setNewsEnabled ] = useState(false);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
+    const navigation = useNavigation<SetupScreenNavigationProp>();
 
     const handleLocationChange = async (location: UserLocation) => {
         const success = await saveCurrentLocation(location);
@@ -36,12 +42,6 @@ export function ConfigurationScreen() {
         // TODO: Implementar logica de mudança de botão
         console.log("Mudando o estado das notícias:", newsEnabled);
     }, [newsEnabled]);
-
-    useEffect(() => {
-        if (currentLocation && ref.current) {
-          ref.current?.setAddressText(currentLocation.short_address);
-        }
-      }, [currentLocation]);
 
     return (
         <SafeAreaView style={styles.container}>

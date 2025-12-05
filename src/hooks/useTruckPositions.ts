@@ -5,19 +5,16 @@ import { TruckDistance } from "src/types";
 interface UseTruckDistancesProps {
     phone_id?: string;
     enabled?: boolean;
-    isUserSavedOnServer?: boolean;
 }
 
-export function useTruckDistances({ phone_id, enabled = true, isUserSavedOnServer = false }: UseTruckDistancesProps) {
-    const [TruckDistance, setTruckDistance] = useState<TruckDistance>();
-    const [isConnected, setIsConnected] = useState(false);
-    const [error, setError] = useState<string>();
+export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistancesProps) {
+    const [ TruckDistance, setTruckDistance ] = useState<TruckDistance>();
+    const [ isReconnected, setIsReconnected ] = useState(false);
+    const [ isConnected, setIsConnected ] = useState(false);
+    const [ error, setError ] = useState<string>();
 
     useEffect(() => {
-        if (!phone_id || !enabled || !isUserSavedOnServer) {
-            if (!isUserSavedOnServer) {
-                console.log("Aguardando sincronização com servidor...");
-            }
+        if (!phone_id || !enabled) {
             return;
         }
 
@@ -42,10 +39,10 @@ export function useTruckDistances({ phone_id, enabled = true, isUserSavedOnServe
         return () => {
             TruckWebSocketService.disconnect();
         };
-    }, [phone_id, enabled, isUserSavedOnServer]);
+    }, [phone_id, enabled]);
 
     const reconnect = useCallback(() => {
-        if (phone_id && isUserSavedOnServer) {
+        if (phone_id) {
             TruckWebSocketService.disconnect();
             setTimeout(() => {
                 TruckWebSocketService.connect(
@@ -55,7 +52,7 @@ export function useTruckDistances({ phone_id, enabled = true, isUserSavedOnServe
                 );
             }, 100);
         }
-    }, [phone_id, isUserSavedOnServer]);
+    }, [phone_id]);
 
     return {
         TruckDistance,
