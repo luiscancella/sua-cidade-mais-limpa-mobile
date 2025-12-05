@@ -9,12 +9,18 @@ import * as MapsApiService from "src/service/MapsApiService";
 import { UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
 import { useError } from "src/hooks/useModal";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "src/types/navigation";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
 export function SetupScreen() {
     const { saveCurrentLocation } = useCurrentLocation();
     const { showError } = useError();
-    const [ isChecked, setChecked ] = useState(false);
-    const [ selectedLocation, setSelectedLocation ] = useState<UserLocation>();
+    const [isChecked, setChecked] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
+    const navigation = useNavigation<SetupScreenNavigationProp>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
     useEffect(() => {
@@ -30,11 +36,11 @@ export function SetupScreen() {
             try {
                 console.log("Solicitando coordenadas do usuário...");
                 const coords = await MapsApiService.askForLocation();
-                
+
                 const googleResponse = await MapsApiService.reverseGoogleGeocoding(coords);
                 const firstResult = googleResponse.results[0];
                 const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
-                
+
                 if (!userLocation) {
                     console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
                     showError(
@@ -42,13 +48,13 @@ export function SetupScreen() {
                         "Não foi possível determinar seu endereço automaticamente. Por favor, digite seu endereço manualmente.");
                     return;
                 }
-                
+
                 if (ref?.current?.getAddressText() === "") {
                     setSelectedLocation(userLocation);
                 }
             } catch (error: any) {
                 console.error("Erro ao obter localização:", error);
-                
+
                 if (error?.code === 'PERMISSION_DENIED') {
                     showError("Permissão Necessária", [
                         "Permissão de localização negada, digite seu endereço manualmente."
@@ -66,7 +72,7 @@ export function SetupScreen() {
 
     async function handleProsseguirButton() {
         const errors: string[] = [];
-        
+
         if (!isChecked) {
             errors.push("É necessário aceitar os termos e serviços!");
         }
@@ -106,13 +112,17 @@ export function SetupScreen() {
                     onLocationSelected={setSelectedLocation}
                     ignoreAlert={true}
                 />
-                <View style={styles.checkboxContainer}>
+                <TouchableOpacity style={styles.checkboxContainer} onPress={() => setChecked(!isChecked)}>
                     <Checkbox
                         value={isChecked}
                         onValueChange={setChecked}
                     />
-                    <Text style={styles.checkboxLabel}>Aceito os <Text style={styles.coloredText}>Termos de Serviço</Text></Text>
-                </View>
+                    <TouchableOpacity onPress={() => {
+                        navigation.navigate("TermsOfService");
+                    }}>
+                        <Text style={styles.checkboxLabel}>Aceito os <Text style={styles.coloredText}>Termos de Serviço</Text></Text>
+                    </TouchableOpacity>
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.buttonContainer}
                     onPress={() => handleProsseguirButton()}
