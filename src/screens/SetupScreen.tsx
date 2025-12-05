@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "src/types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import UserService from "src/service/UserService";
+import Logo from "src/components/Logo";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
@@ -111,9 +112,7 @@ export function SetupScreen() {
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
             <View style={styles.card}>
-                <View style={styles.logoContainer}>
-                    <Ionicons name="leaf" size={24} color="white" />
-                </View>
+                <Logo />
                 <Text style={styles.title}>Sua Cidade <Text style={styles.coloredText}>+ Limpa</Text></Text>
                 <Text style={styles.inputLabel}>Digite seu endereço:</Text>
                 <GoogleAutocompleteInput
@@ -165,22 +164,6 @@ const styles = StyleSheet.create({
         shadowRadius: 11.6,
         // Android
         elevation: 4,
-    },
-    logoContainer: {
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#4CAF50",
-        borderRadius: 50,
-        width: 50,
-        height: 50,
-        alignSelf: "center",
-        // iOS
-        shadowColor: "#4CAF50",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.61, // 9C em hex ≈ 156/255 = 0.61
-        shadowRadius: 5.5,
-        // Android
-        elevation: 5,
     },
     title: {
         marginTop: 15,
