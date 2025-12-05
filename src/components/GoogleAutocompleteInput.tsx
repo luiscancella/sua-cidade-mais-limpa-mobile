@@ -19,10 +19,11 @@ interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
 export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
     ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ignoreConfirmation = false, ...props }, ref) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
-        const { showConfirmation } = useModal();
+        const { showConfirmation, showError } = useModal();
         const { currentLocation } = useCurrentLocation();
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null) {
+            changeInputText("Salvando endereço...");
             const userLocation = UserMapper.fromGoogleAutocomplete(data, details, currentLocation);
 
             if (!userLocation) {
@@ -46,6 +47,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                         userLocation.phone_id,
                         userLocation
                     ).then(() => {
+                        console.log("Endereço do usuário atualizado com sucesso.");
                         Toast.show({
                             type: "success",
                             text1: "Endereço atualizado com sucesso!"
@@ -53,11 +55,8 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                         onLocationSelected?.(userLocation)
                         changeInputText(userLocation.short_address);
                     }).catch((error) => {
-                        Toast.show({
-                            type: "error",
-                            text1: "Erro ao atualizar o endereço.",
-                            text2: error.message || "Tente novamente mais tarde."
-                        });
+                        console.error("Erro ao atualizar endereço do usuário:", error);
+                        showError("Erro ao atualizar o endereço", "Tente novamente mais tarde.");
                         changeInputText(currentLocation?.short_address ?? '');
                     });
                 },

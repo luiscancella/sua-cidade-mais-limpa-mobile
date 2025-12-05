@@ -10,18 +10,20 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 import Toast from "react-native-toast-message";
+import { UserLocation } from "src/types";
 
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
   const { showError } = useError();
   const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
+  const mapRef = React.useRef<MapView | null>(null);
 
   useEffect(() => {
     // clearData();
   }, []);
 
-  const { TruckDistance, isConnected, hasConnectedBefore } = useTruckDistances({ 
+  const { TruckDistance, isConnected, hasConnectedBefore, setHasConnectedBefore, reconnect } = useTruckDistances({ 
     phone_id: currentLocation?.phone_id
   });
 
@@ -54,9 +56,34 @@ export function HomeScreen() {
     );
   }, [TruckDistance]);
 
+  useEffect(() => {
+    if (currentLocation && mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
+        latitudeDelta: 0.0143,
+        longitudeDelta: 0.0134,
+      }, 1000);
+    }
+  }, [currentLocation]);
+
+  async function handleLocationSelection(userLocation: UserLocation) {
+    try {
+      saveCurrentLocation(userLocation);
+      setEstimatedTimePreviewText("Calculando...");
+      reconnect();
+      setHasConnectedBefore(false);
+    } catch (error) {
+      console.error("Erro ao salvar localização selecionada:", error);
+      showError("Erro ao salvar localização", "Não foi possível salvar a localização selecionada. Por favor, tente novamente.");
+    }
+    ref.current?.setAddressText(currentLocation?.short_address ?? "");
+  }
+
   return (
     <>
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={{
           latitude: currentLocation?.latitude ?? 0,
@@ -90,7 +117,7 @@ export function HomeScreen() {
                 placeholderTextColor: "#fff",
               }}
               onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
-              onLocationSelected={saveCurrentLocation}
+              onLocationSelected={handleLocationSelection}
             />
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />

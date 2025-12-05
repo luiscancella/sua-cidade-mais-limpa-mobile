@@ -47,7 +47,7 @@ export default function ErrorModal({ visible, title, message, onSuccess, onClose
                     {
                         typeof message === 'string' ? (
                             <View style={styles.messageContainer}>
-                                <Text style={styles.messageText}>{message}</Text>
+                                <Text style={[styles.messageText, {textAlign: 'center'}]}>{message}</Text>
                             </View>
                         ) : (
                             <View style={styles.messageContainer}>

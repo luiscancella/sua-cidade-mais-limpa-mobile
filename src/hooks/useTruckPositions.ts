@@ -61,5 +61,6 @@ export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistance
         error,
         reconnect,
         hasConnectedBefore,
+        setHasConnectedBefore,
     };
 }
