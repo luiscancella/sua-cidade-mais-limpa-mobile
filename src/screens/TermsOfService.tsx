@@ -53,7 +53,21 @@ export function TermsOfService() {
                     </Text>
                     <Text style={styles.subtitle}>4. DESCRIÇÃO DO SERVIÇO</Text>
                     <Text style={styles.description}>
-                        TODO: Implementar
+                        O "Sua Cidade Mais Limpa" é um aplicativo móvel desenvolvido para conectar os cidadãos ao serviço de coleta de lixo urbano da sua região. Por meio de tecnologia de rastreamento em tempo real e geolocalização, o aplicativo oferece uma solução moderna e eficiente para que os moradores acompanhem os horários de coleta de resíduos em seus endereços.
+                        {"\n"}{"\n"}
+                        O aplicativo funciona como uma ponte de comunicação entre o serviço público de limpeza urbana e a população, proporcionando transparência e acessibilidade às informações sobre a coleta de lixo domiciliar. Utilizando dados de GPS e integração com a frota de caminhões de coleta, o sistema calcula e apresenta estimativas precisas de chegada dos veículos coletores.
+                        {"\n"}{"\n"}
+                        O aplicativo traz diversos benefícios práticos para o dia a dia dos cidadãos. Ao saber exatamente quando o caminhão de coleta passará, o usuário evita deixar o lixo exposto na calçada por longos períodos, reduzindo problemas com animais, mau cheiro e poluição visual. Não é mais necessário ficar atento a horários fixos ou esperar por períodos indeterminados, pois o usuário pode consultar a estimativa de chegada a qualquer momento e se programar adequadamente.
+                        {"\n"}{"\n"}
+                        Com informações precisas, os cidadãos podem dispor seus resíduos no momento certo, contribuindo para uma cidade mais limpa e organizada, evitando acúmulo de lixo nas vias públicas. O aplicativo promove maior transparência nos serviços públicos, permitindo que os cidadãos acompanhem e validem a execução do serviço de coleta em suas regiões, oferecendo uma interface intuitiva e amigável, com recursos de busca de endereços, visualização em mapa e notificações personalizáveis, tornando a experiência simples e acessível para todos os públicos.
+                        {"\n"}{"\n"}
+                        O usuário pode cadastrar seu endereço principal para receber informações personalizadas sobre a coleta de lixo em sua localização. O aplicativo fornece uma estimativa em tempo real de quando o caminhão de coleta de lixo chegará ao endereço cadastrado do usuário, com base na localização atual dos veículos. A interface com mapa interativo permite visualizar a localização do usuário e acompanhar as informações de coleta de forma visual e intuitiva.
+                        {"\n"}{"\n"}
+                        O sistema de busca inteligente permite pesquisar e selecionar diferentes endereços para consultar informações de coleta em múltiplas localidades. O usuário pode optar por receber notificações push sobre os horários de coleta próximos e atualizações importantes do serviço, sendo esta funcionalidade totalmente configurável. O painel de configurações permite ao usuário gerenciar suas preferências de notificação, atualizar seu endereço principal e ajustar outras opções do aplicativo conforme sua necessidade.
+                        {"\n"}{"\n"}
+                        O serviço utiliza tecnologia de geolocalização (GPS), integração com sistemas de rastreamento de veículos de coleta e APIs de mapas para fornecer informações precisas e atualizadas aos usuários. Todas as informações de localização e dados pessoais fornecidos pelos usuários são tratados com o máximo rigor de segurança, em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD) e conforme descrito na Política de Privacidade deste aplicativo.
+                        {"\n"}{"\n"}
+                        O aplicativo não compartilha dados pessoais dos usuários com terceiros para fins comerciais e utiliza as informações exclusivamente para a prestação do serviço de informação sobre coleta de lixo, garantindo a privacidade e segurança dos dados dos cidadãos que utilizam a plataforma.
                     </Text>
 
                     <Text style={styles.subtitle}>5. DIREITOS DO USUÁRIO</Text>
