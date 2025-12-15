@@ -15,7 +15,7 @@ import { UserLocation } from "src/types";
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
   const { showError } = useError();
-  const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
+  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
   const mapRef = React.useRef<MapView | null>(null);
 
@@ -23,21 +23,21 @@ export function HomeScreen() {
     // clearData();
   }, []);
 
-  const { TruckDistance, isConnected, hasConnectedBefore, setHasConnectedBefore, reconnect } = useTruckDistances({ 
+  const { TruckDistance, isConnected, connectionCount, setConnectionCount, reconnect } = useTruckDistances({
     phone_id: currentLocation?.phone_id
   });
 
   useEffect(() => {
-    if (!isConnected && hasConnectedBefore) {
+    if (!isConnected && connectionCount > 0) {
       Toast.show({
         type: 'error',
         text1: 'Conexão perdida',
-        text2: 'A conexão com o caminhão de coleta de lixo foi perdida. Estamos tentando reconectar...',
+        text2: 'A conexão com o caminhão de coleta de lixo foi perdida',
         position: 'top',
-        visibilityTime: 10000,
+        visibilityTime: 7000,
       });
     }
-    if (isConnected && hasConnectedBefore) {
+    if (isConnected && connectionCount > 1) {
       Toast.show({
         type: 'success',
         text1: 'Conexão restabelecida',
@@ -46,7 +46,7 @@ export function HomeScreen() {
         visibilityTime: 7000,
       });
     }
-  }, [isConnected, hasConnectedBefore]);
+  }, [isConnected]);
 
   useEffect(() => {
     setEstimatedTimePreviewText(
@@ -72,7 +72,7 @@ export function HomeScreen() {
       saveCurrentLocation(userLocation);
       setEstimatedTimePreviewText("Calculando...");
       reconnect();
-      setHasConnectedBefore(false);
+      setConnectionCount(0);
     } catch (error) {
       console.error("Erro ao salvar localização selecionada:", error);
       showError("Erro ao salvar localização", "Não foi possível salvar a localização selecionada. Por favor, tente novamente.");

@@ -9,7 +9,7 @@ interface UseTruckDistancesProps {
 
 export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistancesProps) {
     const [ TruckDistance, setTruckDistance ] = useState<TruckDistance>();
-    const [ hasConnectedBefore, setHasConnectedBefore ] = useState(false);
+    const [ connectionCount, setConnectionCount ] = useState(0);
     const [ isConnected, setIsConnected ] = useState(false);
     const [ error, setError ] = useState<string>();
 
@@ -26,7 +26,7 @@ export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistance
                 },
                 (connected : boolean) => {
                     setIsConnected(connected);
-                    setHasConnectedBefore(true);
+                    setConnectionCount(connectionCount + 1);
                     if (!connected) {
                         setError("Conexão perdida");
                     }
@@ -60,7 +60,7 @@ export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistance
         isConnected,
         error,
         reconnect,
-        hasConnectedBefore,
-        setHasConnectedBefore,
+        connectionCount,
+        setConnectionCount,
     };
 }
