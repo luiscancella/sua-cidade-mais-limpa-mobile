@@ -14,6 +14,7 @@ import { RootStackParamList } from "src/types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import UserService from "src/service/UserService";
 import Logo from "src/components/Logo";
+import Toast from "react-native-toast-message";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
@@ -53,19 +54,16 @@ export function SetupScreen() {
 
                 if (ref?.current?.getAddressText() === "") {
                     setSelectedLocation(userLocation);
+                    Toast.show({
+                        type: "info",
+                        text1: "Endereço definido",
+                        text2: "Seu endereço foi definido automaticamente com base na sua localização atual.",
+                        visibilityTime: 6000,
+                    });
+                    console.log("Endereço do usuário definido automaticamente:", userLocation.full_address);
                 }
             } catch (error: any) {
                 console.error("Erro ao obter localização:", error);
-
-                if (error?.code === 'PERMISSION_DENIED') {
-                    showError("Permissão Necessária", [
-                        "Permissão de localização negada, digite seu endereço manualmente."
-                    ]);
-                } else {
-                    showError("Erro ao obter localização", [
-                        "Não foi possível obter sua localização automaticamente. Por favor, digite seu endereço manualmente."
-                    ]);
-                }
             }
         }
 

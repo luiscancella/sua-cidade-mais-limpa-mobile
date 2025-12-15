@@ -43,7 +43,7 @@ export function HomeScreen() {
         text1: 'Conexão restabelecida',
         text2: 'A conexão com o caminhão de coleta de lixo foi restabelecida.',
         position: 'top',
-        visibilityTime: 10000,
+        visibilityTime: 7000,
       });
     }
   }, [isConnected, hasConnectedBefore]);
