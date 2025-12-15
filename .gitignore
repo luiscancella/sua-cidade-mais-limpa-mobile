@@ -37,7 +37,8 @@ yarn-error.*
 *.tsbuildinfo
 
 # Env
-.env*
+.env
+.env.local
 
 # Others
 todo

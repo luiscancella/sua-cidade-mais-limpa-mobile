@@ -7,6 +7,7 @@ import { useModal } from "src/hooks/useModal";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import UserService from "src/service/UserService";
 import Toast from "react-native-toast-message";
+import Constants from "expo-constants";
 
 interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
@@ -139,7 +140,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 placeholder='Buscar Endereço'
                 renderLeftButton={() => renderedIcon}
                 query={{
-                    key: 'AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE',
+                    key: Constants.expoConfig?.extra?.googleMapsApiKey || '',
                     language: 'pt',
                     components: 'country:br',
                     types: 'address',
