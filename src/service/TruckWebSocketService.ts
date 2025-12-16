@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { TruckDistance, TruckDistanceSchema } from "src/types";
+import Constants from "expo-constants";
 
 type TruckDistanceCallback = (trucks: TruckDistance) => void;
 type ConnectionStatusCallback = (connected: boolean) => void;
