@@ -15,7 +15,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export function AppRoutes() {
-    const { currentLocation, isLoading } = useCurrentLocation();
+    const { currentLocation, isLoading, createdOnServer } = useCurrentLocation();
 
     if (isLoading) {
         return (<SplashScreen />)
@@ -34,29 +34,29 @@ export function AppRoutes() {
 
     return (
         <NavigationContainer>
-            {currentLocation == null ? (
+            {currentLocation == null || !createdOnServer ? (
                 <Stack.Navigator initialRouteName={"Setup"} screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="Setup" component={ SetupScreen } />
-                    <Stack.Screen name="TermsOfService" component={ TermsOfService } />
+                    <Stack.Screen name="Setup" component={SetupScreen} />
+                    <Stack.Screen name="TermsOfService" component={TermsOfService} />
                 </Stack.Navigator>
             ) : (
                 <Tab.Navigator
-                initialRouteName={"Home"}
-                screenOptions={{
-                    headerShown: false,
-                    tabBarActiveTintColor: "#0FAD83"
-                }}
+                    initialRouteName={"Home"}
+                    screenOptions={{
+                        headerShown: false,
+                        tabBarActiveTintColor: "#0FAD83"
+                    }}
                 >
                     <Tab.Screen
                         name="Home"
-                        component={ HomeScreen }
+                        component={HomeScreen}
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "map", "map-outline")),
                         }}
                     />
                     <Tab.Screen
                         name="Configs"
-                        component={ ConfigurationRoute }
+                        component={ConfigurationRoute}
                         options={{
                             tabBarIcon: ((props) => setTabIcon(props, "settings", "settings-outline"))
                         }}

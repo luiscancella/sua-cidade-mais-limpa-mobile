@@ -6,6 +6,8 @@ interface CurrentLocationContextData {
     currentLocation?: UserLocation,
     saveCurrentLocation(value: UserLocation): Promise<boolean>,
     loadCurrentLocation(): Promise<boolean>,
+    createdOnServer: boolean,
+    setCreatedOnServer: (value: boolean) => void,
     isLoading: boolean,
     error: string | null,
     clearData(): Promise<void>,
@@ -14,9 +16,10 @@ interface CurrentLocationContextData {
 const CurrentLocationContext = React.createContext<CurrentLocationContextData>({} as CurrentLocationContextData);
 
 export const CurrentLocationProvider = ({ children }: { children: React.ReactNode }) => {
-    const [currentLocation, setCurrentLocation] = React.useState<UserLocation>();
-    const [isLoading, setIsLoading] = React.useState<boolean>(true);
-    const [error, setError] = React.useState<string | null>(null);
+    const [ currentLocation, setCurrentLocation ] = React.useState<UserLocation>();
+    const [ createdOnServer, setCreatedOnServer ] = React.useState<boolean>(false);
+    const [ isLoading, setIsLoading ] = React.useState<boolean>(true);
+    const [ error, setError ] = React.useState<string | null>(null);
 
     async function saveCurrentLocation(value: UserLocation): Promise<boolean> {
         if (JSON.stringify(value).length > 2048) {
@@ -49,6 +52,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             const location = JSON.parse(result) as UserLocation;
             
             setCurrentLocation(location);
+            setCreatedOnServer(true);
             setIsLoading(false);
             return true;
         } catch (error) {
@@ -79,6 +83,8 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 currentLocation,
                 saveCurrentLocation,
                 loadCurrentLocation,
+                createdOnServer,
+                setCreatedOnServer,
                 isLoading,
                 error,
                 clearData,

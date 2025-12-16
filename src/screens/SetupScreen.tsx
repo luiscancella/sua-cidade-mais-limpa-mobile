@@ -19,7 +19,7 @@ import Toast from "react-native-toast-message";
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
 export function SetupScreen() {
-    const { saveCurrentLocation, clearData } = useCurrentLocation();
+    const { saveCurrentLocation, clearData, setCreatedOnServer } = useCurrentLocation();
     const { showError } = useError();
     const [ isChecked, setChecked ] = useState(false);
     const [ selectedLocation, setSelectedLocation ] = useState<UserLocation>();
@@ -87,6 +87,7 @@ export function SetupScreen() {
 
         if (selectedLocation) {
             console.log("Location data salvando no contexto:", selectedLocation);
+
             try {
                 let result = await saveCurrentLocation(selectedLocation);
                 if (!result) {
@@ -94,8 +95,15 @@ export function SetupScreen() {
                     console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");
                     return;
                 }
+            } catch (error) {
+                showError("Erro ao salvar localização", "Não foi possível salvar sua localização localmente. Tente novamente mais tarde.");
+                clearData();
+                return;
+            }
 
+            try {
                 await UserService.createUser(selectedLocation.phone_id, selectedLocation);
+                setCreatedOnServer(true);
                 console.log("Usuário criado no servidor com sucesso.");
             } catch (error) {
                 console.error("Erro ao criar usuário no servidor:", error);
@@ -103,7 +111,6 @@ export function SetupScreen() {
                 clearData();
                 return;
             }
-
         }
     }
 
