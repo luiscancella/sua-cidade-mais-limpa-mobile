@@ -52,8 +52,6 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: 10,
     },
     sectionCollapsed: {
         borderBottomLeftRadius: 0,
@@ -68,7 +66,7 @@ const styles = StyleSheet.create({
     icon: {
     },
     topicContainer: {
-        width: "78%",
+        flex: 1,
         marginLeft: 9,
     },
     topicTitle: {
