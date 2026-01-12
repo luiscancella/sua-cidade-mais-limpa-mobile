@@ -85,6 +85,11 @@ export function SetupScreen() {
             return;
         }
 
+        if (selectedLocation?.city !== "Machado" && selectedLocation?.city !== "Ribeirão das Neves") {
+            showError("Área não atendida", "No momento, nosso serviço está disponível apenas para as cidades de Machado e Ribeirão das Neves. Estamos trabalhando para expandir nossa cobertura em breve!");
+            return;
+        }
+
         if (selectedLocation) {
             console.log("Location data salvando no contexto:", selectedLocation);
 
