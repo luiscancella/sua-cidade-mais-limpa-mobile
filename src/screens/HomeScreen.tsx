@@ -101,7 +101,7 @@ export function HomeScreen() {
           }}
         />
       </MapView>
-      <View style={styles.container}>
+      <View style={styles.container} pointerEvents="box-none">
         <LinearGradient
           colors={["#1CB788", "#19AB89"]}
           start={{ x: 0.5, y: 0 }}

@@ -14,7 +14,7 @@ export async function askForLocation(): Promise<Location.LocationObject> {
 export async function reverseGoogleGeocoding(coords: Location.LocationObject): Promise<GoogleReverseGeocodingApiResponse> {
     const params = {
         latlng: `${coords.coords.latitude},${coords.coords.longitude}`,
-        key: "AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE",
+        key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
         result_type: "street_address",
     };
 
