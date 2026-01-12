@@ -33,6 +33,11 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 return;
             }
 
+            if (userLocation?.city !== "Machado" && userLocation?.city !== "Ribeirão das Neves") {
+                showError("Área não atendida", "No momento, nosso serviço está disponível apenas para as cidades de Machado e Ribeirão das Neves. Estamos trabalhando para expandir nossa cobertura em breve!");
+                return;
+            }
+
             if (ignoreConfirmation) {
                 onLocationSelected?.(userLocation);
                 changeInputText(userLocation.short_address);
