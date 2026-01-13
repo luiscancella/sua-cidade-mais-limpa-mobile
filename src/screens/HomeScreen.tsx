@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MapView, { Marker, PROVIDER_DEFAULT, } from "react-native-maps";
+import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE, } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { useError } from "src/hooks/useModal";
@@ -92,7 +92,7 @@ export function HomeScreen() {
           longitudeDelta: 0.0134,
         }}
         loadingEnabled={true}
-        provider={PROVIDER_DEFAULT}
+        provider={PROVIDER_GOOGLE}
       >
         <Marker
           coordinate={{
@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   topCardContainer: {
-    backgroundColor: "#D9D9D9",
     paddingHorizontal: 25,
     paddingBottom: 15,
     borderBottomLeftRadius: 37,

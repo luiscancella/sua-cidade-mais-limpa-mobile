@@ -21,8 +21,8 @@ type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, '
 export function SetupScreen() {
     const { saveCurrentLocation, clearData, setCreatedOnServer } = useCurrentLocation();
     const { showError } = useError();
-    const [ isChecked, setChecked ] = useState(false);
-    const [ selectedLocation, setSelectedLocation ] = useState<UserLocation>();
+    const [isChecked, setChecked] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
     const navigation = useNavigation<SetupScreenNavigationProp>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
@@ -49,6 +49,12 @@ export function SetupScreen() {
                     showError(
                         "Erro ao obter localização",
                         "Não foi possível determinar seu endereço automaticamente. Por favor, digite seu endereço manualmente.");
+                    return;
+                }
+
+                if (userLocation?.city !== "Machado" && userLocation?.city !== "Ribeirão das Neves") {
+                    console.error("Área não atendida:", userLocation?.city);
+                    showError("Área não atendida", "Detectamos que sua localização está fora da área atendida. No momento, nosso serviço está disponível apenas para as cidades de Machado e Ribeirão das Neves. Estamos trabalhando para expandir nossa cobertura em breve!");
                     return;
                 }
 
