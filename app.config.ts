@@ -15,6 +15,7 @@ module.exports = {
     ios: {
       supportsTablet: true,
       config: {
+        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
       }
     },
     android: {
@@ -26,7 +27,7 @@ module.exports = {
       package: "com.anonymous.suacidademaislimpa",
       config: {
         googleMaps: {
-          apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+          apiKey: process.env.GOOGLE_MAPS_API_KEY
         }
       }
     },
@@ -36,7 +37,8 @@ module.exports = {
     extra: {
       eas: {
         projectId: "804d6293-1977-4b0b-8863-1bb26e3a3945"
-      }
+      },
+      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
     },
     plugins: [
       [

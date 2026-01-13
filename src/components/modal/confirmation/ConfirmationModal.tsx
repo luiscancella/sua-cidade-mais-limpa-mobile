@@ -71,7 +71,7 @@ export default function ConfirmationModal({
                             onPress={handleConfirm} 
                             style={styles.confirmButton}
                         >
-                            <Text style={styles.confirmButtonText}>Confirmar</Text>
+                            <Text style={styles.confirmButtonText}>Sim</Text>
                         </StyledButton>
                     </View>
                 </View>

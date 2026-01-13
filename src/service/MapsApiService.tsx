@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import { GoogleReverseGeocodingApiResponse, UserLocation } from 'src/types';
 import { GoogleReverseGeocodingApiResponseSchema } from 'src/types';
@@ -14,7 +15,7 @@ export async function askForLocation(): Promise<Location.LocationObject> {
 export async function reverseGoogleGeocoding(coords: Location.LocationObject): Promise<GoogleReverseGeocodingApiResponse> {
     const params = {
         latlng: `${coords.coords.latitude},${coords.coords.longitude}`,
-        key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+        key: Constants.expoConfig?.extra?.googleMapsApiKey,
         result_type: "street_address",
     };
 
