@@ -23,38 +23,28 @@ export function HomeScreen() {
     // clearData();
   }, []);
 
-  const { TruckDistance, isConnected, connectionCount, setConnectionCount, reconnect } = useTruckDistances({
+  const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({
     phone_id: currentLocation?.phone_id
   });
 
   useEffect(() => {
-    if (!isConnected && connectionCount > 0) {
-      Toast.show({
-        type: 'error',
-        text1: 'Conexão perdida',
-        text2: 'A conexão com o caminhão de coleta de lixo foi perdida',
-        position: 'top',
-        visibilityTime: 7000,
-      });
+    if (connectionFailed) {
+      showError(
+        "Erro de conexão",
+        "Não foi possível conectar ao servidor. Verifique a internet e reinicie o aplicativo.",
+      );
+      setEstimatedTimePreviewText("Sem conexão");
+      return;
     }
-    if (isConnected && connectionCount > 1) {
-      Toast.show({
-        type: 'success',
-        text1: 'Conexão restabelecida',
-        text2: 'A conexão com o caminhão de coleta de lixo foi restabelecida.',
-        position: 'top',
-        visibilityTime: 7000,
-      });
+    
+    if (!isConnected) {
+      setEstimatedTimePreviewText("Conectando...");
+    } else if (TruckDistance) {
+      setEstimatedTimePreviewText(`${Math.round(TruckDistance.etaMinutes)} minutos`);
+    } else {
+      setEstimatedTimePreviewText("Calculando...");
     }
-  }, [isConnected]);
-
-  useEffect(() => {
-    setEstimatedTimePreviewText(
-      TruckDistance
-        ? `${Math.round(TruckDistance.etaMinutes)} minutos`
-        : "Calculando..."
-    );
-  }, [TruckDistance]);
+  }, [TruckDistance, isConnected, connectionFailed]);
 
   useEffect(() => {
     if (currentLocation && mapRef.current) {
@@ -72,10 +62,9 @@ export function HomeScreen() {
       saveCurrentLocation(userLocation);
       setEstimatedTimePreviewText("Calculando...");
       reconnect();
-      setConnectionCount(0);
     } catch (error) {
-      console.error("Erro ao salvar localização selecionada:", error);
-      showError("Erro ao salvar localização", "Não foi possível salvar a localização selecionada. Por favor, tente novamente.");
+      console.error("Erro ao salvar localização:", error);
+      showError("Erro ao salvar localização", "Não foi possível salvar a localização. Tente novamente.");
     }
     ref.current?.setAddressText(currentLocation?.short_address ?? "");
   }

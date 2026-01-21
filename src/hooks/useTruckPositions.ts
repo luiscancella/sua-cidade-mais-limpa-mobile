@@ -9,33 +9,20 @@ interface UseTruckDistancesProps {
 
 export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistancesProps) {
     const [ TruckDistance, setTruckDistance ] = useState<TruckDistance>();
-    const [ connectionCount, setConnectionCount ] = useState(0);
     const [ isConnected, setIsConnected ] = useState(false);
-    const [ error, setError ] = useState<string>();
+    const [ connectionFailed, setConnectionFailed ] = useState(false);
 
     useEffect(() => {
         if (!phone_id || !enabled) {
             return;
         }
 
-        try {
-            TruckWebSocketService.connect(
-                phone_id,
-                (position : TruckDistance) => {
-                    setTruckDistance(position);
-                },
-                (connected : boolean) => {
-                    setIsConnected(connected);
-                    setConnectionCount(connectionCount + 1);
-                    if (!connected) {
-                        setError("Conexão perdida");
-                    }
-                }
-            );
-        } catch (err) {
-            setError("Erro ao conectar ao WebSocket");
-            console.error(err);
-        }
+        TruckWebSocketService.connect(
+            phone_id,
+            setTruckDistance,
+            setIsConnected,
+            () => setConnectionFailed(true)
+        );
 
         return () => {
             TruckWebSocketService.disconnect();
@@ -44,12 +31,14 @@ export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistance
 
     const reconnect = useCallback(() => {
         if (phone_id) {
+            setConnectionFailed(false);
             TruckWebSocketService.disconnect();
             setTimeout(() => {
                 TruckWebSocketService.connect(
                     phone_id,
                     setTruckDistance,
-                    setIsConnected
+                    setIsConnected,
+                    () => setConnectionFailed(true)
                 );
             }, 100);
         }
@@ -58,9 +47,7 @@ export function useTruckDistances({ phone_id, enabled = true }: UseTruckDistance
     return {
         TruckDistance,
         isConnected,
-        error,
+        connectionFailed,
         reconnect,
-        connectionCount,
-        setConnectionCount,
     };
 }
