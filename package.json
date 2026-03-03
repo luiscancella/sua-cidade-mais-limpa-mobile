@@ -13,7 +13,8 @@
     "build:dev:android:local": "eas build --platform android --profile development --local",
     "build:preview:android": "eas build --platform android --profile preview",
     "build:preview:android:local": "eas build --platform android --profile preview --local",
-    "build:dev:ios": "eas build --platform ios --profile development"
+    "build:production:android:local": "eas build --platform android --profile production --local",
+    "build:dev:ios": "eas build --platform ios --profile development"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
