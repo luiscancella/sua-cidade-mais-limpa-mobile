@@ -132,7 +132,7 @@ export function TermsOfService() {
                     <Text style={styles.description}>
                         A SINAURB SERVIÇOS E EMPREENDIMENTOS LTDA, no papel de custodiante das informações pessoais dos usuários, deve cumprir todas as legislações inerentes ao uso correto dos dados pessoais do cidadão de forma a preservar a privacidade dos dados utilizados na plataforma.
                         {"\n"}{"\n"}
-                        Tal dever inclui publicar e informar ao Usuário as futuras alterações a estes Termos de Uso e Política de Privacidade por meio do sítio (https://XXXXXX.COM.BR/), conforme o princípio da publicidade estabelecido no artigo 37, caput, da Constituição Federal.
+                        Tal dever inclui publicar e informar ao Usuário as futuras alterações a estes Termos de Uso e Política de Privacidade por meio do sítio https://sinaurb.github.io/sua-cidade-mais-limpa-terms-of-service/, conforme o princípio da publicidade estabelecido no artigo 37, caput, da Constituição Federal.
                         {"\n"}{"\n"}
                         Em nenhuma hipótese, a SINAURB SERVIÇOS E EMPREENDIMENTOS LTDA será responsável pela instalação no equipamento do Usuário ou de terceiros, de códigos maliciosos (vírus, trojans, malware, worm, bot, backdoor, spyware, rootkit, ou de quaisquer outros que venham a ser criados), em decorrência da navegação na Internet pelo Usuário.
                         {"\n"}{"\n"}

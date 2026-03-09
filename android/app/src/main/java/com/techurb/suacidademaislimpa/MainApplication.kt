@@ -1,4 +1,4 @@
-package com.anonymous.suacidademaislimpa
+package com.techurb.suacidademaislimpa
 
 import android.app.Application
 import android.content.res.Configuration
