@@ -29,7 +29,7 @@ class UserMapper {
 
         const houseNumber = houseNumberComponent?.long_name ?? houseNumberComponent?.short_name;
         const street = streetComponent?.long_name ?? streetComponent?.short_name;
-        const neighborhood = neighborhoodComponent?.long_name ?? neighborhoodComponent?.short_name;
+        const neighborhood = neighborhoodComponent?.long_name ?? neighborhoodComponent?.short_name ?? "?";
         const city = cityComponent?.long_name ?? cityComponent?.short_name;
 
         if (!street || !houseNumber || !neighborhood || !city) {

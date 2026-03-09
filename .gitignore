@@ -40,5 +40,10 @@ yarn-error.*
 .env
 .env.local
 
+# Build
+*.aab
+*.apk
+
 # Others
 todo
+prod
