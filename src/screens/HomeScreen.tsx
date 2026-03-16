@@ -15,17 +15,15 @@ import { UserLocation } from "src/types";
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
   const { showError } = useError();
-  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
+  const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
   const mapRef = React.useRef<MapView | null>(null);
+  const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({ phone_id: currentLocation?.phone_id });
 
   useEffect(() => {
     // clearData();
   }, []);
 
-  const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({
-    phone_id: currentLocation?.phone_id
-  });
 
   useEffect(() => {
     if (connectionFailed) {
@@ -42,6 +40,16 @@ export function HomeScreen() {
     } else if (TruckDistance) {
       setEstimatedTimePreviewText(`${Math.round(TruckDistance.etaMinutes)} minutos`);
     } else {
+      setTimeout(() => {
+        if (!TruckDistance) {
+          setEstimatedTimePreviewText("Caminhões Indisponíveis");
+          Toast.show({
+            type: "info",
+            text1: "Caminhões Indisponíveis",
+            text2: "Não foi possível obter a localização dos caminhões. Por favor, tente novamente mais tarde.",
+          });
+        }
+      }, 7000);
       setEstimatedTimePreviewText("Calculando...");
     }
   }, [TruckDistance, isConnected, connectionFailed]);

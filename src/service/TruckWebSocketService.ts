@@ -37,18 +37,20 @@ class TruckWebSocketService {
             query: { deviceId: phone_id },
             transports: ['websocket'],
             reconnection: true,
-            reconnectionAttempts: 5,
+            reconnectionAttempts: 3,
             reconnectionDelay: 3000,
-            reconnectionDelayMax: 7000,
+            reconnectionDelayMax: 5000,
         });
 
         this.socket.on('connect', () => {
+            console.log("WebSocket conectado com sucesso");
             this.onConnectionChange?.(true);
         });
 
         this.socket.on('truck:update', (data) => {
             try {
                 const result = TruckDistanceSchema.parse(data);
+                console.log("Dados do caminhão recebidos:", result);
                 this.onPositionUpdate?.(result);
             } catch (error) {
                 console.error("Erro ao processar dados do caminhão:", error);

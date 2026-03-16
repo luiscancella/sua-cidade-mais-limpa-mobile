@@ -19,10 +19,10 @@ import Toast from "react-native-toast-message";
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
 export function SetupScreen() {
-    const { saveCurrentLocation, clearData, setCreatedOnServer } = useCurrentLocation();
+    const { saveCurrentLocation, clearData } = useCurrentLocation();
     const { showError } = useError();
     const [isChecked, setChecked] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState<UserLocation>();
+    const [ selectedLocation, setSelectedLocation ] = useState<UserLocation>();
     const navigation = useNavigation<SetupScreenNavigationProp>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
@@ -53,7 +53,7 @@ export function SetupScreen() {
                 }
 
                 if (userLocation?.city !== "Machado" && userLocation?.city !== "Ribeirão das Neves") {
-                    console.error("Área não atendida:", userLocation?.city);
+                    console.info("Área não atendida:", userLocation?.city);
                     showError("Área não atendida", "Detectamos que sua localização está fora da área atendida. No momento, nosso serviço está disponível apenas para as cidades de Machado e Ribeirão das Neves. Estamos trabalhando para expandir nossa cobertura em breve!");
                     return;
                 }
@@ -109,7 +109,6 @@ export function SetupScreen() {
 
             try {
                 await UserService.createUser(selectedLocation.phone_id, selectedLocation);
-                setCreatedOnServer(true);
                 console.log("Usuário criado no servidor com sucesso.");
             } catch (error) {
                 console.error("Erro ao criar usuário no servidor:", error);
