@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE, } from "react-native-maps";
+import MapView, { AnimatedRegion, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { useError } from "src/hooks/useModal";
@@ -9,8 +9,31 @@ import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput"
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
+import { useTruckMapPositions } from "src/hooks/useTruckMapPositions";
 import Toast from "react-native-toast-message";
 import { UserLocation } from "src/types";
+
+// Componente separado para que cada marcador gerencie seu próprio tracksViewChanges.
+// Começa true para o Android capturar o ícone, depois desliga para não re-renderizar a cada update.
+function TruckMarker({ coordinate, rotation }: { coordinate: AnimatedRegion; rotation: number }) {
+  const [tracksViewChanges, setTracksViewChanges] = useState(true);
+
+  return (
+    <Marker.Animated
+      coordinate={coordinate}
+      rotation={rotation}
+      anchor={{ x: 0.5, y: 0.5 }}
+      tracksViewChanges={tracksViewChanges}
+    >
+      <Image
+        source={require("../../assets/caminhao-referencia.png")}
+        style={styles.truckMarker}
+        resizeMode="contain"
+        onLoad={() => setTracksViewChanges(false)}
+      />
+    </Marker.Animated>
+  );
+}
 
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
@@ -26,6 +49,7 @@ export function HomeScreen() {
   const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({
     phone_id: currentLocation?.phone_id
   });
+  const { truckIds, animatedRegions, bearings } = useTruckMapPositions();
 
   useEffect(() => {
     if (connectionFailed) {
@@ -36,7 +60,7 @@ export function HomeScreen() {
       setEstimatedTimePreviewText("Sem conexão");
       return;
     }
-    
+
     if (!isConnected) {
       setEstimatedTimePreviewText("Conectando...");
     } else if (TruckDistance) {
@@ -89,6 +113,13 @@ export function HomeScreen() {
             longitude: currentLocation?.longitude ?? 0,
           }}
         />
+        {truckIds.map((id) => (
+          <TruckMarker
+            key={id}
+            coordinate={animatedRegions.get(id)!}
+            rotation={bearings[id] ?? 0}
+          />
+        ))}
       </MapView>
       <View style={styles.container} pointerEvents="box-none">
         <LinearGradient
@@ -168,6 +199,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 28,
     fontWeight: "700",
+  },
+  truckMarker: {
+    width: 50,
+    height: 50,
   },
 });
 
