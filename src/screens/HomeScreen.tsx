@@ -3,37 +3,17 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { AnimatedRegion, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
-import { useCurrentLocation } from "src/hooks/useCurrentLocation";
-import { useError } from "src/hooks/useModal";
-import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
+import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+
+import { useError } from "src/hooks/useModal";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 import { useTruckMapPositions } from "src/hooks/useTruckMapPositions";
-import Toast from "react-native-toast-message";
+import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { UserLocation } from "src/types";
-
-// Componente separado para que cada marcador gerencie seu próprio tracksViewChanges.
-// Começa true para o Android capturar o ícone, depois desliga para não re-renderizar a cada update.
-function TruckMarker({ coordinate, rotation }: { coordinate: AnimatedRegion; rotation: number }) {
-  const [tracksViewChanges, setTracksViewChanges] = useState(true);
-
-  return (
-    <Marker.Animated
-      coordinate={coordinate}
-      rotation={rotation}
-      anchor={{ x: 0.5, y: 0.5 }}
-      tracksViewChanges={tracksViewChanges}
-    >
-      <Image
-        source={require("../../assets/caminhao-referencia.png")}
-        style={styles.truckMarker}
-        resizeMode="contain"
-        onLoad={() => setTracksViewChanges(false)}
-      />
-    </Marker.Animated>
-  );
-}
+import { TruckMarker } from "src/components/TruckMarker";
 
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
@@ -207,10 +187,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 28,
     fontWeight: "700",
-  },
-  truckMarker: {
-    width: 50,
-    height: 50,
   },
 });
 
