@@ -28,7 +28,6 @@ export function HomeScreen() {
     // clearData();
   }, []);
 
-
   useEffect(() => {
     if (connectionFailed) {
       showError(
@@ -53,7 +52,7 @@ export function HomeScreen() {
             text2: "Não foi possível obter a localização dos caminhões. Por favor, tente novamente mais tarde.",
           });
         }
-      }, 7000);
+      }, 10000);
       setEstimatedTimePreviewText("Calculando...");
     }
   }, [TruckDistance, isConnected, connectionFailed]);
