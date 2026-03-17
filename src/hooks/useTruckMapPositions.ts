@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatedRegion } from "react-native-maps";
-import { z } from "zod";
-import apiBackend from "src/lib/apiBackend";
-import { TruckPositionSchema } from "src/types";
+import TruckService from "src/service/TruckService";
 
 const POLL_INTERVAL = 3000;
 const ANIMATION_DURATION = 2500;
@@ -25,8 +23,8 @@ function calculateBearing(
 export function useTruckMapPositions() {
     const animatedRegions = useRef<Map<number, AnimatedRegion>>(new Map());
     const prevPositions = useRef<Map<number, { lat: number; lng: number }>>(new Map());
-    const [truckIds, setTruckIds] = useState<number[]>([]);
-    const [bearings, setBearings] = useState<Record<number, number>>({});
+    const [ truckIds, setTruckIds ] = useState<number[]>([]);
+    const [ bearings, setBearings ] = useState<Record<number, number>>({});
     const controllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
@@ -35,11 +33,7 @@ export function useTruckMapPositions() {
             controllerRef.current = new AbortController();
 
             try {
-                const response = await apiBackend.get<unknown[]>("/trucks/positions", {
-                    signal: controllerRef.current.signal,
-                });
-
-                const trucks = z.array(TruckPositionSchema).parse(response.data);
+                const trucks = await TruckService.getTruckPositions(controllerRef.current.signal);
 
                 let hasNew = false;
                 const bearingUpdates: Record<number, number> = {};
@@ -62,6 +56,7 @@ export function useTruckMapPositions() {
                             longitudeDelta: 0,
                             duration: ANIMATION_DURATION,
                             useNativeDriver: false,
+                            toValue: {x: coord.latitude, y: coord.longitude},
                         }).start();
                     } else {
                         animatedRegions.current.set(
@@ -86,9 +81,8 @@ export function useTruckMapPositions() {
                     setTruckIds(Array.from(animatedRegions.current.keys()));
                 }
             } catch (error: any) {
-                if (error?.name !== "AbortError" && error?.code !== "ERR_CANCELED") {
-                    console.error("Erro ao buscar posições dos caminhões:", error);
-                }
+                console.error("Erro ao buscar posições dos caminhões:", error);
+                console.error(error);
             }
         }
 
