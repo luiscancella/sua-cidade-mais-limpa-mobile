@@ -11,16 +11,16 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://sinaurb-backend-gateway-coleta-seletiva.nu5jqr.easypanel.host",
-        "EXPO_PUBLIC_WEBSOCKET_URL": "wss://sinaurb-backend-gateway-coleta-seletiva.nu5jqr.easypanel.host",
+        "EXPO_PUBLIC_API_URL": "https://city-clear.techurb.com.br",
+        "EXPO_PUBLIC_WEBSOCKET_URL": "wss://city-clear.techurb.com.br",
         "GOOGLE_MAPS_API_KEY": "AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://sinaurb-backend-gateway-coleta-seletiva.nu5jqr.easypanel.host",
-        "EXPO_PUBLIC_WEBSOCKET_URL": "wss://sinaurb-backend-gateway-coleta-seletiva.nu5jqr.easypanel.host",
+        "EXPO_PUBLIC_API_URL": "https://city-clear.techurb.com.br",
+        "EXPO_PUBLIC_WEBSOCKET_URL": "wss://city-clear.techurb.com.br",
         "GOOGLE_MAPS_API_KEY": "AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE"
       }
     }

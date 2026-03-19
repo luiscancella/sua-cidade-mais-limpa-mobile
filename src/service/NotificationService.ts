@@ -1,0 +1,31 @@
+import * as Notifications from "expo-notifications";
+
+class NotificacaoService {
+    async requestNotificationPermission() {
+        const { status } = await Notifications.requestPermissionsAsync();
+        return status === 'granted';
+    }
+
+    async hasNotificationPermission() {
+        const { status } = await Notifications.getPermissionsAsync();
+        if (status === 'granted') {
+            return true;
+        }
+
+        return await this.requestNotificationPermission();
+    }
+
+    public async getToken(): Promise<string | null> {
+        const granted = await this.hasNotificationPermission();
+        if (!granted) {
+            console.warn("Notification permissions not granted");
+            return null;
+        }
+
+        const tokenData = await Notifications.getDevicePushTokenAsync();
+        const fcmToken = tokenData.data;
+        return fcmToken;
+    }
+}
+
+export default new NotificacaoService

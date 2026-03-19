@@ -2,6 +2,7 @@ import z from "zod";
 import uuid from 'react-native-uuid';
 
 export const CreateUserLocationRequestSchema = z.object({
+    phone_id: z.uuid().optional(),
     latitude: z.number(),
     longitude: z.number(),
     street: z.string().default("None"),
@@ -11,7 +12,7 @@ export const CreateUserLocationRequestSchema = z.object({
 });
 
 export const UserLocationSchema = z.object({
-    phone_id: z.uuid().default(() => uuid.v4() as string),
+    phone_id: z.uuid().optional(),
     place_id: z.string(),
     latitude: z.number(),
     longitude: z.number(),

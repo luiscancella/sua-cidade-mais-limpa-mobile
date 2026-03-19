@@ -50,7 +50,6 @@ class TruckWebSocketService {
         this.socket.on('truck:update', (data) => {
             try {
                 const result = TruckDistanceSchema.parse(data);
-                console.log("Dados do caminhão recebidos:", result);
                 this.onPositionUpdate?.(result);
             } catch (error) {
                 console.error("Erro ao processar dados do caminhão:", error);

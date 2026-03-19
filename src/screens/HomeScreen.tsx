@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MapView, { AnimatedRegion, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,6 +14,7 @@ import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { UserLocation } from "src/types";
 import { TruckMarker } from "src/components/TruckMarker";
+import NotificationService from "src/service/NotificationService";
 
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
@@ -26,6 +27,8 @@ export function HomeScreen() {
 
   useEffect(() => {
     // clearData();
+    console.log("Requesting notification permission and device token...");
+    const token = NotificationService.getToken().then(console.log).catch(console.error);
   }, []);
 
   useEffect(() => {

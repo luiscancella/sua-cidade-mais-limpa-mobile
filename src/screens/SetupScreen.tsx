@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import UserService from "src/service/UserService";
 import Logo from "src/components/Logo";
 import Toast from "react-native-toast-message";
+import NotificationService from "src/service/NotificationService";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
@@ -74,6 +75,7 @@ export function SetupScreen() {
         }
 
         fetchCurrentLocationAndAddress();
+        NotificationService.requestNotificationPermission();
     }, []);
 
     async function handleProsseguirButton() {
@@ -92,7 +94,8 @@ export function SetupScreen() {
         }
 
         if (selectedLocation) {
-            console.log("Location data salvando no contexto:", selectedLocation);
+            const deviceNotificationToken = await NotificationService.getToken();
+            selectedLocation.phone_id = deviceNotificationToken || undefined;
 
             try {
                 let result = await saveCurrentLocation(selectedLocation);
@@ -108,7 +111,7 @@ export function SetupScreen() {
             }
 
             try {
-                await UserService.createUser(selectedLocation.phone_id, selectedLocation);
+                await UserService.createUser(selectedLocation);
                 console.log("Usuário criado no servidor com sucesso.");
             } catch (error) {
                 console.error("Erro ao criar usuário no servidor:", error);
