@@ -24,8 +24,8 @@ class NotificacaoService {
         }
 
         const tokenData = await Notifications.getDevicePushTokenAsync();
-        const fcmToken = tokenData.data;
-        return fcmToken;
+        const fcm_token = tokenData.data;
+        return fcm_token;
     }
 }
 

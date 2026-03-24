@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Alert, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
-import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
@@ -96,18 +95,15 @@ export function SetupScreen() {
 
         if (selectedAddress) {
             // const deviceNotificationToken = await NotificationService.getToken();
-            // selectedLocation.fcmToken = deviceNotificationToken || undefined;
+            // selectedLocation.fcm_token = deviceNotificationToken || undefined;
 
             try {
-                const user = {
-                    address: selectedAddress,
-                    fcmToken: await NotificationService.getToken() || undefined,
-                } as UserLocation;
-                const userToBeCreated = UserMapper.toCreateUserLocationRequest(user);
-                const userCreated = await UserService.createUser(userToBeCreated);
+                const userToBeCreated = UserMapper.toCreateUserLocationRequest(selectedAddress);
+                const response = await UserService.createUser(userToBeCreated);
                 console.log("Usuário criado no servidor com sucesso.");
+                const user = UserMapper.fromCreateResponse(response, selectedAddress);
 
-                let result = await saveCurrentLocation(userCreated);
+                const result = await saveCurrentLocation(user);
                 if (!result) {
                     showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Tente novamente mais tarde.");
                     console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");

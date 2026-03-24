@@ -10,24 +10,43 @@ import { Ionicons } from "@expo/vector-icons";
 import { useError } from "src/hooks/useModal";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 import { useTruckMapPositions } from "src/hooks/useTruckMapPositions";
-import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { UserLocation } from "src/types";
 import { TruckMarker } from "src/components/TruckMarker";
 import NotificationService from "src/service/NotificationService";
+import UserService from "src/service/UserService";
 
 export function HomeScreen() {
-  const { currentLocation, saveCurrentLocation, clearData } = useCurrentLocation();
+  const { currentLocation, saveCurrentLocation, clearData } = useRequiredCurrentLocation();
   const { showError } = useError();
-  const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
+  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
   const mapRef = React.useRef<MapView | null>(null);
   const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({ phone_id: currentLocation?.phone_id });
   const { truckIds, animatedRegions, bearings } = useTruckMapPositions();
 
   useEffect(() => {
+    // Use isso caso queira limpar a localização e limpar o fluxo
     // clearData();
+
     console.log("Requesting notification permission and device token...");
+    async function registerForPushNotifications() {
+      try {
+        const token = await NotificationService.getToken();
+        console.log("Device token obtained:", token);
+        if (token) {
+          UserService.registerFCMToken(currentLocation.phone_id, token);
+          return;
+        }
+        showError("Erro de Notificação", "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.");
+      } catch (error) {
+        console.error("Error obtaining device token:", error);
+        showError("Erro de Notificação", "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.");
+      }
+    }
+
+    registerForPushNotifications();
   }, []);
 
   useEffect(() => {
@@ -88,8 +107,8 @@ export function HomeScreen() {
         ref={mapRef}
         style={styles.map}
         initialRegion={{
-          latitude: currentLocation?.address.latitude ?? 0,
-          longitude: currentLocation?.address.longitude ?? 0,
+          latitude: currentLocation.address.latitude,
+          longitude: currentLocation.address.longitude,
           latitudeDelta: 0.0143,
           longitudeDelta: 0.0134,
         }}
@@ -98,8 +117,8 @@ export function HomeScreen() {
       >
         <Marker
           coordinate={{
-            latitude: currentLocation?.address.latitude ?? 0,
-            longitude: currentLocation?.address.longitude ?? 0,
+            latitude: currentLocation.address.latitude,
+            longitude: currentLocation.address.longitude,
           }}
         />
         {truckIds.map((id) => (

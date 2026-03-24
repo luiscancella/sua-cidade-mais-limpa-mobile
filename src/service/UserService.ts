@@ -1,15 +1,20 @@
+import { Axios, AxiosResponse } from "axios";
 import apiBackend from "src/lib/apiBackend";
-import { CreateUserLocationRequest, UserLocation } from "src/types";
+import UserMapper from "src/mapper/UserMapper";
+import { CreateUserLocationRequest, UserCreatedResponse, UserLocation } from "src/types";
 
 class UserService {
-    async createUser(newUser: CreateUserLocationRequest): Promise<UserLocation> {
-        return apiBackend.post("/users/address", newUser);
+    async createUser(newUser: CreateUserLocationRequest): Promise<UserCreatedResponse> {
+        console.log("Criando usuário com dados:", newUser);
+        const response = await apiBackend.post<UserCreatedResponse>("/users/address", newUser);
+        const data = response.data;
+        return data;
     }
 
-    async registerFCMToken(phoneId: string, fcmToken: string): Promise<void> {
+    async registerFCMToken(phoneId: string, fcm_token: string): Promise<void> {
         return apiBackend.post(
             "/users/fcm-token",
-            { fcmToken },
+            { fcm_token },
             { params: { phoneId } }
         );
     }

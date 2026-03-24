@@ -34,7 +34,7 @@ export function AppRoutes() {
 
     return (
         <NavigationContainer>
-            {currentLocation == null ? (
+            {!currentLocation ? (
                 <Stack.Navigator initialRouteName={"Setup"} screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Setup" component={SetupScreen} />
                     <Stack.Screen name="TermsOfService" component={TermsOfService} />

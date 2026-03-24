@@ -3,19 +3,27 @@ import {
     CreateUserLocationRequest,
     GoogleReverseGeocodingApiPlace,
     UserLocationSchema,
-    CreateUserLocationRequestSchema
+    CreateUserLocationRequestSchema,
+    UserCreatedResponse,
+    Address
 } from "src/types";
 
 class UserMapper {
-    toCreateUserLocationRequest(data: UserLocation): CreateUserLocationRequest {
+    toCreateUserLocationRequest(data: Address): CreateUserLocationRequest {
         return CreateUserLocationRequestSchema.parse({
-            fcmToken: data.fcmToken,
-            latitude: data.address.latitude,
-            longitude: data.address.longitude,
-            street: data.address.street,
-            houseNumber: data.address.houseNumber.toString(),
-            neighborhood: data.address.neighborhood,
-            city: data.address.city,
+            latitude: data.latitude,
+            longitude: data.longitude,
+            street: data.street,
+            houseNumber: data.houseNumber.toString(),
+            neighborhood: data.neighborhood,
+            city: data.city,
+        });
+    }
+
+    fromCreateResponse(response: UserCreatedResponse, address: Address): UserLocation {
+        return UserLocationSchema.parse({
+            phone_id: response.phoneId,
+            address: address,
         });
     }
 }
