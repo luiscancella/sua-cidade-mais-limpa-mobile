@@ -1,4 +1,5 @@
 import * as Notifications from "expo-notifications";
+import apiBackend from "src/lib/apiBackend";
 
 class NotificacaoService {
     async requestNotificationPermission() {

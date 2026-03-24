@@ -40,7 +40,7 @@ export function ConfigurationScreen() {
                 icon={<Ionicons name="location" size={24} color="#4AB469" />}
                 placeholder={"Buscar endereço"}
                 styles={searchAddressStyles}
-                onLocationSelected={saveCurrentLocation}
+                updateCurrentLocationOnSelect={true}
                 onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
             />
             <ConfigurationSection

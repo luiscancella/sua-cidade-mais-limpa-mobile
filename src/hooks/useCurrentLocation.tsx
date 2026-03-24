@@ -1,10 +1,13 @@
 import React from "react";
 import * as SecureStore from "expo-secure-store"
-import { UserLocation } from "src/types";
+import { Address, UserLocation } from "src/types";
+import UserService from "src/service/UserService";
+import UserMapper from "src/mapper/UserMapper";
 
 interface CurrentLocationContextData {
     currentLocation?: UserLocation,
     saveCurrentLocation(value: UserLocation): Promise<boolean>,
+    updateAddress(newAddress: Address): Promise<UserLocation | null>,
     loadCurrentLocation(): Promise<boolean>,
     isLoading: boolean,
     error: string | null,
@@ -33,6 +36,24 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             console.error("Failed to save location:", error);
             setError("Failed to save location");
             return false;
+        }
+    }
+
+    async function updateAddress(newAddress: Address): Promise<UserLocation> {
+        const user = {
+            ...currentLocation,
+            address: newAddress,
+        } as UserLocation;
+
+        const userToBeCreated = UserMapper.toCreateUserLocationRequest(user);
+
+        try {
+            const createdUser = await UserService.createUser(userToBeCreated);
+            saveCurrentLocation(createdUser);
+            return createdUser;
+        } catch (error) {
+            console.error("Failed to update user location on server:", error);
+            throw new Error("Failed to update user location on server");
         }
     }
 
@@ -78,6 +99,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             value={{
                 currentLocation,
                 saveCurrentLocation,
+                updateAddress,
                 loadCurrentLocation,
                 isLoading,
                 error,

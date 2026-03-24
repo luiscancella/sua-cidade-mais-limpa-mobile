@@ -1,74 +1,77 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteProps, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
-import { UserLocation } from "src/types";
-import UserMapper from "src/mapper/UserMapper";
+import Constants from "expo-constants";
+
 import { useModal } from "src/hooks/useModal";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
-import UserService from "src/service/UserService";
-import Toast from "react-native-toast-message";
-import Constants from "expo-constants";
+import AddressMapper from "src/mapper/AddressMapper";
+import { Address } from "src/types";
 
 interface SearchAddressProps extends Partial<GooglePlacesAutocompleteProps> {
     icon?: React.ReactNode;
     iconStyles?: React.CSSProperties;
-    onLocationSelected?: (location: UserLocation) => void;
+    onLocationSelected?: (location: Address) => void;
     onError?: () => void;
     ignoreConfirmation?: boolean;
+    updateCurrentLocationOnSelect?: boolean;
 }
 
 export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocompleteRef, SearchAddressProps>(
-    ({ icon, iconStyles, styles: propsStyle = {}, onLocationSelected, onError, ignoreConfirmation = false, ...props }, ref) => {
+    (
+        {
+            icon,
+            iconStyles,
+            styles: propsStyle = {},
+            onLocationSelected,
+            onError,
+            ignoreConfirmation = false,
+            updateCurrentLocationOnSelect = false,
+            ...props
+        }, ref
+    ) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
         const { showConfirmation, showError } = useModal();
-        const { currentLocation } = useCurrentLocation();
+        const { currentLocation, updateAddress } = useCurrentLocation();
 
-        function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null) {
+        function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null): Address | undefined {
             changeInputText("Salvando endereço...");
-            const userLocation = UserMapper.fromGoogleAutocomplete(data, details, currentLocation);
+            const address = AddressMapper.fromGoogleAutocomplete(data, details);
 
-            if (!userLocation) {
+            if (!address) {
                 console.error("Erro ao mapear localização do autocomplete");
                 onError?.();
                 return;
             }
 
-            if (userLocation?.city !== "Machado" && userLocation?.city !== "Ribeirão das Neves") {
-                console.error("Área não atendida:", userLocation?.city);
+            if (address?.city !== "Machado" && address?.city !== "Ribeirão das Neves") {
+                console.error("Área não atendida:", address?.city);
                 showError("Área não atendida", "No momento, nosso serviço está disponível apenas para as cidades de Machado e Ribeirão das Neves. Estamos trabalhando para expandir nossa cobertura em breve!");
-                changeInputText(currentLocation?.short_address ?? '');
+                changeInputText(currentLocation?.address.short_address ?? '');
                 return;
             }
 
             if (ignoreConfirmation) {
-                onLocationSelected?.(userLocation);
-                changeInputText(userLocation.short_address);
+                onLocationSelected?.(address);
+                changeInputText(currentLocation?.address.short_address ?? '');
                 return;
             }
 
             showConfirmation(
                 "Confirmação",
                 "Deseja alterar seu endereço para o endereço selecionado?",
-                userLocation.short_address,
+                address.short_address,
                 () => {
-                    UserService.createUser(
-                        userLocation.phone_id,
-                        userLocation
-                    ).then(() => {
-                        console.log("Endereço do usuário atualizado com sucesso.");
-                        Toast.show({
-                            type: "success",
-                            text1: "Endereço atualizado com sucesso!"
+                    if (updateCurrentLocationOnSelect) {
+                        updateAddress(address).catch(error => {
+                            console.error("Erro ao atualizar localização do usuário com o novo endereço selecionado");
+                            showError("Erro ao atualizar localização", "Ocorreu um erro ao atualizar sua localização com o endereço selecionado. Por favor, tente novamente ou contate o suporte.");
+                            changeInputText(currentLocation?.address.short_address ?? '');
                         });
-                        onLocationSelected?.(userLocation)
-                        changeInputText(userLocation.short_address);
-                    }).catch((error) => {
-                        console.error("Erro ao atualizar endereço do usuário:", error);
-                        showError("Erro ao atualizar o endereço", "Tente novamente mais tarde.");
-                        changeInputText(currentLocation?.short_address ?? '');
-                    });
+                    }
+                    onLocationSelected?.(address)
                 },
-                () => changeInputText(currentLocation?.short_address ?? '')
+                () => changeInputText(address.short_address ?? '')
             );
         };
 
@@ -80,10 +83,9 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
 
         React.useEffect(() => {
             if (currentLocation && ref && typeof ref !== 'function' && ref.current) {
-                ref.current.setAddressText(currentLocation.short_address);
+                ref.current.setAddressText(currentLocation.address.short_address);
             }
         }, [currentLocation, ref]);
-
 
         const renderedIcon = React.isValidElement(icon)
             ? React.cloneElement(icon, { style: [styles.icon, iconStyles] } as React.CSSProperties)

@@ -1,8 +1,8 @@
-import z from "zod";    
-import uuid from 'react-native-uuid';
+import z from "zod";
+import { AddressSchema } from "../address/address.schema";
 
 export const CreateUserLocationRequestSchema = z.object({
-    phone_id: z.uuid().optional(),
+    fcmToken: z.string().optional(),
     latitude: z.number(),
     longitude: z.number(),
     street: z.string().default("None"),
@@ -12,16 +12,9 @@ export const CreateUserLocationRequestSchema = z.object({
 });
 
 export const UserLocationSchema = z.object({
-    phone_id: z.uuid().optional(),
-    place_id: z.string(),
-    latitude: z.number(),
-    longitude: z.number(),
-    full_address: z.string(),
-    short_address: z.string(),
-    street: z.string().default("None"),
-    houseNumber: z.string().default("None"),
-    neighborhood: z.string().default("None"),
-    city: z.string().default("None"),
+    phone_id: z.uuid(),
+    fcmToken: z.string().optional(),
+    address: AddressSchema,
 });
 
 export type CreateUserLocationRequest = z.infer<typeof CreateUserLocationRequestSchema>;

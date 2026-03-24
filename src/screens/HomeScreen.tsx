@@ -28,7 +28,6 @@ export function HomeScreen() {
   useEffect(() => {
     // clearData();
     console.log("Requesting notification permission and device token...");
-    const token = NotificationService.getToken().then(console.log).catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -63,8 +62,8 @@ export function HomeScreen() {
   useEffect(() => {
     if (currentLocation && mapRef.current) {
       mapRef.current.animateToRegion({
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
+        latitude: currentLocation.address.latitude,
+        longitude: currentLocation.address.longitude,
         latitudeDelta: 0.0143,
         longitudeDelta: 0.0134,
       }, 1000);
@@ -80,7 +79,7 @@ export function HomeScreen() {
       console.error("Erro ao salvar localização:", error);
       showError("Erro ao salvar localização", "Não foi possível salvar a localização. Tente novamente.");
     }
-    ref.current?.setAddressText(currentLocation?.short_address ?? "");
+    ref.current?.setAddressText(userLocation.address.short_address);
   }
 
   return (
@@ -89,8 +88,8 @@ export function HomeScreen() {
         ref={mapRef}
         style={styles.map}
         initialRegion={{
-          latitude: currentLocation?.latitude ?? 0,
-          longitude: currentLocation?.longitude ?? 0,
+          latitude: currentLocation?.address.latitude ?? 0,
+          longitude: currentLocation?.address.longitude ?? 0,
           latitudeDelta: 0.0143,
           longitudeDelta: 0.0134,
         }}
@@ -99,8 +98,8 @@ export function HomeScreen() {
       >
         <Marker
           coordinate={{
-            latitude: currentLocation?.latitude ?? 0,
-            longitude: currentLocation?.longitude ?? 0,
+            latitude: currentLocation?.address.latitude ?? 0,
+            longitude: currentLocation?.address.longitude ?? 0,
           }}
         />
         {truckIds.map((id) => (
@@ -127,7 +126,7 @@ export function HomeScreen() {
                 placeholderTextColor: "#fff",
               }}
               onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
-              onLocationSelected={handleLocationSelection}
+              updateCurrentLocationOnSelect={true}
             />
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />

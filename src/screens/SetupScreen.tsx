@@ -6,7 +6,7 @@ import Checkbox from "expo-checkbox";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import * as MapsApiService from "src/service/MapsApiService";
-import { UserLocation } from "src/types";
+import { Address, UserLocation } from "src/types";
 import UserMapper from "src/mapper/UserMapper";
 import { useError } from "src/hooks/useModal";
 import { useNavigation } from "@react-navigation/native";
@@ -16,24 +16,25 @@ import UserService from "src/service/UserService";
 import Logo from "src/components/Logo";
 import Toast from "react-native-toast-message";
 import NotificationService from "src/service/NotificationService";
+import AddressMapper from "src/mapper/AddressMapper";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
 export function SetupScreen() {
     const { saveCurrentLocation, clearData } = useCurrentLocation();
     const { showError } = useError();
-    const [isChecked, setChecked] = useState(false);
-    const [ selectedLocation, setSelectedLocation ] = useState<UserLocation>();
+    const [ isChecked, setChecked ] = useState(false);
+    const [ selectedAddress, setSelectedAddress ] = useState<Address>();
     const navigation = useNavigation<SetupScreenNavigationProp>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
     useEffect(() => {
-        if (selectedLocation && ref.current) {
+        if (selectedAddress && ref.current) {
             ref.current.setAddressText(
-                selectedLocation.short_address || selectedLocation.full_address
+                selectedAddress.short_address || selectedAddress.full_address
             );
         }
-    }, [selectedLocation]);
+    }, [selectedAddress]);
 
     useEffect(() => {
         async function fetchCurrentLocationAndAddress() {
@@ -43,9 +44,9 @@ export function SetupScreen() {
 
                 const googleResponse = await MapsApiService.reverseGoogleGeocoding(coords);
                 const firstResult = googleResponse.results[0];
-                const userLocation = UserMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
-
-                if (!userLocation) {
+                const address = AddressMapper.fromGoogleReverseGeocodingApiPlace(firstResult);
+                
+                if (!address) {
                     console.error("Não foi possível mapear o endereço do usuário a partir da resposta do Google.");
                     showError(
                         "Erro ao obter localização",
@@ -53,21 +54,21 @@ export function SetupScreen() {
                     return;
                 }
 
-                if (userLocation?.city !== "Machado" && userLocation?.city !== "Ribeirão das Neves") {
-                    console.info("Área não atendida:", userLocation?.city);
+                if (address?.city !== "Machado" && address?.city !== "Ribeirão das Neves") {
+                    console.info("Área não atendida:", address?.city);
                     showError("Área não atendida", "Detectamos que sua localização está fora da área atendida. No momento, nosso serviço está disponível apenas para as cidades de Machado e Ribeirão das Neves. Estamos trabalhando para expandir nossa cobertura em breve!");
                     return;
                 }
 
                 if (ref?.current?.getAddressText() === "") {
-                    setSelectedLocation(userLocation);
+                    setSelectedAddress(address);
                     Toast.show({
                         type: "info",
                         text1: "Endereço definido",
                         text2: "Seu endereço foi definido automaticamente com base na sua localização atual.",
                         visibilityTime: 6000,
                     });
-                    console.log("Endereço do usuário definido automaticamente:", userLocation.full_address);
+                    console.log("Endereço do usuário definido automaticamente:", address.full_address);
                 }
             } catch (error: any) {
                 console.error("Erro ao obter localização:", error);
@@ -84,7 +85,7 @@ export function SetupScreen() {
         if (!isChecked) {
             errors.push("É necessário aceitar os termos e serviços!");
         }
-        if (!selectedLocation) {
+        if (!selectedAddress) {
             errors.push("É necessário selecionar um endereço!");
         }
 
@@ -93,26 +94,24 @@ export function SetupScreen() {
             return;
         }
 
-        if (selectedLocation) {
-            const deviceNotificationToken = await NotificationService.getToken();
-            selectedLocation.phone_id = deviceNotificationToken || undefined;
+        if (selectedAddress) {
+            // const deviceNotificationToken = await NotificationService.getToken();
+            // selectedLocation.fcmToken = deviceNotificationToken || undefined;
 
             try {
-                let result = await saveCurrentLocation(selectedLocation);
+                const user = {
+                    address: selectedAddress,
+                    fcmToken: await NotificationService.getToken() || undefined,
+                } as UserLocation;
+                const userToBeCreated = UserMapper.toCreateUserLocationRequest(user);
+                const userCreated = await UserService.createUser(userToBeCreated);
+                console.log("Usuário criado no servidor com sucesso.");
+
+                let result = await saveCurrentLocation(userCreated);
                 if (!result) {
                     showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Tente novamente mais tarde.");
                     console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");
-                    return;
                 }
-            } catch (error) {
-                showError("Erro ao salvar localização", "Não foi possível salvar sua localização localmente. Tente novamente mais tarde.");
-                clearData();
-                return;
-            }
-
-            try {
-                await UserService.createUser(selectedLocation);
-                console.log("Usuário criado no servidor com sucesso.");
             } catch (error) {
                 console.error("Erro ao criar usuário no servidor:", error);
                 showError("Erro ao salvar localização", "Não foi possível salvar sua localização no servidor. Tente novamente mais tarde.");
@@ -133,7 +132,7 @@ export function SetupScreen() {
                     styles={searchAddressStyles}
                     placeholder="Rua das Flores, 123 - Belo Horizonte"
                     onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
-                    onLocationSelected={setSelectedLocation}
+                    onLocationSelected={setSelectedAddress}
                     ignoreConfirmation={true}
                 />
                 <TouchableOpacity style={styles.checkboxContainer} onPress={() => setChecked(!isChecked)}>
