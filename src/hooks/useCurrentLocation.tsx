@@ -2,6 +2,8 @@ import React from "react";
 import * as SecureStore from "expo-secure-store";
 import { Address, HeadersRequired, UserLocation } from "src/types";
 import { th } from "zod/locales";
+import UserService from "src/service/UserService";
+import UserMapper from "src/mapper/UserMapper";
 
 interface CurrentLocationContextData {
     currentLocation?: UserLocation,
@@ -78,12 +80,19 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
 
     async function updateAddress(newAddress: Address) : Promise<UserLocation> {
         // TODO: Mudar no server
-        const userInfo = {
-            ...currentLocation,
-            address: newAddress,
-        } as UserLocation;
 
-        return userInfo;
+        try {
+            const newUserRequest = UserMapper.toCreateUserLocationRequest(newAddress);
+            newUserRequest.phoneId = currentLocation?.phone_id;
+
+            const userCreated = await UserService.createUser(newUserRequest);
+            const user = UserMapper.fromCreateResponse(userCreated, newAddress);
+            await saveCurrentLocation(user);
+            return user;
+        } catch (error) {
+            console.error("Failed to update address:", error);
+            throw error;
+        }
     }
 
     function getHeaders() : HeadersRequired {

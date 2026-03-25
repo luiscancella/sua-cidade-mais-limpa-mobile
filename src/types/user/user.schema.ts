@@ -2,6 +2,7 @@ import z from "zod";
 import { AddressSchema } from "../address/address.schema";
 
 export const CreateUserLocationRequestSchema = z.object({
+    phoneId: z.uuid().optional(),
     latitude: z.number(),
     longitude: z.number(),
     street: z.string().default("None"),
