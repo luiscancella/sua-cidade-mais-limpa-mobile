@@ -21,8 +21,10 @@ class UserMapper {
     }
 
     fromCreateResponse(response: UserCreatedResponse, address: Address): UserLocation {
+        console.log("Mapping user created response to user location:", response, address);
         return UserLocationSchema.parse({
             phone_id: response.phoneId,
+            device_secret: response.deviceSecret,
             address: address,
         });
     }

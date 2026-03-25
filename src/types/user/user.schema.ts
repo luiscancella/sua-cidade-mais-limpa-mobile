@@ -12,6 +12,7 @@ export const CreateUserLocationRequestSchema = z.object({
 
 export const UserCreatedResponseSchema = z.object({
     phoneId: z.uuid(),
+    deviceSecret: z.string(),
     city: z.string(),
     neighborhood: z.string(),
     street: z.string(),
@@ -26,6 +27,7 @@ export const UserCreatedResponseSchema = z.object({
 
 export const UserLocationSchema = z.object({
     phone_id: z.uuid(),
+    device_secret: z.uuid(),
     address: AddressSchema,
 });
 

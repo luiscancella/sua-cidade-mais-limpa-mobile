@@ -1,9 +1,7 @@
 import React from "react";
-import * as SecureStore from "expo-secure-store"
-import { Address, UserLocation } from "src/types";
-import UserService from "src/service/UserService";
-import UserMapper from "src/mapper/UserMapper";
-import NotificationService from "src/service/NotificationService";
+import * as SecureStore from "expo-secure-store";
+import { Address, HeadersRequired, UserLocation } from "src/types";
+import { th } from "zod/locales";
 
 interface CurrentLocationContextData {
     currentLocation?: UserLocation,
@@ -11,8 +9,8 @@ interface CurrentLocationContextData {
     updateAddress(newAddress: Address): Promise<UserLocation | null>,
     loadCurrentLocation(): Promise<boolean>,
     isLoading: boolean,
-    error: string | null,
     clearData(): Promise<void>,
+    getHeaders() : HeadersRequired,
 }
 
 type CurrentLocationRequiredContextData = Omit<CurrentLocationContextData, "currentLocation"> & {
@@ -24,7 +22,6 @@ const CurrentLocationContext = React.createContext<CurrentLocationContextData>({
 export const CurrentLocationProvider = ({ children }: { children: React.ReactNode }) => {
     const [ currentLocation, setCurrentLocation ] = React.useState<UserLocation>();
     const [ isLoading, setIsLoading ] = React.useState<boolean>(true);
-    const [ error, setError ] = React.useState<string | null>(null);
 
     async function saveCurrentLocation(value: UserLocation) : Promise<boolean> {
         console.log("Saving location:", value);
@@ -39,13 +36,42 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
 
         try {
             await SecureStore.setItemAsync("phone_id", value.phone_id);
+            await SecureStore.setItemAsync("device_secret", value.device_secret);
             await SecureStore.setItemAsync("address", JSON.stringify(value.address));
             console.log("Location saved");
             setCurrentLocation(value);
             return true;
         } catch (error) {
             console.error("Failed to save location:", error);
-            setError("Failed to save location");
+            return false;
+        }
+    }
+
+    async function loadCurrentLocation() : Promise<boolean> {
+        setIsLoading(true);
+        try {
+            const phone_id = await SecureStore.getItemAsync("phone_id");
+            const device_secret = await SecureStore.getItemAsync("device_secret");
+            const address = await SecureStore.getItemAsync("address");
+            if (!phone_id || !device_secret || !address) {
+                console.log("No location found in secure store");
+                setIsLoading(false);
+                clearData();
+                return false;
+            }
+
+            const userInfo = {
+                phone_id: phone_id,
+                device_secret: device_secret,
+                address: JSON.parse(address),
+            } as UserLocation;
+            
+            setCurrentLocation(userInfo);
+            setIsLoading(false);
+            return true;
+        } catch (error) {
+            console.error("Failed to load location:", error);
+            setIsLoading(false);
             return false;
         }
     }
@@ -60,31 +86,15 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
         return userInfo;
     }
 
-    async function loadCurrentLocation() : Promise<boolean> {
-        setIsLoading(true);
-        try {
-            const phone_id = await SecureStore.getItemAsync("phone_id");
-            const address = await SecureStore.getItemAsync("address");
-            if (!phone_id || !address) {
-                setError("Nenhuma localização encontrada");
-                setIsLoading(false);
-                return false;
-            }
-
-            const userInfo = {
-                phone_id: phone_id,
-                address: JSON.parse(address),
-            } as UserLocation;
-            
-            setCurrentLocation(userInfo);
-            setIsLoading(false);
-            return true;
-        } catch (error) {
-            console.error("Failed to load location:", error);
-            setError("Falha ao carregar a localização");
-            setIsLoading(false);
-            return false;
+    function getHeaders() : HeadersRequired {
+        if (!currentLocation) {
+            throw new Error("Current location is required to get headers");
         }
+        return {
+            "x-phone-id": currentLocation.phone_id,
+            "x-device-secret": currentLocation.device_secret,
+            "x-timestamp": Date.now().toString(),
+        };
     }
 
     async function clearData() {
@@ -109,8 +119,8 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 updateAddress,
                 loadCurrentLocation,
                 isLoading,
-                error,
                 clearData,
+                getHeaders
             }}
         >
             {children}

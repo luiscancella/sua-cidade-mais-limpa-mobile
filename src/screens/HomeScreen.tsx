@@ -18,7 +18,7 @@ import NotificationService from "src/service/NotificationService";
 import UserService from "src/service/UserService";
 
 export function HomeScreen() {
-  const { currentLocation, saveCurrentLocation, clearData } = useRequiredCurrentLocation();
+  const { currentLocation, saveCurrentLocation, getHeaders, clearData } = useRequiredCurrentLocation();
   const { showError } = useError();
   const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
@@ -36,7 +36,8 @@ export function HomeScreen() {
         const token = await NotificationService.getToken();
         console.log("Device token obtained:", token);
         if (token) {
-          UserService.registerFCMToken(currentLocation.phone_id, token);
+          console.warn(getHeaders());
+          UserService.registerFCMToken(currentLocation.phone_id, token, getHeaders());
           return;
         }
         showError("Erro de Notificação", "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.");

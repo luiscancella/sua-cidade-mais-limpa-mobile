@@ -10,49 +10,66 @@ const API_CONFIG = {
 
 const apiBackend = axios.create(API_CONFIG);
 
-const buildFullUrl = (baseURL?: string, url?: string) => {
-    if (!url) return baseURL || "";
+// const buildFullUrl = (baseURL?: string, url?: string) => {
+//     if (!url) return baseURL || "";
 
-    try {
-        return new URL(url, baseURL).toString();
-    } catch {
-        return `${baseURL || ""}${url}`;
-    }
-};
+//     try {
+//         return new URL(url, baseURL).toString();
+//     } catch {
+//         return `${baseURL || ""}${url}`;
+//     }
+// };
 
-const getEndpoint = (fullUrl: string) => {
-    try {
-        return new URL(fullUrl).pathname;
-    } catch {
-        return fullUrl;
-    }
-};
+// const getEndpoint = (fullUrl: string) => {
+//     try {
+//         return new URL(fullUrl).pathname;
+//     } catch {
+//         return fullUrl;
+//     }
+// };
 
-apiBackend.interceptors.response.use(
-    (response) => {
-        const fullUrl = buildFullUrl(response.config?.baseURL, response.config?.url);
+// apiBackend.interceptors.request.use((config) => {
+//     const fullUrl = buildFullUrl(config.baseURL, config.url);
 
-        console.log("[API RESPONSE]", {
-            code: response.status,
-            body: response.data ?? null,
-            url: fullUrl,
-            endpoint: getEndpoint(fullUrl),
-        });
+//     console.log("[API REQUEST]", {
+//         method: config.method,
+//         url: fullUrl,
+//         endpoint: getEndpoint(fullUrl),
+//         body: config.data ?? null,
+//         headers: config.headers ?? null,
+//     });
 
-        return response;
-    },
-    (error: AxiosError) => {
-        const fullUrl = buildFullUrl(error.config?.baseURL, error.config?.url);
+//     return config;
+// }, (error) => {
+//     console.error("[API REQUEST ERROR]", error);
+//     return Promise.reject(error);
+// });
 
-        console.error("[API ERROR]", {
-            code: error.response?.status ?? null,
-            body: error.response?.data ?? null,
-            url: fullUrl,
-            endpoint: getEndpoint(fullUrl),
-        });
+// apiBackend.interceptors.response.use(
+//     (response) => {
+//         const fullUrl = buildFullUrl(response.config?.baseURL, response.config?.url);
 
-        return Promise.reject(error);
-    }
-);
+//         console.log("[API RESPONSE]", {
+//             code: response.status,
+//             body: response.data ?? null,
+//             url: fullUrl,
+//             endpoint: getEndpoint(fullUrl),
+//         });
+
+//         return response;
+//     },
+//     (error: AxiosError) => {
+//         const fullUrl = buildFullUrl(error.config?.baseURL, error.config?.url);
+
+//         console.error("[API ERROR]", {
+//             code: error.response?.status ?? null,
+//             body: error.response?.data ?? null,
+//             url: fullUrl,
+//             endpoint: getEndpoint(fullUrl),
+//         });
+
+//         return Promise.reject(error);
+//     }
+// );
 
 export default apiBackend;

@@ -1,7 +1,9 @@
-import { Axios, AxiosResponse } from "axios";
 import apiBackend from "src/lib/apiBackend";
-import UserMapper from "src/mapper/UserMapper";
-import { CreateUserLocationRequest, UserCreatedResponse, UserLocation } from "src/types";
+import {
+    CreateUserLocationRequest,
+    HeadersRequired,
+    UserCreatedResponse
+} from "src/types";
 
 class UserService {
     async createUser(newUser: CreateUserLocationRequest): Promise<UserCreatedResponse> {
@@ -11,11 +13,14 @@ class UserService {
         return data;
     }
 
-    async registerFCMToken(phoneId: string, fcm_token: string): Promise<void> {
+    async registerFCMToken(phoneId: string, fcm_token: string, headers: HeadersRequired): Promise<void> {
         return apiBackend.post(
             "/users/fcm-token",
-            { fcm_token },
-            { params: { phoneId } }
+            { fcmToken: fcm_token },
+            {
+                params: { phoneId },
+                headers: headers,
+            }
         );
     }
 }
