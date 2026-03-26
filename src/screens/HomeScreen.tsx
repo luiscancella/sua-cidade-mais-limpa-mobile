@@ -74,7 +74,7 @@ export function HomeScreen() {
             text2: "Não foi possível obter a localização dos caminhões. Por favor, tente novamente mais tarde.",
           });
         }
-      }, 15000);
+      }, 5000);
       setEstimatedTimePreviewText("Calculando...");
     }
   }, [TruckDistance, isConnected, connectionFailed]);
@@ -147,6 +147,7 @@ export function HomeScreen() {
               }}
               onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
               updateCurrentLocationOnSelect={true}
+              onLocationSelected={(address) => setEstimatedTimePreviewText("Calculando...")}
             />
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />

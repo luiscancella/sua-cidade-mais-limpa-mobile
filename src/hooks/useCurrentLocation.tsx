@@ -86,6 +86,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             const userCreated = await UserService.createUser(newUserRequest);
             const user = UserMapper.fromCreateResponse(userCreated, newAddress);
             await saveCurrentLocation(user);
+              
             return user;
         } catch (error) {
             console.error("Failed to update address:", error);

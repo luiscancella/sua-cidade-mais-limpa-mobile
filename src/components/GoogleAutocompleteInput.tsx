@@ -36,6 +36,12 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null): Address | undefined {
             changeInputText("Salvando endereço...");
+            
+            if (currentLocation && currentLocation.address.place_id === data.place_id) {
+                changeInputText(currentLocation.address.short_address);
+                return currentLocation.address;
+            }
+
             const address = AddressMapper.fromGoogleAutocomplete(data, details);
 
             if (!address) {
@@ -87,9 +93,9 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
             }
         }, [currentLocation, ref]);
 
-        const renderedIcon = React.isValidElement(icon)
-            ? React.cloneElement(icon, { style: [styles.icon, iconStyles] } as React.CSSProperties)
-            : null;
+        const renderedIcon = React.isValidElement(icon) ?
+            React.cloneElement(icon, { style: [styles.icon, iconStyles] } as React.CSSProperties) :
+            null;
 
         const defaultStyles = {
             container: {
