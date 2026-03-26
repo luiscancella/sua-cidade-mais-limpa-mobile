@@ -149,7 +149,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 placeholder='Buscar Endereço'
                 renderLeftButton={() => renderedIcon}
                 query={{
-                    key: Constants.expoConfig?.extra?.googleMapsApiKey || process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+                    key: Constants.expoConfig?.extra?.googleMapsApiKey || process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY,
                     language: 'pt',
                     components: 'country:br',
                     types: 'address',

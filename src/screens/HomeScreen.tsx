@@ -36,6 +36,7 @@ export function HomeScreen() {
         const token = await NotificationService.getToken();
         if (token) {
           UserService.registerFCMToken(currentLocation.phone_id, token, getHeaders());
+          console.log("Device token obtained and registered successfully:", token);
           return;
         }
         showError("Erro de Notificação", "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.");
@@ -46,6 +47,7 @@ export function HomeScreen() {
     }
 
     registerForPushNotifications();
+    console.log(currentLocation);
   }, []);
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export function HomeScreen() {
             text2: "Não foi possível obter a localização dos caminhões. Por favor, tente novamente mais tarde.",
           });
         }
-      }, 10000);
+      }, 15000);
       setEstimatedTimePreviewText("Calculando...");
     }
   }, [TruckDistance, isConnected, connectionFailed]);

@@ -79,8 +79,6 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
     }
 
     async function updateAddress(newAddress: Address) : Promise<UserLocation> {
-        // TODO: Mudar no server
-
         try {
             const newUserRequest = UserMapper.toCreateUserLocationRequest(newAddress);
             newUserRequest.phoneId = currentLocation?.phone_id;

@@ -1,3 +1,5 @@
+const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY ?? process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+
 module.exports = {
   expo: {
     name: "sua-cidade-mais-limpa",
@@ -15,7 +17,7 @@ module.exports = {
     ios: {
       supportsTablet: true,
       config: {
-        googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+        googleMapsApiKey: googleMapsApiKey
       }
     },
     android: {
@@ -28,7 +30,7 @@ module.exports = {
       package: "com.techurb.suacidademaislimpa",
       config: {
         googleMaps: {
-          apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+          apiKey: googleMapsApiKey
         }
       }
     },
@@ -39,7 +41,7 @@ module.exports = {
       eas: {
         projectId: "804d6293-1977-4b0b-8863-1bb26e3a3945"
       },
-      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+      googleMapsApiKey: googleMapsApiKey
     },
     plugins: [
       [

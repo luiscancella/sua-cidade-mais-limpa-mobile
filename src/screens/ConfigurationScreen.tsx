@@ -10,14 +10,15 @@ import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput"
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { useError } from "src/hooks/useModal";
 import { RootStackParamList } from "src/types/navigation";
+import { set } from "zod";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Configuration'>;
 
 export function ConfigurationScreen() {
     const { currentLocation, saveCurrentLocation } = useCurrentLocation();
     const { showError } = useError();
-    const [ garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled ] = useState(false);
-    const [ newsEnabled, setNewsEnabled ] = useState(false);
+    const [garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled] = useState(false);
+    const [newsEnabled, setNewsEnabled] = useState(false);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const navigation = useNavigation<SetupScreenNavigationProp>();
 
@@ -30,6 +31,12 @@ export function ConfigurationScreen() {
         // TODO: Implementar logica de mudança de botão
         console.log("Mudando o estado das notícias:", newsEnabled);
     }, [newsEnabled]);
+
+    function handleSwitchChange(value: boolean) {
+        showError("Funcionalidade em desenvolvimento", "A configuração de notícias e atualizações ainda está em desenvolvimento e será lançada em breve. Fique atento às atualizações!");
+        setGarbageCollectionNotificationEnabled(false);
+        setNewsEnabled(false);
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -53,7 +60,7 @@ export function ConfigurationScreen() {
                     <Text style={styles.itemText}>Notícias e atualizações</Text>
                     <Switch
                         value={newsEnabled}
-                        onValueChange={setNewsEnabled}
+                        onValueChange={handleSwitchChange}
                         style={styles.itemSwitch}
                         thumbColor={newsEnabled ? '#f9f9f9' : '#e2e1e1ff'}
                         trackColor={{ false: '#C5C5C5', true: '#4AB469' }}
@@ -64,7 +71,7 @@ export function ConfigurationScreen() {
                     <Text style={styles.itemText}>Horários de coleta</Text>
                     <Switch
                         value={garbageCollectionNotificationEnabled}
-                        onValueChange={setGarbageCollectionNotificationEnabled}
+                        onValueChange={handleSwitchChange}
                         style={styles.itemSwitch}
                         thumbColor={garbageCollectionNotificationEnabled ? '#f9f9f9' : '#e2e1e1ff'}
                         trackColor={{ false: '#C5C5C5', true: '#4AB469' }}

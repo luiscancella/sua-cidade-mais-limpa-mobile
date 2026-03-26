@@ -70,7 +70,7 @@ export function SetupScreen() {
                     console.log("Endereço do usuário definido automaticamente:", address.full_address);
                 }
             } catch (error: any) {
-                console.error("Erro ao obter localização:", error);
+                console.error("Erro ao obter localização automaticamente:", error);
             }
         }
 
@@ -110,7 +110,7 @@ export function SetupScreen() {
                 }
             } catch (error) {
                 console.error("Erro ao criar usuário no servidor:", error);
-                showError("Erro ao salvar localização", "Não foi possível salvar sua localização no servidor. Tente novamente mais tarde.");
+                showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Verifique sua conexão com a internet e tente novamente mais tarde.");
                 clearData();
                 return;
             }
