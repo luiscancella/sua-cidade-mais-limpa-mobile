@@ -20,7 +20,7 @@ import UserService from "src/service/UserService";
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, getHeaders, clearData } = useRequiredCurrentLocation();
   const { showError } = useError();
-  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
+  const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
   const mapRef = React.useRef<MapView | null>(null);
   const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({ phone_id: currentLocation?.phone_id });
@@ -74,7 +74,7 @@ export function HomeScreen() {
             text2: "Não foi possível obter a localização dos caminhões. Por favor, tente novamente mais tarde.",
           });
         }
-      }, 5000);
+      }, 30000);
       setEstimatedTimePreviewText("Calculando...");
     }
   }, [TruckDistance, isConnected, connectionFailed]);
