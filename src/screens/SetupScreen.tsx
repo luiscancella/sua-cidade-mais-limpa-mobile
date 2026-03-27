@@ -3,30 +3,23 @@ import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from "
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import Checkbox from "expo-checkbox";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
-import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import * as MapsApiService from "src/service/MapsApiService";
-import { Address, UserLocation } from "src/types";
-import UserMapper from "src/mapper/UserMapper";
+import { Address } from "src/types";
 import { useError } from "src/hooks/useModal";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "src/types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import UserService from "src/service/UserService";
 import Logo from "src/components/Logo";
 import Toast from "react-native-toast-message";
 import NotificationService from "src/service/NotificationService";
 import AddressMapper from "src/mapper/AddressMapper";
-import { RadioButton } from "react-native-paper";
-import { CollectionSchedule } from "src/types";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setup'>;
 
 export function SetupScreen() {
-    const { saveCurrentLocation, clearData } = useCurrentLocation();
     const { showError } = useError();
     const [ isChecked, setChecked ] = useState(false);
     const [ selectedAddress, setSelectedAddress ] = useState<Address>();
-    const [ collectionSchedule, setCollectionSchedule ] = useState<CollectionSchedule>("SEG_QUA_SEX");
     const navigation = useNavigation<SetupScreenNavigationProp>();
     const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
 
@@ -90,36 +83,13 @@ export function SetupScreen() {
         if (!selectedAddress) {
             errors.push("É necessário selecionar um endereço!");
         }
-        if (!collectionSchedule) {
-            errors.push("Selecione os dias da coleta para receber avisos corretos.");
-        }
-
         if (errors.length > 0) {
             showError("Atenção!", errors);
             return;
         }
 
         if (selectedAddress) {
-            // const deviceNotificationToken = await NotificationService.getToken();
-            // selectedLocation.fcm_token = deviceNotificationToken || undefined;
-
-            try {
-                const userToBeCreated = UserMapper.toCreateUserLocationRequest(selectedAddress, collectionSchedule);
-                const response = await UserService.createUser(userToBeCreated);
-                console.log("Usuário criado no servidor com sucesso.");
-                const user = UserMapper.fromCreateResponse(response, selectedAddress, collectionSchedule!);
-
-                const result = await saveCurrentLocation(user);
-                if (!result) {
-                    showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Tente novamente mais tarde.");
-                    console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");
-                }
-            } catch (error) {
-                console.error("Erro ao criar usuário no servidor:", error);
-                showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Verifique sua conexão com a internet e tente novamente mais tarde.");
-                clearData();
-                return;
-            }
+            navigation.navigate("CollectionSchedule", { selectedAddress });
         }
     }
 
@@ -148,34 +118,6 @@ export function SetupScreen() {
                         <Text style={styles.checkboxLabel}>Aceito os <Text style={styles.coloredText}>Termos de Serviço</Text></Text>
                     </TouchableOpacity>
                 </TouchableOpacity>
-
-                <Text style={styles.collectionScheduleLabel}>Quais dias a coleta passa na sua rua?</Text>
-                <View style={styles.scheduleContainer}>
-                    <TouchableOpacity
-                        style={styles.scheduleOption}
-                        onPress={() => setCollectionSchedule("SEG_QUA_SEX")}
-                    >
-                        <RadioButton
-                            value="SEG_QUA_SEX"
-                            status={collectionSchedule === "SEG_QUA_SEX" ? "checked" : "unchecked"}
-                            onPress={() => setCollectionSchedule("SEG_QUA_SEX")}
-                            color="#0FAD83"
-                        />
-                        <Text style={styles.scheduleText}>Segunda, Quarta e Sexta</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.scheduleOption, styles.scheduleOptionBorderTop]}
-                        onPress={() => setCollectionSchedule("TER_QUI_SAB")}
-                    >
-                        <RadioButton
-                            value="TER_QUI_SAB"
-                            status={collectionSchedule === "TER_QUI_SAB" ? "checked" : "unchecked"}
-                            onPress={() => setCollectionSchedule("TER_QUI_SAB")}
-                            color="#0FAD83"
-                        />
-                        <Text style={styles.scheduleText}>Terça, Quinta e Sábado</Text>
-                    </TouchableOpacity>
-                </View>
                 <TouchableOpacity
                     style={styles.buttonContainer}
                     onPress={() => handleProsseguirButton()}
@@ -232,35 +174,6 @@ const styles = StyleSheet.create({
     checkboxLabel: {
         fontSize: 14,
         marginLeft: 8,
-    },
-    collectionScheduleLabel: {
-        marginTop: 18,
-        marginLeft: 5,
-        fontWeight: "600",
-        fontSize: 15,
-    },
-    scheduleContainer: {
-        marginTop: 8,
-        borderWidth: 1,
-        borderColor: "#E4E4E4",
-        borderRadius: 13,
-        overflow: "hidden",
-        backgroundColor: "#FAFAFA",
-    },
-    scheduleOption: {
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: 4,
-        paddingRight: 10,
-    },
-    scheduleOptionBorderTop: {
-        borderTopWidth: 1,
-        borderTopColor: "#E4E4E4",
-    },
-    scheduleText: {
-        marginLeft: 2,
-        fontSize: 14,
-        fontWeight: "500",
     },
     buttonContainer: {
         backgroundColor: "#0FAD83",

@@ -1,7 +1,6 @@
 import {
     UserLocation,
     CreateUserLocationRequest,
-    GoogleReverseGeocodingApiPlace,
     UserLocationSchema,
     CreateUserLocationRequestSchema,
     UserCreatedResponse,
