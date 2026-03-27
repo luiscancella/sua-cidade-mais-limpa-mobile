@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Switch, Text, View, } from "react-native";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
+import { RadioButton } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ConfigurationSection } from "src/components/ConfigurationSection";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
@@ -17,26 +18,14 @@ type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, '
 export function ConfigurationScreen() {
     const { currentLocation, saveCurrentLocation } = useCurrentLocation();
     const { showError } = useError();
-    const [garbageCollectionNotificationEnabled, setGarbageCollectionNotificationEnabled] = useState(false);
-    const [newsEnabled, setNewsEnabled] = useState(false);
+    const [segTerQuaEnabled, setSegTerQuaEnabled] = useState(true);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const navigation = useNavigation<SetupScreenNavigationProp>();
 
     useEffect(() => {
         // TODO: Implementar logica de mudança de botão
-        console.log("Mudando o estado da notificação:", garbageCollectionNotificationEnabled);
-    }, [garbageCollectionNotificationEnabled]);
-
-    useEffect(() => {
-        // TODO: Implementar logica de mudança de botão
-        console.log("Mudando o estado das notícias:", newsEnabled);
-    }, [newsEnabled]);
-
-    function handleSwitchChange(value: boolean) {
-        showError("Funcionalidade em desenvolvimento", "A configuração de notícias e atualizações ainda está em desenvolvimento e será lançada em breve. Fique atento às atualizações!");
-        setGarbageCollectionNotificationEnabled(false);
-        setNewsEnabled(false);
-    }
+        console.log("Mudando o estado da notificação:", segTerQuaEnabled);
+    }, [segTerQuaEnabled]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -56,26 +45,24 @@ export function ConfigurationScreen() {
                 description="Alterar configurações de notificações"
             >
                 <View style={styles.itemContainer}>
-                    <Ionicons name="newspaper" size={20} color="black" style={styles.itemIcon} />
-                    <Text style={styles.itemText}>Notícias e atualizações</Text>
-                    <Switch
-                        value={newsEnabled}
-                        onValueChange={handleSwitchChange}
-                        style={styles.itemSwitch}
-                        thumbColor={newsEnabled ? '#f9f9f9' : '#e2e1e1ff'}
-                        trackColor={{ false: '#C5C5C5', true: '#4AB469' }}
-                    />
+                    <Text style={styles.daysListContainer}>SEGUNDA, QUARTA, SEXTA</Text>
+                    <View style={styles.itemSwitch}>
+                        <RadioButton
+                            value="first"
+                            status={segTerQuaEnabled ? 'checked' : 'unchecked'}
+                            onPress={() => setSegTerQuaEnabled(true)}
+                        />
+                    </View>
                 </View>
                 <View style={styles.itemContainer}>
-                    <Ionicons name="alarm" size={20} color="black" style={styles.itemIcon} />
-                    <Text style={styles.itemText}>Horários de coleta</Text>
-                    <Switch
-                        value={garbageCollectionNotificationEnabled}
-                        onValueChange={handleSwitchChange}
-                        style={styles.itemSwitch}
-                        thumbColor={garbageCollectionNotificationEnabled ? '#f9f9f9' : '#e2e1e1ff'}
-                        trackColor={{ false: '#C5C5C5', true: '#4AB469' }}
-                    />
+                    <Text style={styles.daysListContainer}>TERÇA, QUINTA, SÁBADO</Text>
+                    <View style={styles.itemSwitch}>
+                        <RadioButton
+                            value="second"
+                            status={segTerQuaEnabled ? 'unchecked' : 'checked'}
+                            onPress={() => setSegTerQuaEnabled(false)}
+                        />
+                    </View>
                 </View>
             </ConfigurationSection>
             <ConfigurationSection
@@ -117,9 +104,12 @@ const styles = StyleSheet.create({
     itemIcon: {
         marginLeft: 10,
     },
-    itemText: {
+    daysListContainer: {
         fontWeight: "600",
         fontSize: 14,
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
         marginLeft: 14,
         marginBottom: 1,
     },
