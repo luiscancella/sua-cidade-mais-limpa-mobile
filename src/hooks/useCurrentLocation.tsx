@@ -1,7 +1,6 @@
 import React from "react";
 import * as SecureStore from "expo-secure-store";
-import { Address, HeadersRequired, UserLocation } from "src/types";
-import { th } from "zod/locales";
+import { Address, CollectionSchedule, HeadersRequired, UserLocation, UserLocationSchema } from "src/types";
 import UserService from "src/service/UserService";
 import UserMapper from "src/mapper/UserMapper";
 
@@ -9,6 +8,7 @@ interface CurrentLocationContextData {
     currentLocation?: UserLocation,
     saveCurrentLocation(value: UserLocation): Promise<boolean>,
     updateAddress(newAddress: Address): Promise<UserLocation | null>,
+    updateCollectionSchedule(collectionSchedule: CollectionSchedule): Promise<boolean>,
     loadCurrentLocation(): Promise<boolean>,
     isLoading: boolean,
     clearData(): Promise<void>,
@@ -40,6 +40,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             await SecureStore.setItemAsync("phone_id", value.phone_id);
             await SecureStore.setItemAsync("device_secret", value.device_secret);
             await SecureStore.setItemAsync("address", JSON.stringify(value.address));
+            await SecureStore.setItemAsync("collection_schedule", value.collection_schedule);
             console.log("Location saved");
             setCurrentLocation(value);
             return true;
@@ -55,6 +56,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             const phone_id = await SecureStore.getItemAsync("phone_id");
             const device_secret = await SecureStore.getItemAsync("device_secret");
             const address = await SecureStore.getItemAsync("address");
+            const collection_schedule = await SecureStore.getItemAsync("collection_schedule");
             if (!phone_id || !device_secret || !address) {
                 console.log("No location found in secure store");
                 setIsLoading(false);
@@ -62,11 +64,12 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 return false;
             }
 
-            const userInfo = {
+            const userInfo = UserLocationSchema.parse({
                 phone_id: phone_id,
                 device_secret: device_secret,
                 address: JSON.parse(address),
-            } as UserLocation;
+                collection_schedule: collection_schedule || "SEG_QUA_SEX",
+            });
             
             setCurrentLocation(userInfo);
             setIsLoading(false);
@@ -84,7 +87,11 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             newUserRequest.phoneId = currentLocation?.phone_id;
 
             const userCreated = await UserService.createUser(newUserRequest);
-            const user = UserMapper.fromCreateResponse(userCreated, newAddress);
+            const user = UserMapper.fromCreateResponse(
+                userCreated,
+                newAddress,
+                currentLocation?.collection_schedule || "SEG_QUA_SEX"
+            );
             await saveCurrentLocation(user);
               
             return user;
@@ -92,6 +99,18 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             console.error("Failed to update address:", error);
             throw error;
         }
+    }
+
+    async function updateCollectionSchedule(collectionSchedule: CollectionSchedule): Promise<boolean> {
+        if (!currentLocation) {
+            console.error("Current location not found while trying to update collection schedule");
+            return false;
+        }
+
+        return saveCurrentLocation({
+            ...currentLocation,
+            collection_schedule: collectionSchedule,
+        });
     }
 
     function getHeaders() : HeadersRequired {
@@ -108,6 +127,10 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
     async function clearData() {
         try {
             await SecureStore.deleteItemAsync("location");
+            await SecureStore.deleteItemAsync("phone_id");
+            await SecureStore.deleteItemAsync("device_secret");
+            await SecureStore.deleteItemAsync("address");
+            await SecureStore.deleteItemAsync("collection_schedule");
             setCurrentLocation(undefined);
             console.log("Cleared location and user data from secure store");
         } catch (error) {
@@ -125,6 +148,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 currentLocation,
                 saveCurrentLocation,
                 updateAddress,
+                updateCollectionSchedule,
                 loadCurrentLocation,
                 isLoading,
                 clearData,

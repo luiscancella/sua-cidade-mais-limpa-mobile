@@ -1,31 +1,41 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Switch, Text, View, } from "react-native";
-import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
-import { RadioButton } from "react-native-paper";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { RadioButton } from "react-native-paper";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
+import { Ionicons } from "@expo/vector-icons";
+
 import { ConfigurationSection } from "src/components/ConfigurationSection";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
-import { useCurrentLocation } from "src/hooks/useCurrentLocation";
 import { useError } from "src/hooks/useModal";
 import { RootStackParamList } from "src/types/navigation";
-import { set } from "zod";
+import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
+import { CollectionSchedule } from "src/types";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Configuration'>;
 
 export function ConfigurationScreen() {
-    const { currentLocation, saveCurrentLocation } = useCurrentLocation();
     const { showError } = useError();
-    const [segTerQuaEnabled, setSegTerQuaEnabled] = useState(true);
+    const { currentLocation, updateCollectionSchedule } = useRequiredCurrentLocation();
+    const [ collectionSchedule, setCollectionSchedule ] = useState<CollectionSchedule>(currentLocation.collection_schedule);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const navigation = useNavigation<SetupScreenNavigationProp>();
 
     useEffect(() => {
-        // TODO: Implementar logica de mudança de botão
-        console.log("Mudando o estado da notificação:", segTerQuaEnabled);
-    }, [segTerQuaEnabled]);
+        setCollectionSchedule(currentLocation.collection_schedule);
+    }, [currentLocation.collection_schedule]);
+
+    async function handleCollectionScheduleChange(newSchedule: CollectionSchedule) {
+        setCollectionSchedule(newSchedule);
+
+        const saved = await updateCollectionSchedule(newSchedule);
+        if (!saved) {
+            showError("Erro ao salvar", "Não foi possível salvar sua preferência de dias de coleta. Tente novamente.");
+            setCollectionSchedule(currentLocation.collection_schedule);
+        }
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -49,8 +59,8 @@ export function ConfigurationScreen() {
                     <View style={styles.itemSwitch}>
                         <RadioButton
                             value="first"
-                            status={segTerQuaEnabled ? 'checked' : 'unchecked'}
-                            onPress={() => setSegTerQuaEnabled(true)}
+                            status={collectionSchedule === "SEG_QUA_SEX" ? 'checked' : 'unchecked'}
+                            onPress={() => handleCollectionScheduleChange("SEG_QUA_SEX")}
                         />
                     </View>
                 </View>
@@ -59,8 +69,8 @@ export function ConfigurationScreen() {
                     <View style={styles.itemSwitch}>
                         <RadioButton
                             value="second"
-                            status={segTerQuaEnabled ? 'unchecked' : 'checked'}
-                            onPress={() => setSegTerQuaEnabled(false)}
+                            status={collectionSchedule === "TER_QUI_SAB" ? 'checked' : 'unchecked'}
+                            onPress={() => handleCollectionScheduleChange("TER_QUI_SAB")}
                         />
                     </View>
                 </View>
