@@ -15,6 +15,7 @@ module.exports = {
       backgroundColor: "#ffffff"
     },
     ios: {
+      bundleIdentifier: "com.techurb.suacidademaislimpa",
       supportsTablet: true,
       config: {
         googleMapsApiKey: googleMapsApiKey

@@ -51,6 +51,10 @@ export function HomeScreen() {
   }, []);
 
   useEffect(() => {
+    // if ( 1=== 1) {
+    //   setEstimatedTimePreviewText("9 minutos");
+    //   return;
+    // }
     if (connectionFailed) {
       showError(
         "Erro de conexão",

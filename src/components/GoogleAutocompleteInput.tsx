@@ -90,6 +90,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
         React.useEffect(() => {
             if (currentLocation && ref && typeof ref !== 'function' && ref.current) {
                 ref.current.setAddressText(currentLocation.address.short_address);
+                // ref.current.setAddressText("Endereço de Exemplo, 123");
             }
         }, [currentLocation, ref]);
 
