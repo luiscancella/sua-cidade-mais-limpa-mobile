@@ -12,7 +12,7 @@ import { useTruckDistances } from "src/hooks/useTruckPositions";
 import { useTruckMapPositions } from "src/hooks/useTruckMapPositions";
 import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
-import { UserLocation } from "src/types";
+import { Address } from "src/types";
 import { TruckMarker } from "src/components/TruckMarker";
 import NotificationService from "src/service/NotificationService";
 import UserService from "src/service/UserService";
@@ -20,7 +20,7 @@ import UserService from "src/service/UserService";
 export function HomeScreen() {
   const { currentLocation, saveCurrentLocation, getHeaders, clearData } = useRequiredCurrentLocation();
   const { showError } = useError();
-  const [ estimatedTimePreviewText, setEstimatedTimePreviewText ] = useState("Calculando...");
+  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
   const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
   const mapRef = React.useRef<MapView | null>(null);
   const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({ phone_id: currentLocation?.phone_id });
@@ -94,16 +94,14 @@ export function HomeScreen() {
     }
   }, [currentLocation]);
 
-  async function handleLocationSelection(userLocation: UserLocation) {
+  async function handleLocationSelection(userLocation: Address) {
     try {
-      saveCurrentLocation(userLocation);
       setEstimatedTimePreviewText("Calculando...");
       reconnect();
     } catch (error) {
       console.error("Erro ao salvar localização:", error);
       showError("Erro ao salvar localização", "Não foi possível salvar a localização. Tente novamente.");
     }
-    ref.current?.setAddressText(userLocation.address.short_address);
   }
 
   return (
@@ -151,13 +149,20 @@ export function HomeScreen() {
               }}
               onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
               updateCurrentLocationOnSelect={true}
-              onLocationSelected={(address) => setEstimatedTimePreviewText("Calculando...")}
+              onLocationSelected={handleLocationSelection}
             />
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />
               <View style={styles.estimatedTimeTextContainer}>
                 <Text style={styles.estimatedTimeText}>A coleta de lixo irá chegar em:</Text>
-                <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText}</Text>
+                { estimatedTimePreviewText === "Caminhões Indisponíveis" ?
+                  <View>
+                    <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText.split(" ")[0]}</Text>
+                    <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText.split(" ")[1]}</Text>
+                  </View>
+                  :
+                  <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText}</Text>
+                }
               </View>
             </View>
           </SafeAreaView>
