@@ -46,6 +46,13 @@ module.exports = {
     },
     plugins: [
       [
+        "expo-notifications",
+        {
+          icon: "./assets/adaptive-icon.png",
+          color: "#1CB788"
+        }
+      ],
+      [
         "expo-location",
         {
           locationAlwaysAndWhenInUsePermission: "Permitir que $(PRODUCT_NAME) use sua localização.",

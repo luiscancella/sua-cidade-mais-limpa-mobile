@@ -10,6 +10,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		7CBC58D50516D3AAE5C0D102 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7893310A252FA1F8EB96E2 /* ExpoModulesProvider.swift */; };
+		9A4498B22F93EBB20012930D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A4498B12F93EBB10012930D /* GoogleService-Info.plist */; };
+		9A4498B52F93ED030012930D /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 9A4498B42F93ED030012930D /* FirebaseAnalytics */; };
+		9A4498B72F93ED030012930D /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 9A4498B62F93ED030012930D /* FirebaseMessaging */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		CFC580DC7F9A3CB990A03242 /* libPods-suacidademaislimpa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8148CB3A586352E6372BCEB1 /* libPods-suacidademaislimpa.a */; };
 		DB4873859595FC5382E26188 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D4FF321E74F8DDCF50F81E48 /* PrivacyInfo.xcprivacy */; };
@@ -24,6 +27,7 @@
 		1F7893310A252FA1F8EB96E2 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-suacidademaislimpa/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		4D931CF21D3C257034F70036 /* Pods-suacidademaislimpa.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-suacidademaislimpa.release.xcconfig"; path = "Target Support Files/Pods-suacidademaislimpa/Pods-suacidademaislimpa.release.xcconfig"; sourceTree = "<group>"; };
 		8148CB3A586352E6372BCEB1 /* libPods-suacidademaislimpa.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-suacidademaislimpa.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A4498B12F93EBB10012930D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = suacidademaislimpa/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		D4FF321E74F8DDCF50F81E48 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = suacidademaislimpa/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -37,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A4498B72F93ED030012930D /* FirebaseMessaging in Frameworks */,
+				9A4498B52F93ED030012930D /* FirebaseAnalytics in Frameworks */,
 				CFC580DC7F9A3CB990A03242 /* libPods-suacidademaislimpa.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,6 +68,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				D4FF321E74F8DDCF50F81E48 /* PrivacyInfo.xcprivacy */,
+				9A4498B12F93EBB10012930D /* GoogleService-Info.plist */,
 			);
 			name = suacidademaislimpa;
 			sourceTree = "<group>";
@@ -178,6 +185,9 @@
 				Base,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
+			packageReferences = (
+				9A4498B32F93ED030012930D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -194,6 +204,7 @@
 			files = (
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				9A4498B22F93EBB20012930D /* GoogleService-Info.plist in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				DB4873859595FC5382E26188 /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -550,6 +561,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9A4498B32F93ED030012930D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.12.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9A4498B42F93ED030012930D /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A4498B32F93ED030012930D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		9A4498B62F93ED030012930D /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A4498B32F93ED030012930D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }

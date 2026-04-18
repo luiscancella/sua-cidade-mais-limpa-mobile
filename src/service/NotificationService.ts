@@ -1,7 +1,39 @@
 import * as Notifications from "expo-notifications";
-import apiBackend from "src/lib/apiBackend";
+import { Platform } from "react-native";
 
 class NotificacaoService {
+    private configuredForegroundHandler = false;
+
+    configureForegroundNotifications() {
+        if (this.configuredForegroundHandler) {
+            return;
+        }
+
+        Notifications.setNotificationHandler({
+            handleNotification: async () => ({
+                shouldShowBanner: true,
+                shouldShowList: true,
+                shouldPlaySound: true,
+                shouldSetBadge: true,
+            }),
+        });
+
+        this.configuredForegroundHandler = true;
+    }
+
+    async configureAndroidChannel() {
+        if (Platform.OS !== "android") {
+            return;
+        }
+
+        await Notifications.setNotificationChannelAsync("default", {
+            name: "Padrão",
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: "#1CB788",
+        });
+    }
+
     async requestNotificationPermission() {
         const { status } = await Notifications.requestPermissionsAsync();
         return status === 'granted';
@@ -16,7 +48,7 @@ class NotificacaoService {
         return await this.requestNotificationPermission();
     }
 
-    public async getToken(): Promise<string | null> {
+    public async getDevicePushToken(): Promise<string | null> {
         const granted = await this.hasNotificationPermission();
         if (!granted) {
             console.warn("Notification permissions not granted");

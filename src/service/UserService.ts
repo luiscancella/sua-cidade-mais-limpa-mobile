@@ -13,10 +13,10 @@ class UserService {
         return data;
     }
 
-    async registerFCMToken(phoneId: string, fcm_token: string, headers: HeadersRequired): Promise<void> {
+    async registerPushToken(phoneId: string, pushToken: string, headers: HeadersRequired): Promise<void> {
         return apiBackend.post(
             "/users/fcm-token",
-            { fcmToken: fcm_token },
+            { fcmToken: pushToken },
             {
                 params: { phoneId },
                 headers: headers,

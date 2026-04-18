@@ -33,9 +33,9 @@ export function HomeScreen() {
     console.log("Requesting notification permission and device token...");
     async function registerForPushNotifications() {
       try {
-        const token = await NotificationService.getToken();
+        const token = await NotificationService.getDevicePushToken();
         if (token) {
-          UserService.registerFCMToken(currentLocation.phone_id, token, getHeaders());
+          await UserService.registerPushToken(currentLocation.phone_id, token, getHeaders());
           console.log("Device token obtained and registered successfully:", token);
           return;
         }
