@@ -55,7 +55,8 @@ module.exports = {
       [
         "expo-location",
         {
-          locationAlwaysAndWhenInUsePermission: "Permitir que $(PRODUCT_NAME) use sua localização.",
+          locationAlwaysPermission: "Permitir que $(PRODUCT_NAME) use sua localização para te enviar quando uma coleta chegará.",
+          locationWhenInUsePermission: "Permitir $(PRODUCT_NAME) use sua localização para mostrar a coleta de lixo mais perto de você.",
           isAndroidForegroundServiceEnabled: true
         }
       ],

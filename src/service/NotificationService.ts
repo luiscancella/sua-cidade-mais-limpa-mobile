@@ -1,3 +1,4 @@
+import messaging from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
@@ -51,12 +52,12 @@ class NotificacaoService {
     public async getDevicePushToken(): Promise<string | null> {
         const granted = await this.hasNotificationPermission();
         if (!granted) {
-            console.warn("Notification permissions not granted");
+            console.warn("Permissão não concedida");
             return null;
         }
 
-        const tokenData = await Notifications.getDevicePushTokenAsync();
-        const fcm_token = tokenData.data;
+        // Isso garante que você receberá um token FCM tanto no Android quanto no iOS
+        const fcm_token = await messaging().getToken();
         return fcm_token;
     }
 }
