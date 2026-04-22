@@ -78,7 +78,7 @@ export function HomeScreen() {
             text2: "Não foi possível obter a localização dos caminhões. Por favor, tente novamente mais tarde.",
           });
         }
-      }, 30000);
+      }, 10000);
       setEstimatedTimePreviewText("Calculando...");
     }
   }, [TruckDistance, isConnected, connectionFailed]);
@@ -154,15 +154,22 @@ export function HomeScreen() {
             <View style={styles.estimatedTimeCardContainer}>
               <Ionicons name="time" size={24} color="white" />
               <View style={styles.estimatedTimeTextContainer}>
-                <Text style={styles.estimatedTimeText}>A coleta de lixo irá chegar em:</Text>
-                { estimatedTimePreviewText === "Caminhões Indisponíveis" ?
-                  <View>
-                    <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText.split(" ")[0]}</Text>
-                    <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText.split(" ")[1]}</Text>
-                  </View>
-                  :
-                  <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText}</Text>
-                }
+                {estimatedTimePreviewText === "Caminhões Indisponíveis" ? (
+                  <>
+                    <Text style={styles.estimatedTimeText}>Nenhum caminhão na sua região</Text>
+                    <Text style={styles.estimatedTimeSubtext}>Você será notificado quando um chegar</Text>
+                  </>
+                ) : estimatedTimePreviewText === "Sem conexão" ? (
+                  <>
+                    <Text style={styles.estimatedTimeText}>Sem conexão com o servidor</Text>
+                    <Text style={styles.estimatedTimeSubtext}>Verifique sua internet e tente novamente</Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.estimatedTimeText}>A coleta de lixo irá chegar em:</Text>
+                    <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText}</Text>
+                  </>
+                )}
               </View>
             </View>
           </SafeAreaView>
@@ -211,13 +218,31 @@ const styles = StyleSheet.create({
   },
   estimatedTimeText: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "300",
+  },
+  estimatedTimeSubtext: {
+    color: "rgba(255, 255, 255, 0.7)",
+    fontSize: 16,
+    fontWeight: "300",
+    marginTop: 2,
   },
   estimatedTimeValue: {
     color: "#fff",
     fontSize: 28,
     fontWeight: "700",
+  },
+  unavailableContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 2,
+  },
+  unavailableText: {
+    color: "rgba(255, 255, 255, 0.85)",
+    fontSize: 14,
+    fontWeight: "400",
+    flexShrink: 1,
   },
 });
 
