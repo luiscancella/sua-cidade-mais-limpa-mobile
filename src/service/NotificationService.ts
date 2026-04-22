@@ -1,4 +1,4 @@
-import messaging from "@react-native-firebase/messaging";
+import messaging, { getToken } from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
@@ -9,7 +9,6 @@ class NotificacaoService {
         if (this.configuredForegroundHandler) {
             return;
         }
-
         Notifications.setNotificationHandler({
             handleNotification: async () => ({
                 shouldShowBanner: true,
@@ -18,7 +17,6 @@ class NotificacaoService {
                 shouldSetBadge: true,
             }),
         });
-
         this.configuredForegroundHandler = true;
     }
 
@@ -26,7 +24,6 @@ class NotificacaoService {
         if (Platform.OS !== "android") {
             return;
         }
-
         await Notifications.setNotificationChannelAsync("default", {
             name: "Padrão",
             importance: Notifications.AndroidImportance.MAX,
@@ -37,15 +34,14 @@ class NotificacaoService {
 
     async requestNotificationPermission() {
         const { status } = await Notifications.requestPermissionsAsync();
-        return status === 'granted';
+        return status === "granted";
     }
 
     async hasNotificationPermission() {
         const { status } = await Notifications.getPermissionsAsync();
-        if (status === 'granted') {
+        if (status === "granted") {
             return true;
         }
-
         return await this.requestNotificationPermission();
     }
 
@@ -56,10 +52,15 @@ class NotificacaoService {
             return null;
         }
 
-        // Isso garante que você receberá um token FCM tanto no Android quanto no iOS
-        const fcm_token = await messaging().getToken();
-        return fcm_token;
+        try {
+            const app = await messaging();
+            const fcm_token = await getToken(app);
+            return fcm_token;
+        } catch (error) {
+            console.error("Erro ao obter FCM token:", error);
+            return null;
+        }
     }
 }
 
-export default new NotificacaoService
+export default new NotificacaoService();

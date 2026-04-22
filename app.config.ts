@@ -2,9 +2,10 @@ const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY ?? process.env.EXPO_PUB
 
 module.exports = {
   expo: {
-    name: "sua-cidade-mais-limpa",
+    name: "Sua Cidade Mais Limpa",
     slug: "sua-cidade-mais-limpa",
-    version: "1.0.0",
+    version: "1.0.1",
+    buildNumber: "3",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
