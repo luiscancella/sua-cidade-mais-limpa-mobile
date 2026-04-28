@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>sua-cidade-mais-limpa</string>
+    <string>Sua Cidade Mais Limpa</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -38,7 +38,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>3</string>
+    <string>1</string>
     <key>GMSApiKey</key>
     <string>AIzaSyC06VItPhore2tT6caeS9djCD6iCuPEfFE</string>
     <key>LSMinimumSystemVersion</key>
@@ -53,7 +53,7 @@
       <true/>
     </dict>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Permitir que $(PRODUCT_NAME) use sua localização para te enviar quando uma coleta chegará.</string>
+    <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Permitir que $(PRODUCT_NAME) use sua localização para te enviar quando uma coleta chegará.</string>
     <key>NSLocationWhenInUseUsageDescription</key>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "615472169232",
+    "project_id": "sua-cidade-mais-limpa-f2b61",
+    "storage_bucket": "sua-cidade-mais-limpa-f2b61.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:615472169232:android:925cc26c2be00b2114e595",
+        "android_client_info": {
+          "package_name": "com.techurb.suacidademaislimpa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-wajs6HqfLdAUyLhjv3CT-ww0G8F2yOc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

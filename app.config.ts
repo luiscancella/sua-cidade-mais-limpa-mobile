@@ -18,12 +18,13 @@ module.exports = {
     ios: {
       bundleIdentifier: "com.techurb.suacidademaislimpa",
       supportsTablet: true,
+      googleServicesFile: "./firebase/GoogleService-Info.plist",
       config: {
         googleMapsApiKey: googleMapsApiKey
       }
     },
     android: {
-      googleServicesFile: "./android/app/google-services.json",
+      googleServicesFile: "./firebase/google-services.json",
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff"
@@ -46,6 +47,7 @@ module.exports = {
       googleMapsApiKey: googleMapsApiKey
     },
     plugins: [
+      "@react-native-firebase/app",
       [
         "expo-notifications",
         {

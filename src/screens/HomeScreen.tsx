@@ -117,6 +117,9 @@ export function HomeScreen() {
         }}
         loadingEnabled={true}
         provider={PROVIDER_GOOGLE}
+        // showsUserLocation={true}
+        // showsMyLocationButton={true}
+        // followsUserLocation={true}
       >
         <Marker
           coordinate={{
