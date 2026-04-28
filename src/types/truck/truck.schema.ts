@@ -14,3 +14,13 @@ export const TruckPositionSchema = z.object({
 });
 
 export type TruckPosition = z.infer<typeof TruckPositionSchema>;
+
+export const ETAStatusSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("calculating") }),
+  z.object({ kind: z.literal("connecting") }),
+  z.object({ kind: z.literal("available"), minutes: z.number() }),
+  z.object({ kind: z.literal("unavailable") }),
+  z.object({ kind: z.literal("no_connection") }),
+]);
+
+export type ETAStatus = z.infer<typeof ETAStatusSchema>;

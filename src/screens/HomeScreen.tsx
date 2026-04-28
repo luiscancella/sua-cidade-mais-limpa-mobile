@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
@@ -11,92 +11,92 @@ import { useError } from "src/hooks/useModal";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 import { useTruckMapPositions } from "src/hooks/useTruckMapPositions";
 import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
+import { usePushNotification } from "src/hooks/usePushNotification";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
-import { Address } from "src/types";
+import { ETACard } from "src/components/ETACard";
+import { Address, ETAStatus } from "src/types";
 import { TruckMarker } from "src/components/TruckMarker";
-import NotificationService from "src/service/NotificationService";
-import UserService from "src/service/UserService";
+
+const MAP_DELTA = { latitudeDelta: 0.0143, longitudeDelta: 0.0134 };
 
 export function HomeScreen() {
-  const { currentLocation, saveCurrentLocation, getHeaders, clearData } = useRequiredCurrentLocation();
+  const { currentLocation, getHeaders } = useRequiredCurrentLocation();
   const { showError } = useError();
-  const [estimatedTimePreviewText, setEstimatedTimePreviewText] = useState("Calculando...");
-  const ref = React.useRef<GooglePlacesAutocompleteRef | null>(null);
-  const mapRef = React.useRef<MapView | null>(null);
-  const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({ phone_id: currentLocation?.phone_id });
+  const [etaStatus, setEtaStatus] = useState<ETAStatus>({ kind: "calculating" });
+
+  const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
+  const mapRef = useRef<MapView | null>(null);
+  const unavailableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({
+    phone_id: currentLocation?.phone_id,
+  });
   const { truckIds, animatedRegions, bearings } = useTruckMapPositions();
 
+  usePushNotification({ phoneId: currentLocation.phone_id, getHeaders });
+
   useEffect(() => {
-    // Use isso caso queira limpar a localização e limpar o fluxo
-    // clearData();
-
-    console.log("Requesting notification permission and device token...");
-    async function registerForPushNotifications() {
-      try {
-        const token = await NotificationService.getDevicePushToken();
-        if (token) {
-          await UserService.registerPushToken(currentLocation.phone_id, token, getHeaders());
-          console.log("Device token obtained and registered successfully:", token);
-          return;
-        }
-        showError("Erro de Notificação", "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.");
-      } catch (error) {
-        console.error("Error obtaining device token:", error);
-        showError("Erro de Notificação", "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.");
-      }
-    }
-
-    registerForPushNotifications();
-    console.log(currentLocation);
+    return () => {
+      if (unavailableTimerRef.current) clearTimeout(unavailableTimerRef.current);
+    };
   }, []);
 
   useEffect(() => {
-    // if ( 1=== 1) {
-    //   setEstimatedTimePreviewText("9 minutos");
-    //   return;
-    // }
+    if (unavailableTimerRef.current) {
+      clearTimeout(unavailableTimerRef.current);
+      unavailableTimerRef.current = null;
+    }
+
     if (connectionFailed) {
       showError(
         "Erro de conexão",
         "Não foi possível conectar ao servidor. Verifique a internet e reinicie o aplicativo.",
       );
-      setEstimatedTimePreviewText("Sem conexão");
+      setEtaStatus({ kind: "no_connection" });
       return;
     }
 
     if (!isConnected) {
-      setEstimatedTimePreviewText("Conectando...");
-    } else if (TruckDistance) {
-      setEstimatedTimePreviewText(`${Math.round(TruckDistance.etaMinutes)} minutos`);
-    } else {
-      setTimeout(() => {
-        if (!TruckDistance) {
-          setEstimatedTimePreviewText("Caminhões Indisponíveis");
-          Toast.show({
-            type: "info",
-            text1: "Caminhões Indisponíveis",
-            text2: "Não foi possível obter a localização dos caminhões. Por favor, tente novamente mais tarde.",
-          });
-        }
-      }, 10000);
-      setEstimatedTimePreviewText("Calculando...");
+      setEtaStatus({ kind: "connecting" });
+      return;
     }
+
+    if (TruckDistance) {
+      setEtaStatus({ kind: "available", minutes: Math.round(TruckDistance.etaMinutes) });
+      return;
+    }
+
+    setEtaStatus({ kind: "calculating" });
+    unavailableTimerRef.current = setTimeout(() => {
+      setEtaStatus({ kind: "unavailable" });
+      Toast.show({
+        type: "info",
+        text1: "Nenhum caminhão disponível",
+        text2: "Você será notificado quando um chegar na sua região.",
+      });
+    }, 10000);
   }, [TruckDistance, isConnected, connectionFailed]);
 
   useEffect(() => {
     if (currentLocation && mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: currentLocation.address.latitude,
-        longitude: currentLocation.address.longitude,
-        latitudeDelta: 0.0143,
-        longitudeDelta: 0.0134,
-      }, 1000);
+      mapRef.current.animateToRegion(
+        {
+          latitude: currentLocation.address.latitude,
+          longitude: currentLocation.address.longitude,
+          ...MAP_DELTA,
+        },
+        1000,
+      );
     }
   }, [currentLocation]);
 
   async function handleLocationSelection(userLocation: Address) {
     try {
-      setEstimatedTimePreviewText("Calculando...");
+      if (unavailableTimerRef.current) {
+        clearTimeout(unavailableTimerRef.current);
+        unavailableTimerRef.current = null;
+      }
+      setEtaStatus({ kind: "calculating" });
       reconnect();
     } catch (error) {
       console.error("Erro ao salvar localização:", error);
@@ -112,14 +112,10 @@ export function HomeScreen() {
         initialRegion={{
           latitude: currentLocation.address.latitude,
           longitude: currentLocation.address.longitude,
-          latitudeDelta: 0.0143,
-          longitudeDelta: 0.0134,
+          ...MAP_DELTA,
         }}
-        loadingEnabled={true}
+        loadingEnabled
         provider={PROVIDER_GOOGLE}
-        // showsUserLocation={true}
-        // showsMyLocationButton={true}
-        // followsUserLocation={true}
       >
         <Marker
           coordinate={{
@@ -135,6 +131,7 @@ export function HomeScreen() {
           />
         ))}
       </MapView>
+
       <View style={styles.container} pointerEvents="box-none">
         <LinearGradient
           colors={["#1CB788", "#19AB89"]}
@@ -147,47 +144,30 @@ export function HomeScreen() {
               ref={ref}
               icon={<Ionicons name="location-outline" size={24} color="white" />}
               styles={searchAddressStyles}
-              textInputProps={{
-                placeholderTextColor: "#fff",
-              }}
-              onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
-              updateCurrentLocationOnSelect={true}
+              textInputProps={{ placeholderTextColor: "#fff" }}
+              onError={() =>
+                showError(
+                  "Erro ao selecionar endereço",
+                  "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.",
+                )
+              }
+              updateCurrentLocationOnSelect
               onLocationSelected={handleLocationSelection}
             />
-            <View style={styles.estimatedTimeCardContainer}>
-              <Ionicons name="time" size={24} color="white" />
-              <View style={styles.estimatedTimeTextContainer}>
-                {estimatedTimePreviewText === "Caminhões Indisponíveis" ? (
-                  <>
-                    <Text style={styles.estimatedTimeText}>Nenhum caminhão na sua região</Text>
-                    <Text style={styles.estimatedTimeSubtext}>Você será notificado quando um chegar</Text>
-                  </>
-                ) : estimatedTimePreviewText === "Sem conexão" ? (
-                  <>
-                    <Text style={styles.estimatedTimeText}>Sem conexão com o servidor</Text>
-                    <Text style={styles.estimatedTimeSubtext}>Verifique sua internet e tente novamente</Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.estimatedTimeText}>A coleta de lixo irá chegar em:</Text>
-                    <Text style={styles.estimatedTimeValue}>{estimatedTimePreviewText}</Text>
-                  </>
-                )}
-              </View>
-            </View>
+            <ETACard status={etaStatus} />
           </SafeAreaView>
         </LinearGradient>
       </View>
     </>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   map: {
     zIndex: -2,
     position: "absolute",
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     top: 0,
     left: 0,
     right: 0,
@@ -204,49 +184,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 37,
     borderBottomRightRadius: 37,
   },
-  estimatedTimeCardContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#49C5A0",
-    marginTop: 15,
-    borderWidth: 1,
-    borderRadius: 16,
-    borderColor: "rgba(255, 255, 255, 0.5)",
-    padding: 8,
-    paddingLeft: 12,
-  },
-  estimatedTimeTextContainer: {
-    // borderWidth: 1,
-    marginLeft: 12,
-  },
-  estimatedTimeText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "300",
-  },
-  estimatedTimeSubtext: {
-    color: "rgba(255, 255, 255, 0.7)",
-    fontSize: 16,
-    fontWeight: "300",
-    marginTop: 2,
-  },
-  estimatedTimeValue: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "700",
-  },
-  unavailableContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 2,
-  },
-  unavailableText: {
-    color: "rgba(255, 255, 255, 0.85)",
-    fontSize: 14,
-    fontWeight: "400",
-    flexShrink: 1,
-  },
 });
 
 const searchAddressStyles: Partial<Styles> = {
@@ -258,12 +195,9 @@ const searchAddressStyles: Partial<Styles> = {
     borderColor: "rgba(255, 255, 255, 0.5)",
   },
   textInput: {
-    // borderWidth: 1
     fontSize: 16,
     fontWeight: "300",
     color: "#fff",
   },
-  listView: {
-
-  },
+  listView: {},
 };
