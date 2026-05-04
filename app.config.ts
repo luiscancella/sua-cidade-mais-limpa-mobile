@@ -5,7 +5,7 @@ module.exports = {
     name: "Sua Cidade Mais Limpa",
     slug: "sua-cidade-mais-limpa",
     version: "1.0.1",
-    buildNumber: "3",
+    buildNumber: "4",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
