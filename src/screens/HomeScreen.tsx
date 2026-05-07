@@ -24,7 +24,7 @@ export function HomeScreen() {
   const { showError } = useError();
   const [etaStatus, setEtaStatus] = useState<ETAStatus>({ kind: "calculating" });
 
-  const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
+  const autocompleteRef = useRef<GooglePlacesAutocompleteRef | null>(null);
   const mapRef = useRef<MapView | null>(null);
   const unavailableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -141,7 +141,7 @@ export function HomeScreen() {
         >
           <SafeAreaView>
             <GoogleAutocompleteInput
-              ref={ref}
+              ref={autocompleteRef}
               icon={<Ionicons name="location-outline" size={24} color="white" />}
               styles={searchAddressStyles}
               textInputProps={{ placeholderTextColor: "#fff" }}

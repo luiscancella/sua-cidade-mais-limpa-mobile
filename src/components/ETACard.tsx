@@ -71,17 +71,23 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     marginLeft: 12,
+    flex: 1,
+    flexShrink: 1,
   },
   label: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "300",
+    flexShrink: 1,
+    flexWrap: "wrap",
   },
   subtext: {
     color: "rgba(255, 255, 255, 0.7)",
     fontSize: 16,
     fontWeight: "300",
     marginTop: 2,
+    flexShrink: 1,
+    flexWrap: "wrap",
   },
   value: {
     color: "#fff",

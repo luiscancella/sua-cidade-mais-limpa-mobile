@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, Image } from "react-native";
+import { StyleSheet, Image, Platform } from "react-native";
 import { AnimatedRegion, Marker } from "react-native-maps";
 
 interface TruckMarkerProps {
@@ -9,6 +9,7 @@ interface TruckMarkerProps {
 
 export function TruckMarker({ coordinate, rotation }: TruckMarkerProps) {
   const [tracksViewChanges, setTracksViewChanges] = useState(true);
+  const truckImage = require("../../assets/caminhao-referencia.png");
 
   return (
     <Marker.Animated
@@ -17,12 +18,12 @@ export function TruckMarker({ coordinate, rotation }: TruckMarkerProps) {
       anchor={{ x: 0.5, y: 0.5 }}
       tracksViewChanges={tracksViewChanges}
     >
-      <Image
-        source={require("../../assets/caminhao-referencia.png")}
-        style={styles.truckMarker}
-        resizeMode="contain"
-        onLoad={() => setTracksViewChanges(false)}
-      />
+        <Image
+          source={truckImage}
+          style={styles.truckMarker}
+          resizeMode="contain"
+          onLoad={() => setTracksViewChanges(false)}
+        />
     </Marker.Animated>
   );
 }
