@@ -9,8 +9,7 @@ import {
 } from "src/types";
 
 class UserMapper {
-    // Parar de colocar valor default para o collectionSchedule aqui quando vier de resposta do servidor com um valor
-    toCreateUserLocationRequest(data: Address, collectionSchedule: CollectionSchedule = "SEG_QUA_SEX"): CreateUserLocationRequest {
+    toCreateUserLocationRequest(data: Address, collectionSchedule: CollectionSchedule): CreateUserLocationRequest {
         return CreateUserLocationRequestSchema.parse({
             latitude: data.latitude,
             longitude: data.longitude,
@@ -18,13 +17,14 @@ class UserMapper {
             houseNumber: data.houseNumber.toString(),
             neighborhood: data.neighborhood,
             city: data.city,
+            collectionDays: collectionSchedule,
         });
     }
-// Parar de exigir o collectionSchedule aqui quando vier de resposta do servidor com um valor
+
     fromCreateResponse(
         response: UserCreatedResponse,
         address: Address,
-        collectionSchedule: CollectionSchedule = "SEG_QUA_SEX"
+        collectionSchedule: CollectionSchedule
     ): UserLocation {
         return UserLocationSchema.parse({
             phone_id: response.phoneId,

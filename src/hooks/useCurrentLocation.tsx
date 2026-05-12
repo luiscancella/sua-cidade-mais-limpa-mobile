@@ -40,7 +40,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             await SecureStore.setItemAsync("phone_id", value.phone_id);
             await SecureStore.setItemAsync("device_secret", value.device_secret);
             await SecureStore.setItemAsync("address", JSON.stringify(value.address));
-            await SecureStore.setItemAsync("collection_schedule", value.collection_schedule);
+            await SecureStore.setItemAsync("collection_schedule", JSON.stringify(value.collection_schedule));
             console.log("Location saved");
             setCurrentLocation(value);
             return true;
@@ -57,7 +57,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             const device_secret = await SecureStore.getItemAsync("device_secret");
             const address = await SecureStore.getItemAsync("address");
             const collection_schedule = await SecureStore.getItemAsync("collection_schedule");
-            if (!phone_id || !device_secret || !address) {
+            if (!phone_id || !device_secret || !address || !collection_schedule) {
                 console.log("No location found in secure store");
                 setIsLoading(false);
                 clearData();
@@ -68,7 +68,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 phone_id: phone_id,
                 device_secret: device_secret,
                 address: JSON.parse(address),
-                collection_schedule: collection_schedule || "SEG_QUA_SEX",
+                collection_schedule: JSON.parse(collection_schedule),
             });
             
             setCurrentLocation(userInfo);
@@ -83,15 +83,12 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
 
     async function updateAddress(newAddress: Address) : Promise<UserLocation> {
         try {
-            const newUserRequest = UserMapper.toCreateUserLocationRequest(newAddress);
+            const schedule = currentLocation!.collection_schedule;
+            const newUserRequest = UserMapper.toCreateUserLocationRequest(newAddress, schedule);
             newUserRequest.phoneId = currentLocation?.phone_id;
 
-            const userCreated = await UserService.createUser(newUserRequest);
-            const user = UserMapper.fromCreateResponse(
-                userCreated,
-                newAddress,
-                currentLocation?.collection_schedule || "SEG_QUA_SEX"
-            );
+            const response = await UserService.createUser(newUserRequest);
+            const user = UserMapper.fromCreateResponse(response, newAddress, schedule);
             await saveCurrentLocation(user);
               
             return user;

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { RadioButton } from "react-native-paper";
+import { Checkbox } from "react-native-paper";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import Logo from "src/components/Logo";
 import { RootStackParamList } from "src/types/navigation";
-import { CollectionSchedule } from "src/types";
+import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule } from "src/types";
 import { useError } from "src/hooks/useModal";
 import UserMapper from "src/mapper/UserMapper";
 import UserService from "src/service/UserService";
@@ -20,12 +20,18 @@ export function CollectionScheduleScreen() {
     const navigation = useNavigation<CollectionScheduleScreenNavigationProp>();
     const { showError } = useError();
     const { saveCurrentLocation, clearData } = useCurrentLocation();
-    const [ collectionSchedule, setCollectionSchedule ] = useState<CollectionSchedule | null>(null);
+    const [ selectedDays, setSelectedDays ] = useState<CollectionSchedule>([]);
     const [ isSaving, setIsSaving ] = useState(false);
 
+    function toggleDay(day: CollectionDay) {
+        setSelectedDays(prev =>
+            prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+        );
+    }
+
     async function handleContinue() {
-        if (!collectionSchedule) {
-            showError("Atenção!", "Selecione os dias da coleta para continuar.");
+        if (selectedDays.length === 0) {
+            showError("Atenção!", "Selecione ao menos um dia da coleta para continuar.");
             return;
         }
 
@@ -37,10 +43,10 @@ export function CollectionScheduleScreen() {
 
         try {
             const { selectedAddress } = route.params;
-            const userToBeCreated = UserMapper.toCreateUserLocationRequest(selectedAddress);
+            const userToBeCreated = UserMapper.toCreateUserLocationRequest(selectedAddress, selectedDays);
             const response = await UserService.createUser(userToBeCreated);
             console.log("Usuário criado no servidor com sucesso.");
-            const user = UserMapper.fromCreateResponse(response, selectedAddress, collectionSchedule);
+            const user = UserMapper.fromCreateResponse(response, selectedAddress, selectedDays);
 
             const result = await saveCurrentLocation(user);
             if (!result) {
@@ -64,31 +70,20 @@ export function CollectionScheduleScreen() {
                 <Text style={styles.description}>Selecione os dias em que a coleta passa na sua rua:</Text>
 
                 <View style={styles.scheduleContainer}>
-                    <TouchableOpacity
-                        style={styles.scheduleOption}
-                        onPress={() => setCollectionSchedule("SEG_QUA_SEX")}
-                    >
-                        <RadioButton
-                            value="SEG_QUA_SEX"
-                            status={collectionSchedule === "SEG_QUA_SEX" ? "checked" : "unchecked"}
-                            onPress={() => setCollectionSchedule("SEG_QUA_SEX")}
-                            color="#0FAD83"
-                        />
-                        <Text style={styles.scheduleText}>Segunda, Quarta e Sexta</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[styles.scheduleOption, styles.scheduleOptionBorderTop]}
-                        onPress={() => setCollectionSchedule("TER_QUI_SAB")}
-                    >
-                        <RadioButton
-                            value="TER_QUI_SAB"
-                            status={collectionSchedule === "TER_QUI_SAB" ? "checked" : "unchecked"}
-                            onPress={() => setCollectionSchedule("TER_QUI_SAB")}
-                            color="#0FAD83"
-                        />
-                        <Text style={styles.scheduleText}>Terça, Quinta e Sábado</Text>
-                    </TouchableOpacity>
+                    {CollectionDaySchema.options.map((day, index) => (
+                        <TouchableOpacity
+                            key={day}
+                            style={[styles.scheduleOption, index > 0 && styles.scheduleOptionBorderTop]}
+                            onPress={() => toggleDay(day)}
+                        >
+                            <Checkbox
+                                status={selectedDays.includes(day) ? "checked" : "unchecked"}
+                                onPress={() => toggleDay(day)}
+                                color="#0FAD83"
+                            />
+                            <Text style={styles.scheduleText}>{CollectionDayLabelPTBR[day]}</Text>
+                        </TouchableOpacity>
+                    ))}
                 </View>
 
                 <View style={styles.buttonsRow}>

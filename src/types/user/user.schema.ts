@@ -1,10 +1,6 @@
 import z from "zod";
 import { AddressSchema } from "../address/address.schema";
-
-export const CollectionScheduleSchema = z.enum([
-    "SEG_QUA_SEX",
-    "TER_QUI_SAB",
-]);
+import { CollectionScheduleSchema } from "./common.schema";
 
 export const CreateUserLocationRequestSchema = z.object({
     phoneId: z.uuid().optional(),
@@ -14,6 +10,7 @@ export const CreateUserLocationRequestSchema = z.object({
     houseNumber: z.string().default("None"),
     neighborhood: z.string().default("None"),
     city: z.string().default("None"),
+    collectionDays: CollectionScheduleSchema,
 });
 
 export const UserCreatedResponseSchema = z.object({
@@ -35,10 +32,9 @@ export const UserLocationSchema = z.object({
     phone_id: z.uuid(),
     device_secret: z.uuid(),
     address: AddressSchema,
-    collection_schedule: CollectionScheduleSchema.default("SEG_QUA_SEX"),
+    collection_schedule: CollectionScheduleSchema,
 });
 
 export type CreateUserLocationRequest = z.infer<typeof CreateUserLocationRequestSchema>;
 export type UserLocation = z.infer<typeof UserLocationSchema>;
 export type UserCreatedResponse = z.infer<typeof UserCreatedResponseSchema>;
-export type CollectionSchedule = z.infer<typeof CollectionScheduleSchema>;

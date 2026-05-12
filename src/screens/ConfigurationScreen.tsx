@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { RadioButton } from "react-native-paper";
+import { Checkbox } from "react-native-paper";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,7 +12,7 @@ import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput"
 import { useError } from "src/hooks/useModal";
 import { RootStackParamList } from "src/types/navigation";
 import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
-import { CollectionSchedule } from "src/types";
+import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule } from "src/types";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Configuration'>;
 
@@ -27,10 +27,15 @@ export function ConfigurationScreen() {
         setCollectionSchedule(currentLocation.collection_schedule);
     }, [currentLocation.collection_schedule]);
 
-    async function handleCollectionScheduleChange(newSchedule: CollectionSchedule) {
-        setCollectionSchedule(newSchedule);
+    async function handleDayToggle(day: CollectionDay) {
+        const next = collectionSchedule.includes(day)
+            ? collectionSchedule.filter(d => d !== day)
+            : [...collectionSchedule, day];
 
-        const saved = await updateCollectionSchedule(newSchedule);
+        if (next.length === 0) return;
+
+        setCollectionSchedule(next);
+        const saved = await updateCollectionSchedule(next);
         if (!saved) {
             showError("Erro ao salvar", "Não foi possível salvar sua preferência de dias de coleta. Tente novamente.");
             setCollectionSchedule(currentLocation.collection_schedule);
@@ -52,28 +57,24 @@ export function ConfigurationScreen() {
             <ConfigurationSection
                 nameIcon="notifications"
                 title="Notificações"
-                description="Alterar configurações de notificações"
+                description="Dias de coleta na sua rua"
             >
-                <View style={styles.itemContainer}>
-                    <Text style={styles.daysListContainer}>SEGUNDA, QUARTA, SEXTA</Text>
-                    <View style={styles.itemSwitch}>
-                        <RadioButton
-                            value="first"
-                            status={collectionSchedule === "SEG_QUA_SEX" ? 'checked' : 'unchecked'}
-                            onPress={() => handleCollectionScheduleChange("SEG_QUA_SEX")}
-                        />
-                    </View>
-                </View>
-                <View style={styles.itemContainer}>
-                    <Text style={styles.daysListContainer}>TERÇA, QUINTA, SÁBADO</Text>
-                    <View style={styles.itemSwitch}>
-                        <RadioButton
-                            value="second"
-                            status={collectionSchedule === "TER_QUI_SAB" ? 'checked' : 'unchecked'}
-                            onPress={() => handleCollectionScheduleChange("TER_QUI_SAB")}
-                        />
-                    </View>
-                </View>
+                {CollectionDaySchema.options.map(day => (
+                    <TouchableOpacity
+                        key={day}
+                        style={styles.itemContainer}
+                        onPress={() => handleDayToggle(day)}
+                    >
+                        <Text style={styles.daysListContainer}>{CollectionDayLabelPTBR[day].toUpperCase()}</Text>
+                        <View style={styles.itemSwitch}>
+                            <Checkbox
+                                status={collectionSchedule.includes(day) ? "checked" : "unchecked"}
+                                onPress={() => handleDayToggle(day)}
+                                color="#0FAD83"
+                            />
+                        </View>
+                    </TouchableOpacity>
+                ))}
             </ConfigurationSection>
             <ConfigurationSection
                 nameIcon="information-circle"
