@@ -66,7 +66,7 @@ export function SetupScreen() {
                     console.log("Endereço do usuário definido automaticamente:", address.full_address);
                 }
             } catch (error: any) {
-                console.error("Erro ao obter localização automaticamente:", error);
+                console.info("Erro ao obter localização automaticamente:", error);
             }
         }
 

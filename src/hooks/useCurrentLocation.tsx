@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { Address, CollectionSchedule, HeadersRequired, UserLocation, UserLocationSchema } from "src/types";
 import UserService from "src/service/UserService";
 import UserMapper from "src/mapper/UserMapper";
+import Toast from "react-native-toast-message";
 
 interface CurrentLocationContextData {
     currentLocation?: UserLocation,

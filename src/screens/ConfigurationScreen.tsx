@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Toast from "react-native-toast-message";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -21,13 +22,15 @@ export function ConfigurationScreen() {
     const { currentLocation, updateCollectionSchedule } = useRequiredCurrentLocation();
     const [ collectionSchedule, setCollectionSchedule ] = useState<CollectionSchedule>(currentLocation.collection_schedule);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const pendingScheduleRef = useRef<CollectionSchedule>(currentLocation.collection_schedule);
     const navigation = useNavigation<SetupScreenNavigationProp>();
 
     useEffect(() => {
         setCollectionSchedule(currentLocation.collection_schedule);
     }, [currentLocation.collection_schedule]);
 
-    async function handleDayToggle(day: CollectionDay) {
+    function handleDayToggle(day: CollectionDay) {
         const next = collectionSchedule.includes(day)
             ? collectionSchedule.filter(d => d !== day)
             : [...collectionSchedule, day];
@@ -35,11 +38,27 @@ export function ConfigurationScreen() {
         if (next.length === 0) return;
 
         setCollectionSchedule(next);
-        const saved = await updateCollectionSchedule(next);
-        if (!saved) {
-            showError("Erro ao salvar", "Não foi possível salvar sua preferência de dias de coleta. Tente novamente.");
-            setCollectionSchedule(currentLocation.collection_schedule);
-        }
+        pendingScheduleRef.current = next;
+
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+
+        debounceRef.current = setTimeout(async () => {
+            const saved = await updateCollectionSchedule(pendingScheduleRef.current);
+            if (saved) {
+                Toast.show({
+                    type: "success",
+                    text1: "Preferências salvas",
+                    text2: "Seus dias de coleta foram atualizados.",
+                });
+            } else {
+                Toast.show({
+                    type: "error",
+                    text1: "Erro ao salvar",
+                    text2: "Não foi possível salvar sua preferência de dias de coleta. Tente novamente.",
+                });
+                setCollectionSchedule(currentLocation.collection_schedule);
+            }
+        }, 800);
     }
 
     return (
