@@ -4,7 +4,7 @@ module.exports = {
   expo: {
     name: "Sua Cidade Mais Limpa",
     slug: "sua-cidade-mais-limpa",
-    version: "1.0.2",
+    version: "1.0.3",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
@@ -16,7 +16,7 @@ module.exports = {
     },
     ios: {
       bundleIdentifier: "com.techurb.suacidademaislimpa",
-      buildNumber: "5",
+      buildNumber: "6",
       supportsTablet: true,
       googleServicesFile: "./firebase/GoogleService-Info.plist",
       config: {
