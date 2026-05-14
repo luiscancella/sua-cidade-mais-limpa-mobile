@@ -11,7 +11,6 @@ import { useError } from "src/hooks/useModal";
 import UserMapper from "src/mapper/UserMapper";
 import UserService from "src/service/UserService";
 import { useCurrentLocation } from "src/hooks/useCurrentLocation";
-import { AxiosError } from "axios";
 
 type CollectionShiftRouteProp = RouteProp<RootStackParamList, "CollectionShift">;
 type CollectionShiftScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "CollectionShift">;
@@ -20,7 +19,7 @@ export function CollectionShiftScreen() {
     const route = useRoute<CollectionShiftRouteProp>();
     const navigation = useNavigation<CollectionShiftScreenNavigationProp>();
     const { showError } = useError();
-    const { saveCurrentLocation, clearData } = useCurrentLocation();
+    const { clearData, createUserLocation } = useCurrentLocation();
     const [ selectedShift, setSelectedShift ] = useState<CollectionShift | null>(null);
     const [ isSaving, setIsSaving ] = useState(false);
 
@@ -36,14 +35,9 @@ export function CollectionShiftScreen() {
 
         try {
             const { selectedAddress, selectedDays } = route.params;
-            const userToBeCreated = UserMapper.toCreateUserLocationRequest(selectedAddress, selectedDays, selectedShift);
-            const response = await UserService.createUser(userToBeCreated);
-            console.log("Usuário criado no servidor com sucesso.");
-            const user = UserMapper.fromCreateResponse(response, selectedAddress);
-
-            const result = await saveCurrentLocation(user);
-            if (!result) {
-                showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Tente novamente mais tarde.");
+            const userCreated = await createUserLocation(selectedAddress, selectedDays, selectedShift);
+            if (!userCreated) {
+                showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Verifique sua conexão com a internet e tente novamente mais tarde.");
                 console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");
             }
         } catch (error) {

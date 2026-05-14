@@ -3,18 +3,15 @@ import * as SecureStore from "expo-secure-store";
 import { Address, CollectionSchedule, CollectionShift, HeadersRequired, UserLocation, UserLocationSchema } from "src/types";
 import UserService from "src/service/UserService";
 import UserMapper from "src/mapper/UserMapper";
-import Toast from "react-native-toast-message";
 
 interface CurrentLocationContextData {
     currentLocation?: UserLocation,
-    saveCurrentLocation(value: UserLocation): Promise<boolean>,
-    updateAddress(newAddress: Address): Promise<UserLocation | null>,
-    updateCollectionSchedule(collectionSchedule: CollectionSchedule): Promise<boolean>,
-    updateCollectionShift(shift: CollectionShift): Promise<boolean>,
+    createUserLocation: (address: Address, collectionSchedule: CollectionSchedule, collectionShift: CollectionShift) => Promise<UserLocation | null>,
+    updateUserLocation(data: UserLocation): Promise<UserLocation | null>,
     loadCurrentLocation(): Promise<boolean>,
     isLoading: boolean,
     clearData(): Promise<void>,
-    getHeaders() : HeadersRequired,
+    getHeaders(): HeadersRequired,
 }
 
 type CurrentLocationRequiredContextData = Omit<CurrentLocationContextData, "currentLocation"> & {
@@ -24,10 +21,10 @@ type CurrentLocationRequiredContextData = Omit<CurrentLocationContextData, "curr
 const CurrentLocationContext = React.createContext<CurrentLocationContextData>({} as CurrentLocationContextData);
 
 export const CurrentLocationProvider = ({ children }: { children: React.ReactNode }) => {
-    const [ currentLocation, setCurrentLocation ] = React.useState<UserLocation>();
-    const [ isLoading, setIsLoading ] = React.useState<boolean>(true);
+    const [currentLocation, setCurrentLocation] = React.useState<UserLocation>();
+    const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
-    async function saveCurrentLocation(value: UserLocation) : Promise<boolean> {
+    async function saveCurrentLocation(value: UserLocation): Promise<boolean> {
         console.log("Saving location:", value);
         if (JSON.stringify(value.phone_id).length > 2048) {
             console.error("Phone Id too long to be saved");
@@ -53,7 +50,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
         }
     }
 
-    async function loadCurrentLocation() : Promise<boolean> {
+    async function loadCurrentLocation(): Promise<boolean> {
         setIsLoading(true);
         try {
             const phone_id = await SecureStore.getItemAsync("phone_id");
@@ -75,7 +72,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 collection_schedule: JSON.parse(collection_schedule),
                 collection_shift: collection_shift,
             });
-            
+
             setCurrentLocation(userInfo);
             setIsLoading(false);
             return true;
@@ -86,49 +83,39 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
         }
     }
 
-    async function updateAddress(newAddress: Address) : Promise<UserLocation> {
+    async function createUserLocation(address: Address, collectionSchedule: CollectionSchedule, collectionShift: CollectionShift): Promise<UserLocation | null> {
         try {
-            const schedule = currentLocation!.collection_schedule;
-            const shift = currentLocation!.collection_shift;
-            const newUserRequest = UserMapper.toCreateUserLocationRequest(newAddress, schedule, shift);
-            newUserRequest.phoneId = currentLocation?.phone_id;
-
-            const response = await UserService.createUser(newUserRequest);
-            const user = UserMapper.fromCreateResponse(response, newAddress, schedule, shift);
-            await saveCurrentLocation(user);
-              
+            const newUser = UserMapper.toCreateUserLocationRequest(address, collectionSchedule, collectionShift);
+            const response = await UserService.createUser(newUser);
+            console.log("User created on server successfully.");
+            const user = UserMapper.fromCreateResponse(response, address);
+            const result = await saveCurrentLocation(user);
+            if (!result) {
+                console.error("Failed to save location locally after creating user on server. Probably exceeded the maximum allowed size for local storage.");
+                return null;
+            }
             return user;
         } catch (error) {
-            console.error("Failed to update address:", error);
-            throw error;
+            console.error("Failed to create user location:", error);
+            return null;
         }
     }
 
-    async function updateCollectionSchedule(collectionSchedule: CollectionSchedule): Promise<boolean> {
-        if (!currentLocation) {
-            console.error("Current location not found while trying to update collection schedule");
-            return false;
+    async function updateUserLocation(data: UserLocation): Promise<UserLocation | null> {
+        try {
+            const user = UserMapper.toCreateUserLocationRequestFromDTO(data);
+            const response = await UserService.createUser(user);
+            const updatedUser = UserMapper.fromCreateResponse(response, data.address);
+            await saveCurrentLocation(updatedUser);
+            console.log("User location updated successfully");
+            return updatedUser;
+        } catch (error) {
+            console.error("Failed to update user location:", error);
+            return null;
         }
-
-        return saveCurrentLocation({
-            ...currentLocation,
-            collection_schedule: collectionSchedule,
-        });
     }
 
-    async function updateCollectionShift(shift: CollectionShift): Promise<boolean> {
-        if (!currentLocation) {
-            console.error("Current location not found while trying to update collection shift");
-            return false;
-        }
-
-        return saveCurrentLocation({
-            ...currentLocation,
-            collection_shift: shift,
-        });
-    }
-
-    function getHeaders() : HeadersRequired {
+    function getHeaders(): HeadersRequired {
         if (!currentLocation) {
             throw new Error("Current location is required to get headers");
         }
@@ -162,10 +149,8 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
         <CurrentLocationContext.Provider
             value={{
                 currentLocation,
-                saveCurrentLocation,
-                updateAddress,
-                updateCollectionSchedule,
-                updateCollectionShift,
+                createUserLocation,
+                updateUserLocation,
                 loadCurrentLocation,
                 isLoading,
                 clearData,
@@ -181,7 +166,7 @@ export const useCurrentLocation = () => {
     return React.useContext(CurrentLocationContext);
 }
 
-export const useRequiredCurrentLocation = () : CurrentLocationRequiredContextData => {
+export const useRequiredCurrentLocation = (): CurrentLocationRequiredContextData => {
     const context = React.useContext(CurrentLocationContext);
 
     if (!context.currentLocation) {

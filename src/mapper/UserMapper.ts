@@ -23,6 +23,20 @@ class UserMapper {
         });
     }
 
+    toCreateUserLocationRequestFromDTO(data: UserLocation): CreateUserLocationRequest {
+        return CreateUserLocationRequestSchema.parse({
+            phoneId: data.phone_id,
+            latitude: data.address.latitude,
+            longitude: data.address.longitude,
+            street: data.address.street,
+            houseNumber: data.address.houseNumber,
+            neighborhood: data.address.neighborhood,
+            city: data.address.city,
+            collectionDays: data.collection_schedule,
+            shift: data.collection_shift,
+        });
+    }
+
     fromCreateResponse(
         response: UserCreatedResponse,
         address: Address,

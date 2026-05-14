@@ -13,18 +13,20 @@ import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput"
 import { useError } from "src/hooks/useModal";
 import { RootStackParamList } from "src/types/navigation";
 import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
-import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule, CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema } from "src/types";
+import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule, CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema, UserLocation } from "src/types";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Configuration'>;
 
 export function ConfigurationScreen() {
     const { showError } = useError();
-    const { currentLocation, updateCollectionSchedule, updateCollectionShift } = useRequiredCurrentLocation();
+    const { currentLocation, updateUserLocation } = useRequiredCurrentLocation();
     const [ collectionSchedule, setCollectionSchedule ] = useState<CollectionSchedule>(currentLocation.collection_schedule);
     const [ collectionShift, setCollectionShift ] = useState<CollectionShift>(currentLocation.collection_shift);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pendingScheduleRef = useRef<CollectionSchedule>(currentLocation.collection_schedule);
+    const debounceShiftRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const pendingShiftRef = useRef<CollectionShift>(currentLocation.collection_shift);
     const navigation = useNavigation<SetupScreenNavigationProp>();
 
     useEffect(() => {
@@ -48,7 +50,8 @@ export function ConfigurationScreen() {
         if (debounceRef.current) clearTimeout(debounceRef.current);
 
         debounceRef.current = setTimeout(async () => {
-            const saved = await updateCollectionSchedule(pendingScheduleRef.current);
+            const newCurrentLocation : UserLocation = { ...currentLocation, collection_schedule: pendingScheduleRef.current };
+            const saved = await updateUserLocation(newCurrentLocation);
             if (saved) {
                 Toast.show({
                     type: "success",
@@ -66,23 +69,30 @@ export function ConfigurationScreen() {
         }, 800);
     }
 
-    async function handleShiftChange(shift: CollectionShift) {
+    function handleShiftChange(shift: CollectionShift) {
         setCollectionShift(shift);
-        const saved = await updateCollectionShift(shift);
-        if (saved) {
-            Toast.show({
-                type: "success",
-                text1: "Preferências salvas",
-                text2: "Seu horário de coleta foi atualizado.",
-            });
-        } else {
-            Toast.show({
-                type: "error",
-                text1: "Erro ao salvar",
-                text2: "Não foi possível salvar seu horário de coleta. Tente novamente.",
-            });
-            setCollectionShift(currentLocation.collection_shift);
-        }
+        pendingShiftRef.current = shift;
+
+        if (debounceShiftRef.current) clearTimeout(debounceShiftRef.current);
+
+        debounceShiftRef.current = setTimeout(async () => {
+            const newCurrentLocation: UserLocation = { ...currentLocation, collection_shift: pendingShiftRef.current };
+            const saved = await updateUserLocation(newCurrentLocation);
+            if (saved) {
+                Toast.show({
+                    type: "success",
+                    text1: "Preferências salvas",
+                    text2: "Seu horário de coleta foi atualizado.",
+                });
+            } else {
+                Toast.show({
+                    type: "error",
+                    text1: "Erro ao salvar",
+                    text2: "Não foi possível salvar seu horário de coleta. Tente novamente.",
+                });
+                setCollectionShift(currentLocation.collection_shift);
+            }
+        }, 800);
     }
 
     return (

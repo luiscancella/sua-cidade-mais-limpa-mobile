@@ -1,8 +1,10 @@
 import apiBackend from "src/lib/apiBackend";
+import UserMapper from "src/mapper/UserMapper";
 import {
     CreateUserLocationRequest,
     HeadersRequired,
-    UserCreatedResponse
+    UserCreatedResponse,
+    UserLocation
 } from "src/types";
 
 class UserService {

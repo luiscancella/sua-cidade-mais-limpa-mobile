@@ -32,7 +32,7 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
     ) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
         const { showConfirmation, showError } = useModal();
-        const { currentLocation, updateAddress } = useCurrentLocation();
+        const { currentLocation, updateUserLocation } = useCurrentLocation();
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null): Address | undefined {
             changeInputText("Salvando endereço...");
@@ -67,15 +67,15 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 "Confirmação",
                 "Deseja alterar seu endereço para o endereço selecionado?",
                 address.short_address,
-                () => {
-                    if (updateCurrentLocationOnSelect) {
-                        updateAddress(address).catch(error => {
-                            console.error("Erro ao atualizar localização do usuário com o novo endereço selecionado");
+                async () => {
+                    if (updateCurrentLocationOnSelect && currentLocation) {
+                        const result = await updateUserLocation({ ...currentLocation, address });
+                        if (!result) {
                             showError("Erro ao atualizar localização", "Ocorreu um erro ao atualizar sua localização com o endereço selecionado. Por favor, tente novamente ou contate o suporte.");
-                            changeInputText(currentLocation?.address.short_address ?? '');
-                        });
+                            changeInputText(currentLocation.address.short_address ?? '');
+                        }
                     }
-                    onLocationSelected?.(address)
+                    onLocationSelected?.(address);
                 },
                 () => changeInputText(address.short_address ?? '')
             );
