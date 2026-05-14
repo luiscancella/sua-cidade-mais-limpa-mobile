@@ -3,7 +3,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { Checkbox } from "react-native-paper";
+import { Checkbox, RadioButton } from "react-native-paper";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { GooglePlacesAutocompleteRef, Styles } from "react-native-google-places-autocomplete";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,14 +13,15 @@ import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput"
 import { useError } from "src/hooks/useModal";
 import { RootStackParamList } from "src/types/navigation";
 import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
-import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule } from "src/types";
+import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule, CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema } from "src/types";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Configuration'>;
 
 export function ConfigurationScreen() {
     const { showError } = useError();
-    const { currentLocation, updateCollectionSchedule } = useRequiredCurrentLocation();
+    const { currentLocation, updateCollectionSchedule, updateCollectionShift } = useRequiredCurrentLocation();
     const [ collectionSchedule, setCollectionSchedule ] = useState<CollectionSchedule>(currentLocation.collection_schedule);
+    const [ collectionShift, setCollectionShift ] = useState<CollectionShift>(currentLocation.collection_shift);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pendingScheduleRef = useRef<CollectionSchedule>(currentLocation.collection_schedule);
@@ -29,6 +30,10 @@ export function ConfigurationScreen() {
     useEffect(() => {
         setCollectionSchedule(currentLocation.collection_schedule);
     }, [currentLocation.collection_schedule]);
+
+    useEffect(() => {
+        setCollectionShift(currentLocation.collection_shift);
+    }, [currentLocation.collection_shift]);
 
     function handleDayToggle(day: CollectionDay) {
         const next = collectionSchedule.includes(day)
@@ -61,6 +66,25 @@ export function ConfigurationScreen() {
         }, 800);
     }
 
+    async function handleShiftChange(shift: CollectionShift) {
+        setCollectionShift(shift);
+        const saved = await updateCollectionShift(shift);
+        if (saved) {
+            Toast.show({
+                type: "success",
+                text1: "Preferências salvas",
+                text2: "Seu horário de coleta foi atualizado.",
+            });
+        } else {
+            Toast.show({
+                type: "error",
+                text1: "Erro ao salvar",
+                text2: "Não foi possível salvar seu horário de coleta. Tente novamente.",
+            });
+            setCollectionShift(currentLocation.collection_shift);
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Configurações</Text>
@@ -89,6 +113,29 @@ export function ConfigurationScreen() {
                             <Checkbox
                                 status={collectionSchedule.includes(day) ? "checked" : "unchecked"}
                                 onPress={() => handleDayToggle(day)}
+                                color="#0FAD83"
+                            />
+                        </View>
+                    </TouchableOpacity>
+                ))}
+            </ConfigurationSection>
+            <ConfigurationSection
+                nameIcon="time"
+                title="Horário da coleta"
+                description="Período em que a coleta passa"
+            >
+                {CollectionShiftSchema.options.map(shift => (
+                    <TouchableOpacity
+                        key={shift}
+                        style={styles.itemContainer}
+                        onPress={() => handleShiftChange(shift)}
+                    >
+                        <Text style={styles.daysListContainer}>{CollectionShiftLabelPTBR[shift].toUpperCase()}</Text>
+                        <View style={styles.itemSwitch}>
+                            <RadioButton
+                                value={shift}
+                                status={collectionShift === shift ? "checked" : "unchecked"}
+                                onPress={() => handleShiftChange(shift)}
                                 color="#0FAD83"
                             />
                         </View>

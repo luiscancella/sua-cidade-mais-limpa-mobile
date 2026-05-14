@@ -1,6 +1,6 @@
 import React from "react";
 import * as SecureStore from "expo-secure-store";
-import { Address, CollectionSchedule, HeadersRequired, UserLocation, UserLocationSchema } from "src/types";
+import { Address, CollectionSchedule, CollectionShift, HeadersRequired, UserLocation, UserLocationSchema } from "src/types";
 import UserService from "src/service/UserService";
 import UserMapper from "src/mapper/UserMapper";
 import Toast from "react-native-toast-message";
@@ -10,6 +10,7 @@ interface CurrentLocationContextData {
     saveCurrentLocation(value: UserLocation): Promise<boolean>,
     updateAddress(newAddress: Address): Promise<UserLocation | null>,
     updateCollectionSchedule(collectionSchedule: CollectionSchedule): Promise<boolean>,
+    updateCollectionShift(shift: CollectionShift): Promise<boolean>,
     loadCurrentLocation(): Promise<boolean>,
     isLoading: boolean,
     clearData(): Promise<void>,
@@ -42,6 +43,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             await SecureStore.setItemAsync("device_secret", value.device_secret);
             await SecureStore.setItemAsync("address", JSON.stringify(value.address));
             await SecureStore.setItemAsync("collection_schedule", JSON.stringify(value.collection_schedule));
+            await SecureStore.setItemAsync("collection_shift", value.collection_shift);
             console.log("Location saved");
             setCurrentLocation(value);
             return true;
@@ -58,7 +60,8 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             const device_secret = await SecureStore.getItemAsync("device_secret");
             const address = await SecureStore.getItemAsync("address");
             const collection_schedule = await SecureStore.getItemAsync("collection_schedule");
-            if (!phone_id || !device_secret || !address || !collection_schedule) {
+            const collection_shift = await SecureStore.getItemAsync("collection_shift");
+            if (!phone_id || !device_secret || !address || !collection_schedule || !collection_shift) {
                 console.log("No location found in secure store");
                 setIsLoading(false);
                 clearData();
@@ -70,6 +73,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 device_secret: device_secret,
                 address: JSON.parse(address),
                 collection_schedule: JSON.parse(collection_schedule),
+                collection_shift: collection_shift,
             });
             
             setCurrentLocation(userInfo);
@@ -85,11 +89,12 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
     async function updateAddress(newAddress: Address) : Promise<UserLocation> {
         try {
             const schedule = currentLocation!.collection_schedule;
-            const newUserRequest = UserMapper.toCreateUserLocationRequest(newAddress, schedule);
+            const shift = currentLocation!.collection_shift;
+            const newUserRequest = UserMapper.toCreateUserLocationRequest(newAddress, schedule, shift);
             newUserRequest.phoneId = currentLocation?.phone_id;
 
             const response = await UserService.createUser(newUserRequest);
-            const user = UserMapper.fromCreateResponse(response, newAddress, schedule);
+            const user = UserMapper.fromCreateResponse(response, newAddress, schedule, shift);
             await saveCurrentLocation(user);
               
             return user;
@@ -111,6 +116,18 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
         });
     }
 
+    async function updateCollectionShift(shift: CollectionShift): Promise<boolean> {
+        if (!currentLocation) {
+            console.error("Current location not found while trying to update collection shift");
+            return false;
+        }
+
+        return saveCurrentLocation({
+            ...currentLocation,
+            collection_shift: shift,
+        });
+    }
+
     function getHeaders() : HeadersRequired {
         if (!currentLocation) {
             throw new Error("Current location is required to get headers");
@@ -129,6 +146,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
             await SecureStore.deleteItemAsync("device_secret");
             await SecureStore.deleteItemAsync("address");
             await SecureStore.deleteItemAsync("collection_schedule");
+            await SecureStore.deleteItemAsync("collection_shift");
             setCurrentLocation(undefined);
             console.log("Cleared location and user data from secure store");
         } catch (error) {
@@ -147,6 +165,7 @@ export const CurrentLocationProvider = ({ children }: { children: React.ReactNod
                 saveCurrentLocation,
                 updateAddress,
                 updateCollectionSchedule,
+                updateCollectionShift,
                 loadCurrentLocation,
                 isLoading,
                 clearData,

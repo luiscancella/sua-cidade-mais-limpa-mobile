@@ -1,61 +1,81 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Checkbox } from "react-native-paper";
+import { RadioButton } from "react-native-paper";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import Logo from "src/components/Logo";
 import { RootStackParamList } from "src/types/navigation";
-import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule } from "src/types";
+import { CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema } from "src/types";
 import { useError } from "src/hooks/useModal";
+import UserMapper from "src/mapper/UserMapper";
+import UserService from "src/service/UserService";
+import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { AxiosError } from "axios";
 
-type CollectionScheduleRouteProp = RouteProp<RootStackParamList, "CollectionSchedule">;
-type CollectionScheduleScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "CollectionSchedule">;
+type CollectionShiftRouteProp = RouteProp<RootStackParamList, "CollectionShift">;
+type CollectionShiftScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "CollectionShift">;
 
-export function CollectionScheduleScreen() {
-    const route = useRoute<CollectionScheduleRouteProp>();
-    const navigation = useNavigation<CollectionScheduleScreenNavigationProp>();
+export function CollectionShiftScreen() {
+    const route = useRoute<CollectionShiftRouteProp>();
+    const navigation = useNavigation<CollectionShiftScreenNavigationProp>();
     const { showError } = useError();
-    const [ selectedDays, setSelectedDays ] = useState<CollectionSchedule>([]);
+    const { saveCurrentLocation, clearData } = useCurrentLocation();
+    const [ selectedShift, setSelectedShift ] = useState<CollectionShift | null>(null);
+    const [ isSaving, setIsSaving ] = useState(false);
 
-    function toggleDay(day: CollectionDay) {
-        setSelectedDays(prev =>
-            prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-        );
-    }
-
-    function handleContinue() {
-        if (selectedDays.length === 0) {
-            showError("Atenção!", "Selecione ao menos um dia da coleta para continuar.");
+    async function handleContinue() {
+        if (!selectedShift) {
+            showError("Atenção!", "Selecione o horário da coleta para continuar.");
             return;
         }
 
-        navigation.navigate("CollectionShift", {
-            selectedAddress: route.params.selectedAddress,
-            selectedDays,
-        });
+        if (isSaving) return;
+
+        setIsSaving(true);
+
+        try {
+            const { selectedAddress, selectedDays } = route.params;
+            const userToBeCreated = UserMapper.toCreateUserLocationRequest(selectedAddress, selectedDays, selectedShift);
+            const response = await UserService.createUser(userToBeCreated);
+            console.log("Usuário criado no servidor com sucesso.");
+            const user = UserMapper.fromCreateResponse(response, selectedAddress);
+
+            const result = await saveCurrentLocation(user);
+            if (!result) {
+                showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Tente novamente mais tarde.");
+                console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");
+            }
+        } catch (error) {
+            console.error("Erro ao criar usuário no servidor:", error);
+            showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Verifique sua conexão com a internet e tente novamente mais tarde.");
+            clearData();
+        } finally {
+            setIsSaving(false);
+        }
     }
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
             <View style={styles.card}>
                 <Logo />
-                <Text style={styles.title}>Dias da coleta</Text>
-                <Text style={styles.description}>Selecione os dias em que a coleta passa na sua rua:</Text>
+                <Text style={styles.title}>Horário da coleta</Text>
+                <Text style={styles.description}>Selecione o período em que a coleta passa na sua rua:</Text>
 
                 <View style={styles.scheduleContainer}>
-                    {CollectionDaySchema.options.map((day, index) => (
+                    {CollectionShiftSchema.options.map((shift, index) => (
                         <TouchableOpacity
-                            key={day}
+                            key={shift}
                             style={[styles.scheduleOption, index > 0 && styles.scheduleOptionBorderTop]}
-                            onPress={() => toggleDay(day)}
+                            onPress={() => setSelectedShift(shift)}
                         >
-                            <Checkbox
-                                status={selectedDays.includes(day) ? "checked" : "unchecked"}
-                                onPress={() => toggleDay(day)}
+                            <RadioButton
+                                value={shift}
+                                status={selectedShift === shift ? "checked" : "unchecked"}
+                                onPress={() => setSelectedShift(shift)}
                                 color="#0FAD83"
                             />
-                            <Text style={styles.scheduleText}>{CollectionDayLabelPTBR[day]}</Text>
+                            <Text style={styles.scheduleText}>{CollectionShiftLabelPTBR[shift]}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -64,15 +84,17 @@ export function CollectionScheduleScreen() {
                     <TouchableOpacity
                         style={[styles.buttonContainer, styles.backButton]}
                         onPress={() => navigation.goBack()}
+                        disabled={isSaving}
                     >
                         <Text style={styles.backButtonText}>Voltar</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={styles.buttonContainer}
+                        style={[styles.buttonContainer, isSaving && styles.buttonDisabled]}
                         onPress={handleContinue}
+                        disabled={isSaving}
                     >
-                        <Text style={styles.buttonText}>Continuar</Text>
+                        <Text style={styles.buttonText}>{isSaving ? "Salvando..." : "Finalizar"}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -146,6 +168,9 @@ const styles = StyleSheet.create({
         borderRadius: 13,
         paddingVertical: 15,
         paddingHorizontal: 20,
+    },
+    buttonDisabled: {
+        opacity: 0.7,
     },
     buttonText: {
         color: "white",

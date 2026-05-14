@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const CollectionDaySchema = z.enum(["SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM"]);
+export type CollectionDay = z.infer<typeof CollectionDaySchema>;
 
 export const CollectionDayLabelPTBR : Record<CollectionDay, string> = {
     "SEG": "Segunda-feira",
@@ -12,7 +13,14 @@ export const CollectionDayLabelPTBR : Record<CollectionDay, string> = {
     "DOM": "Domingo",
 };
 
-export const CollectionScheduleSchema = z.array(CollectionDaySchema).min(1);
+export const CollectionShiftSchema = z.enum(["MORNING", "AFTERNOON", "NIGHT"]);
+export type CollectionShift = z.infer<typeof CollectionShiftSchema>;
 
-export type CollectionDay = z.infer<typeof CollectionDaySchema>;
+export const CollectionShiftLabelPTBR: Record<CollectionShift, string> = {
+    "MORNING":   "Manhã",
+    "AFTERNOON": "Tarde",
+    "NIGHT":     "Noite",
+};
+
+export const CollectionScheduleSchema = z.array(CollectionDaySchema).min(1);
 export type CollectionSchedule = z.infer<typeof CollectionScheduleSchema>;

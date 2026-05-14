@@ -6,10 +6,11 @@ import {
     UserCreatedResponse,
     Address,
     CollectionSchedule,
+    CollectionShift,
 } from "src/types";
 
 class UserMapper {
-    toCreateUserLocationRequest(data: Address, collectionSchedule: CollectionSchedule): CreateUserLocationRequest {
+    toCreateUserLocationRequest(data: Address, collectionSchedule: CollectionSchedule, collectionShift: CollectionShift): CreateUserLocationRequest {
         return CreateUserLocationRequestSchema.parse({
             latitude: data.latitude,
             longitude: data.longitude,
@@ -18,19 +19,20 @@ class UserMapper {
             neighborhood: data.neighborhood,
             city: data.city,
             collectionDays: collectionSchedule,
+            shift: collectionShift,
         });
     }
 
     fromCreateResponse(
         response: UserCreatedResponse,
         address: Address,
-        collectionSchedule: CollectionSchedule
     ): UserLocation {
         return UserLocationSchema.parse({
             phone_id: response.phoneId,
             device_secret: response.deviceSecret,
             address: address,
-            collection_schedule: collectionSchedule,
+            collection_schedule: response.collectionDays,
+            collection_shift: response.shift,
         });
     }
 }

@@ -9,6 +9,7 @@ import { HomeScreen } from "src/screens/HomeScreen";
 import { SplashScreen } from "src/screens/SplashScreen";
 import { SetupScreen } from "src/screens/SetupScreen";
 import { CollectionScheduleScreen } from "src/screens/CollectionScheduleScreen";
+import { CollectionShiftScreen } from "src/screens/CollectionShiftScreen";
 import { TermsOfService } from "src/screens/TermsOfService";
 import ConfigurationRoute from "./ConfigurationRoute";
 
@@ -39,6 +40,7 @@ export function AppRoutes() {
                 <Stack.Navigator initialRouteName={"Setup"} screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Setup" component={SetupScreen} />
                     <Stack.Screen name="CollectionSchedule" component={CollectionScheduleScreen} />
+                    <Stack.Screen name="CollectionShift" component={CollectionShiftScreen} />
                     <Stack.Screen name="TermsOfService" component={TermsOfService} />
                 </Stack.Navigator>
             ) : (
