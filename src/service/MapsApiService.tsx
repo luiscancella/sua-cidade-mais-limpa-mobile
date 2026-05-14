@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
-import { GoogleReverseGeocodingApiResponse, UserLocation } from 'src/types';
+import { GoogleReverseGeocodingApiResponse } from 'src/types';
 import { GoogleReverseGeocodingApiResponseSchema } from 'src/types';
 
 export async function askForLocation(): Promise<Location.LocationObject> {

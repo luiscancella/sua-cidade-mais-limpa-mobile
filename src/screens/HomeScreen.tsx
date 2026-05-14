@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useError } from "src/hooks/useModal";
 import { useTruckDistances } from "src/hooks/useTruckPositions";
 import { useTruckMapPositions } from "src/hooks/useTruckMapPositions";
-import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
+import { useRequiredUserRegistration } from "src/contexts/registration.context";
 import { usePushNotification } from "src/hooks/usePushNotification";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { ETACard } from "src/components/ETACard";
@@ -20,7 +20,7 @@ import { TruckMarker } from "src/components/TruckMarker";
 const MAP_DELTA = { latitudeDelta: 0.0143, longitudeDelta: 0.0134 };
 
 export function HomeScreen() {
-  const { currentLocation, getHeaders } = useRequiredCurrentLocation();
+  const { registration, getAuthHeaders } = useRequiredUserRegistration();
   const { showError } = useError();
   const [etaStatus, setEtaStatus] = useState<ETAStatus>({ kind: "calculating" });
 
@@ -29,11 +29,11 @@ export function HomeScreen() {
   const unavailableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({
-    phone_id: currentLocation?.phone_id,
+    phoneId: registration?.phoneId,
   });
   const { truckIds, animatedRegions, bearings } = useTruckMapPositions();
 
-  usePushNotification({ phoneId: currentLocation.phone_id, getHeaders });
+  usePushNotification({ phoneId: registration.phoneId, getHeaders: getAuthHeaders });
 
   useEffect(() => {
     return () => {
@@ -78,17 +78,17 @@ export function HomeScreen() {
   }, [TruckDistance, isConnected, connectionFailed]);
 
   useEffect(() => {
-    if (currentLocation && mapRef.current) {
+    if (registration && mapRef.current) {
       mapRef.current.animateToRegion(
         {
-          latitude: currentLocation.address.latitude,
-          longitude: currentLocation.address.longitude,
+          latitude: registration.address.latitude,
+          longitude: registration.address.longitude,
           ...MAP_DELTA,
         },
         1000,
       );
     }
-  }, [currentLocation]);
+  }, [registration]);
 
   async function handleLocationSelection(userLocation: Address) {
     try {
@@ -110,8 +110,8 @@ export function HomeScreen() {
         ref={mapRef}
         style={styles.map}
         initialRegion={{
-          latitude: currentLocation.address.latitude,
-          longitude: currentLocation.address.longitude,
+          latitude: registration.address.latitude,
+          longitude: registration.address.longitude,
           ...MAP_DELTA,
         }}
         loadingEnabled
@@ -119,8 +119,8 @@ export function HomeScreen() {
       >
         <Marker
           coordinate={{
-            latitude: currentLocation.address.latitude,
-            longitude: currentLocation.address.longitude,
+            latitude: registration.address.latitude,
+            longitude: registration.address.longitude,
           }}
         />
         {truckIds.map((id) => (

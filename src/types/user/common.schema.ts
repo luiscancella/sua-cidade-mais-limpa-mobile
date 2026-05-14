@@ -22,5 +22,5 @@ export const CollectionShiftLabelPTBR: Record<CollectionShift, string> = {
     "NIGHT":     "Noite",
 };
 
-export const CollectionScheduleSchema = z.array(CollectionDaySchema).min(1);
-export type CollectionSchedule = z.infer<typeof CollectionScheduleSchema>;
+export const CollectionDaysSchema = z.array(CollectionDaySchema).min(1);
+export type CollectionDays = z.infer<typeof CollectionDaysSchema>;

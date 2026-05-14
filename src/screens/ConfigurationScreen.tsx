@@ -12,46 +12,46 @@ import { ConfigurationSection } from "src/components/ConfigurationSection";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import { useError } from "src/hooks/useModal";
 import { RootStackParamList } from "src/types/navigation";
-import { useRequiredCurrentLocation } from "src/hooks/useCurrentLocation";
-import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule, CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema, UserLocation } from "src/types";
+import { useRequiredUserRegistration } from "src/contexts/registration.context";
+import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionDays, CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema, UserRegistration } from "src/types";
 
 type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Configuration'>;
 
 export function ConfigurationScreen() {
     const { showError } = useError();
-    const { currentLocation, updateUserLocation } = useRequiredCurrentLocation();
-    const [ collectionSchedule, setCollectionSchedule ] = useState<CollectionSchedule>(currentLocation.collection_schedule);
-    const [ collectionShift, setCollectionShift ] = useState<CollectionShift>(currentLocation.collection_shift);
+    const { registration, updateRegistration } = useRequiredUserRegistration();
+    const [ collectionDays, setCollectionDays ] = useState<CollectionDays>(registration.collectionDays);
+    const [ collectionShift, setCollectionShift ] = useState<CollectionShift>(registration.collectionShift);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const pendingScheduleRef = useRef<CollectionSchedule>(currentLocation.collection_schedule);
+    const pendingDaysRef = useRef<CollectionDays>(registration.collectionDays);
     const debounceShiftRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const pendingShiftRef = useRef<CollectionShift>(currentLocation.collection_shift);
+    const pendingShiftRef = useRef<CollectionShift>(registration.collectionShift);
     const navigation = useNavigation<SetupScreenNavigationProp>();
 
     useEffect(() => {
-        setCollectionSchedule(currentLocation.collection_schedule);
-    }, [currentLocation.collection_schedule]);
+        setCollectionDays(registration.collectionDays);
+    }, [registration.collectionDays]);
 
     useEffect(() => {
-        setCollectionShift(currentLocation.collection_shift);
-    }, [currentLocation.collection_shift]);
+        setCollectionShift(registration.collectionShift);
+    }, [registration.collectionShift]);
 
     function handleDayToggle(day: CollectionDay) {
-        const next = collectionSchedule.includes(day)
-            ? collectionSchedule.filter(d => d !== day)
-            : [...collectionSchedule, day];
+        const next = collectionDays.includes(day)
+            ? collectionDays.filter(d => d !== day)
+            : [...collectionDays, day];
 
         if (next.length === 0) return;
 
-        setCollectionSchedule(next);
-        pendingScheduleRef.current = next;
+        setCollectionDays(next);
+        pendingDaysRef.current = next;
 
         if (debounceRef.current) clearTimeout(debounceRef.current);
 
         debounceRef.current = setTimeout(async () => {
-            const newCurrentLocation : UserLocation = { ...currentLocation, collection_schedule: pendingScheduleRef.current };
-            const saved = await updateUserLocation(newCurrentLocation);
+            const updated: UserRegistration = { ...registration, collectionDays: pendingDaysRef.current };
+            const saved = await updateRegistration(updated);
             if (saved) {
                 Toast.show({
                     type: "success",
@@ -64,7 +64,7 @@ export function ConfigurationScreen() {
                     text1: "Erro ao salvar",
                     text2: "Não foi possível salvar sua preferência de dias de coleta. Tente novamente.",
                 });
-                setCollectionSchedule(currentLocation.collection_schedule);
+                setCollectionDays(registration.collectionDays);
             }
         }, 800);
     }
@@ -76,8 +76,8 @@ export function ConfigurationScreen() {
         if (debounceShiftRef.current) clearTimeout(debounceShiftRef.current);
 
         debounceShiftRef.current = setTimeout(async () => {
-            const newCurrentLocation: UserLocation = { ...currentLocation, collection_shift: pendingShiftRef.current };
-            const saved = await updateUserLocation(newCurrentLocation);
+            const updated: UserRegistration = { ...registration, collectionShift: pendingShiftRef.current };
+            const saved = await updateRegistration(updated);
             if (saved) {
                 Toast.show({
                     type: "success",
@@ -90,7 +90,7 @@ export function ConfigurationScreen() {
                     text1: "Erro ao salvar",
                     text2: "Não foi possível salvar seu horário de coleta. Tente novamente.",
                 });
-                setCollectionShift(currentLocation.collection_shift);
+                setCollectionShift(registration.collectionShift);
             }
         }, 800);
     }
@@ -121,7 +121,7 @@ export function ConfigurationScreen() {
                         <Text style={styles.daysListContainer}>{CollectionDayLabelPTBR[day].toUpperCase()}</Text>
                         <View style={styles.itemSwitch}>
                             <Checkbox
-                                status={collectionSchedule.includes(day) ? "checked" : "unchecked"}
+                                status={collectionDays.includes(day) ? "checked" : "unchecked"}
                                 onPress={() => handleDayToggle(day)}
                                 color="#0FAD83"
                             />

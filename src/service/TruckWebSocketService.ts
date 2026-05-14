@@ -13,20 +13,20 @@ class TruckWebSocketService {
     private phoneId ?: string;
 
     connect(
-        phone_id: string, 
-        onPositionUpdate: TruckDistanceCallback, 
+        phoneId: string,
+        onPositionUpdate: TruckDistanceCallback,
         onConnectionChange?: ConnectionStatusCallback,
         onConnectionFailed?: ConnectionFailedCallback
     ) {
         if (this.socket?.connected) {
             return;
         }
-        
+
         if (this.socket) {
             this.socket.disconnect();
         }
 
-        this.phoneId = phone_id;
+        this.phoneId = phoneId;
         this.onPositionUpdate = onPositionUpdate;
         this.onConnectionChange = onConnectionChange;
         this.onConnectionFailed = onConnectionFailed;
@@ -34,7 +34,7 @@ class TruckWebSocketService {
         const baseUrl = process.env.EXPO_PUBLIC_WEBSOCKET_URL;
 
         this.socket = io(baseUrl, {
-            query: { deviceId: phone_id },
+            query: { deviceId: phoneId },
             transports: ['websocket'],
             reconnection: true,
             reconnectionAttempts: 3,

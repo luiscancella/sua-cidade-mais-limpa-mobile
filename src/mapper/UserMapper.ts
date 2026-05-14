@@ -1,52 +1,52 @@
 import {
-    UserLocation,
-    CreateUserLocationRequest,
-    UserLocationSchema,
-    CreateUserLocationRequestSchema,
-    UserCreatedResponse,
+    UserRegistration,
+    UserRegistrationRequest,
+    UserRegistrationSchema,
+    UserRegistrationRequestSchema,
+    UserRegistrationResponse,
     Address,
-    CollectionSchedule,
+    CollectionDays,
     CollectionShift,
 } from "src/types";
 
 class UserMapper {
-    toCreateUserLocationRequest(data: Address, collectionSchedule: CollectionSchedule, collectionShift: CollectionShift): CreateUserLocationRequest {
-        return CreateUserLocationRequestSchema.parse({
+    toRegistrationRequest(data: Address, collectionDays: CollectionDays, collectionShift: CollectionShift): UserRegistrationRequest {
+        return UserRegistrationRequestSchema.parse({
             latitude: data.latitude,
             longitude: data.longitude,
             street: data.street,
             houseNumber: data.houseNumber.toString(),
             neighborhood: data.neighborhood,
             city: data.city,
-            collectionDays: collectionSchedule,
+            collectionDays,
             shift: collectionShift,
         });
     }
 
-    toCreateUserLocationRequestFromDTO(data: UserLocation): CreateUserLocationRequest {
-        return CreateUserLocationRequestSchema.parse({
-            phoneId: data.phone_id,
+    fromRegistrationToRequest(data: UserRegistration): UserRegistrationRequest {
+        return UserRegistrationRequestSchema.parse({
+            phoneId: data.phoneId,
             latitude: data.address.latitude,
             longitude: data.address.longitude,
             street: data.address.street,
             houseNumber: data.address.houseNumber,
             neighborhood: data.address.neighborhood,
             city: data.address.city,
-            collectionDays: data.collection_schedule,
-            shift: data.collection_shift,
+            collectionDays: data.collectionDays,
+            shift: data.collectionShift,
         });
     }
 
-    fromCreateResponse(
-        response: UserCreatedResponse,
+    fromRegistrationResponse(
+        response: UserRegistrationResponse,
         address: Address,
-    ): UserLocation {
-        return UserLocationSchema.parse({
-            phone_id: response.phoneId,
-            device_secret: response.deviceSecret,
-            address: address,
-            collection_schedule: response.collectionDays,
-            collection_shift: response.shift,
+    ): UserRegistration {
+        return UserRegistrationSchema.parse({
+            phoneId: response.phoneId,
+            deviceSecret: response.deviceSecret,
+            address,
+            collectionDays: response.collectionDays,
+            collectionShift: response.shift,
         });
     }
 }

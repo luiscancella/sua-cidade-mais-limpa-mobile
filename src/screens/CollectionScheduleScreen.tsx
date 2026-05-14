@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import Logo from "src/components/Logo";
 import { RootStackParamList } from "src/types/navigation";
-import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionSchedule } from "src/types";
+import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionDays } from "src/types";
 import { useError } from "src/hooks/useModal";
 
 type CollectionScheduleRouteProp = RouteProp<RootStackParamList, "CollectionSchedule">;
@@ -16,7 +16,7 @@ export function CollectionScheduleScreen() {
     const route = useRoute<CollectionScheduleRouteProp>();
     const navigation = useNavigation<CollectionScheduleScreenNavigationProp>();
     const { showError } = useError();
-    const [ selectedDays, setSelectedDays ] = useState<CollectionSchedule>([]);
+    const [ selectedDays, setSelectedDays ] = useState<CollectionDays>([]);
 
     function toggleDay(day: CollectionDay) {
         setSelectedDays(prev =>

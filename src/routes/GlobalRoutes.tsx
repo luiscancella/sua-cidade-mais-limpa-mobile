@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
-import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { useUserRegistration } from "src/contexts/registration.context";
 import { HomeScreen } from "src/screens/HomeScreen";
 import { SplashScreen } from "src/screens/SplashScreen";
 import { SetupScreen } from "src/screens/SetupScreen";
@@ -17,7 +17,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export function AppRoutes() {
-    const { currentLocation, isLoading } = useCurrentLocation();
+    const { registration, isLoading } = useUserRegistration();
 
     if (isLoading) {
         return (<SplashScreen />)
@@ -36,7 +36,7 @@ export function AppRoutes() {
 
     return (
         <NavigationContainer>
-            {!currentLocation ? (
+            {!registration ? (
                 <Stack.Navigator initialRouteName={"Setup"} screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Setup" component={SetupScreen} />
                     <Stack.Screen name="CollectionSchedule" component={CollectionScheduleScreen} />

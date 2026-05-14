@@ -1,8 +1,8 @@
 import z from "zod";
 import { AddressSchema } from "../address/address.schema";
-import { CollectionScheduleSchema, CollectionShiftSchema } from "./common.schema";
+import { CollectionDaysSchema, CollectionShiftSchema } from "./common.schema";
 
-export const CreateUserLocationRequestSchema = z.object({
+export const UserRegistrationRequestSchema = z.object({
     phoneId: z.uuid().optional(),
     latitude: z.number(),
     longitude: z.number(),
@@ -10,14 +10,14 @@ export const CreateUserLocationRequestSchema = z.object({
     houseNumber: z.string().default("None"),
     neighborhood: z.string().default("None"),
     city: z.string().default("None"),
-    collectionDays: CollectionScheduleSchema,
+    collectionDays: CollectionDaysSchema,
     shift: CollectionShiftSchema,
 });
 
-export const UserCreatedResponseSchema = z.object({
+export const UserRegistrationResponseSchema = z.object({
     phoneId: z.uuid(),
     deviceSecret: z.string(),
-    collectionDays: CollectionScheduleSchema,
+    collectionDays: CollectionDaysSchema,
     shift: CollectionShiftSchema,
     city: z.string(),
     neighborhood: z.string(),
@@ -31,14 +31,14 @@ export const UserCreatedResponseSchema = z.object({
     updatedAt: z.string(),
 });
 
-export const UserLocationSchema = z.object({
-    phone_id: z.uuid(),
-    device_secret: z.uuid(),
+export const UserRegistrationSchema = z.object({
+    phoneId: z.uuid(),
+    deviceSecret: z.uuid(),
     address: AddressSchema,
-    collection_schedule: CollectionScheduleSchema,
-    collection_shift: CollectionShiftSchema,
+    collectionDays: CollectionDaysSchema,
+    collectionShift: CollectionShiftSchema,
 });
 
-export type CreateUserLocationRequest = z.infer<typeof CreateUserLocationRequestSchema>;
-export type UserLocation = z.infer<typeof UserLocationSchema>;
-export type UserCreatedResponse = z.infer<typeof UserCreatedResponseSchema>;
+export type UserRegistrationRequest = z.infer<typeof UserRegistrationRequestSchema>;
+export type UserRegistration = z.infer<typeof UserRegistrationSchema>;
+export type UserRegistrationResponse = z.infer<typeof UserRegistrationResponseSchema>;

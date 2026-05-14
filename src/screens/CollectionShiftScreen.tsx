@@ -10,7 +10,7 @@ import { CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema } from
 import { useError } from "src/hooks/useModal";
 import UserMapper from "src/mapper/UserMapper";
 import UserService from "src/service/UserService";
-import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { useUserRegistration } from "src/contexts/registration.context";
 
 type CollectionShiftRouteProp = RouteProp<RootStackParamList, "CollectionShift">;
 type CollectionShiftScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "CollectionShift">;
@@ -19,7 +19,7 @@ export function CollectionShiftScreen() {
     const route = useRoute<CollectionShiftRouteProp>();
     const navigation = useNavigation<CollectionShiftScreenNavigationProp>();
     const { showError } = useError();
-    const { clearData, createUserLocation } = useCurrentLocation();
+    const { clearRegistration, registerUser } = useUserRegistration();
     const [ selectedShift, setSelectedShift ] = useState<CollectionShift | null>(null);
     const [ isSaving, setIsSaving ] = useState(false);
 
@@ -35,7 +35,7 @@ export function CollectionShiftScreen() {
 
         try {
             const { selectedAddress, selectedDays } = route.params;
-            const userCreated = await createUserLocation(selectedAddress, selectedDays, selectedShift);
+            const userCreated = await registerUser(selectedAddress, selectedDays, selectedShift);
             if (!userCreated) {
                 showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Verifique sua conexão com a internet e tente novamente mais tarde.");
                 console.error("Falha ao salvar localização localmente. Provavelmente excedeu o tamanho máximo permitido localmente.");
@@ -43,7 +43,7 @@ export function CollectionShiftScreen() {
         } catch (error) {
             console.error("Erro ao criar usuário no servidor:", error);
             showError("Erro ao salvar localização", "Não foi possível salvar sua localização. Verifique sua conexão com a internet e tente novamente mais tarde.");
-            clearData();
+            clearRegistration();
         } finally {
             setIsSaving(false);
         }

@@ -4,7 +4,7 @@ import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePla
 import Constants from "expo-constants";
 
 import { useModal } from "src/hooks/useModal";
-import { useCurrentLocation } from "src/hooks/useCurrentLocation";
+import { useUserRegistration } from "src/contexts/registration.context";
 import AddressMapper from "src/mapper/AddressMapper";
 import { Address } from "src/types";
 
@@ -32,14 +32,14 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
     ) => {
         const [searchFocused, setSearchFocused] = React.useState(false);
         const { showConfirmation, showError } = useModal();
-        const { currentLocation, updateUserLocation } = useCurrentLocation();
+        const { registration, updateRegistration } = useUserRegistration();
 
         function handleLocationPress(data: GooglePlaceData, details: GooglePlaceDetail | null): Address | undefined {
             changeInputText("Salvando endereço...");
             
-            if (currentLocation && currentLocation.address.place_id === data.place_id) {
-                changeInputText(currentLocation.address.short_address);
-                return currentLocation.address;
+            if (registration && registration.address.place_id === data.place_id) {
+                changeInputText(registration.address.short_address);
+                return registration.address;
             }
 
             const address = AddressMapper.fromGoogleAutocomplete(data, details);
@@ -53,13 +53,13 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
             if (address?.city !== "Machado" && address?.city !== "Ribeirão das Neves") {
                 console.error("Área não atendida:", address?.city);
                 showError("Área não atendida", "No momento, nosso serviço está disponível apenas para as cidades de Machado e Ribeirão das Neves. Estamos trabalhando para expandir nossa cobertura em breve!");
-                changeInputText(currentLocation?.address.short_address ?? '');
+                changeInputText(registration?.address.short_address ?? '');
                 return;
             }
 
             if (ignoreConfirmation) {
                 onLocationSelected?.(address);
-                changeInputText(currentLocation?.address.short_address ?? '');
+                changeInputText(registration?.address.short_address ?? '');
                 return;
             }
 
@@ -68,11 +68,11 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
                 "Deseja alterar seu endereço para o endereço selecionado?",
                 address.short_address,
                 async () => {
-                    if (updateCurrentLocationOnSelect && currentLocation) {
-                        const result = await updateUserLocation({ ...currentLocation, address });
+                    if (updateCurrentLocationOnSelect && registration) {
+                        const result = await updateRegistration({ ...registration, address });
                         if (!result) {
                             showError("Erro ao atualizar localização", "Ocorreu um erro ao atualizar sua localização com o endereço selecionado. Por favor, tente novamente ou contate o suporte.");
-                            changeInputText(currentLocation.address.short_address ?? '');
+                            changeInputText(registration.address.short_address ?? '');
                         }
                     }
                     onLocationSelected?.(address);
@@ -88,11 +88,11 @@ export const GoogleAutocompleteInput = React.forwardRef<GooglePlacesAutocomplete
         }
 
         React.useEffect(() => {
-            if (currentLocation && ref && typeof ref !== 'function' && ref.current) {
-                ref.current.setAddressText(currentLocation.address.short_address);
+            if (registration && ref && typeof ref !== 'function' && ref.current) {
+                ref.current.setAddressText(registration.address.short_address);
                 // ref.current.setAddressText("Endereço de Exemplo, 123");
             }
-        }, [currentLocation, ref]);
+        }, [registration, ref]);
 
         const renderedIcon = React.isValidElement(icon) ?
             React.cloneElement(icon, { style: [styles.icon, iconStyles] } as React.CSSProperties) :

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { CurrentLocationProvider } from 'src/hooks/useCurrentLocation';
+import { UserRegistrationProvider } from 'src/contexts/registration.context';
 import { ModalProvider } from 'src/hooks/useModal';
 import { GlobalErrorModal } from 'src/components/modal/error/GlobalErrorModal';
 import { GlobalConfirmationModal } from 'src/components/modal/confirmation/GlobalConfirmationModal';
@@ -12,12 +12,12 @@ interface AppProviderProps {
 export function AppProvider({ children }: AppProviderProps) {
     return (
         <ModalProvider>
-            <CurrentLocationProvider>
+            <UserRegistrationProvider>
                 {children}
                 <GlobalErrorModal />
                 <GlobalConfirmationModal />
                 <Toast />
-            </CurrentLocationProvider>
+            </UserRegistrationProvider>
         </ModalProvider>
     );
 }
