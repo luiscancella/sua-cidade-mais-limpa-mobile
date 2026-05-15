@@ -5,7 +5,6 @@ import TruckService from "src/service/TruckService";
 const POLL_INTERVAL = 3000;
 const ANIMATION_DURATION = 2500;
 
-// Calcula o ângulo (em graus, 0 = norte, sentido horário) entre dois pontos GPS.
 function calculateBearing(
     fromLat: number, fromLng: number,
     toLat: number, toLng: number,
@@ -20,7 +19,7 @@ function calculateBearing(
     return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
 }
 
-export function useTruckMapPositions() {
+export function useTruckMarkers() {
     const animatedRegions = useRef<Map<number, AnimatedRegion>>(new Map());
     const prevPositions = useRef<Map<number, { lat: number; lng: number }>>(new Map());
     const [ truckIds, setTruckIds ] = useState<number[]>([]);

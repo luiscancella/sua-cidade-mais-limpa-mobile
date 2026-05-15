@@ -1,5 +1,5 @@
 import React from 'react';
-import { useModal } from 'src/hooks/useModal';
+import { useModal } from 'src/contexts/modal.context';
 import ErrorModal from './ErrorModal';
 
 export function GlobalErrorModal() {

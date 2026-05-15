@@ -1,5 +1,5 @@
 import React from "react";
-import { useModal } from "src/hooks/useModal";
+import { useModal } from "src/contexts/modal.context";
 import ConfirmationModal from "./ConfirmationModal";
 
 export function GlobalConfirmationModal() {

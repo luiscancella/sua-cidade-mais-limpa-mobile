@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import NotificationService from "src/service/NotificationService";
 import UserService from "src/service/UserService";
-import { useError } from "src/hooks/useModal";
+import { useError } from "src/contexts/modal.context";
 import { HeadersRequired } from "src/types";
 
 interface Props {

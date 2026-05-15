@@ -5,7 +5,7 @@ import Checkbox from "expo-checkbox";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
 import * as MapsApiService from "src/service/MapsApiService";
 import { Address } from "src/types";
-import { useError } from "src/hooks/useModal";
+import { useError } from "src/contexts/modal.context";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "src/types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";

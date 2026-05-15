@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { ConfigurationSection } from "src/components/ConfigurationSection";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
-import { useError } from "src/hooks/useModal";
+import { useError } from "src/contexts/modal.context";
 import { RootStackParamList } from "src/types/navigation";
 import { useRequiredUserRegistration } from "src/contexts/registration.context";
 import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionDays, CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema, UserRegistration } from "src/types";

@@ -2,24 +2,23 @@ import { useState, useEffect, useCallback } from "react";
 import TruckWebSocketService from "src/service/TruckWebSocketService";
 import { TruckDistance } from "src/types";
 
-interface UseTruckDistancesProps {
+interface UseTruckETAProps {
     phoneId?: string;
-    enabled?: boolean;
 }
 
-export function useTruckDistances({ phoneId, enabled = true }: UseTruckDistancesProps) {
-    const [ TruckDistance, setTruckDistance ] = useState<TruckDistance>();
+export function useTruckETA({ phoneId }: UseTruckETAProps) {
+    const [ truckETA, setTruckETA ] = useState<TruckDistance>();
     const [ isConnected, setIsConnected ] = useState(false);
     const [ connectionFailed, setConnectionFailed ] = useState(false);
 
     useEffect(() => {
-        if (!phoneId || !enabled) {
+        if (!phoneId) {
             return;
         }
 
         TruckWebSocketService.connect(
             phoneId,
-            setTruckDistance,
+            setTruckETA,
             setIsConnected,
             () => setConnectionFailed(true)
         );
@@ -27,7 +26,7 @@ export function useTruckDistances({ phoneId, enabled = true }: UseTruckDistances
         return () => {
             TruckWebSocketService.disconnect();
         };
-    }, [phoneId, enabled]);
+    }, [phoneId]);
 
     const reconnect = useCallback(() => {
         if (phoneId) {
@@ -36,7 +35,7 @@ export function useTruckDistances({ phoneId, enabled = true }: UseTruckDistances
             setTimeout(() => {
                 TruckWebSocketService.connect(
                     phoneId,
-                    setTruckDistance,
+                    setTruckETA,
                     setIsConnected,
                     () => setConnectionFailed(true)
                 );
@@ -45,7 +44,7 @@ export function useTruckDistances({ phoneId, enabled = true }: UseTruckDistances
     }, [phoneId]);
 
     return {
-        TruckDistance,
+        truckETA,
         isConnected,
         connectionFailed,
         reconnect,

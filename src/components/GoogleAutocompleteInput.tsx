@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteProps, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import Constants from "expo-constants";
 
-import { useModal } from "src/hooks/useModal";
+import { useModal } from "src/contexts/modal.context";
 import { useUserRegistration } from "src/contexts/registration.context";
 import AddressMapper from "src/mapper/AddressMapper";
 import { Address } from "src/types";

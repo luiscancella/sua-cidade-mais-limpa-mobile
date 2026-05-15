@@ -7,9 +7,9 @@ import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 
-import { useError } from "src/hooks/useModal";
-import { useTruckDistances } from "src/hooks/useTruckPositions";
-import { useTruckMapPositions } from "src/hooks/useTruckMapPositions";
+import { useError } from "src/contexts/modal.context";
+import { useTruckETA } from "src/hooks/useTruckETA";
+import { useTruckMarkers } from "src/hooks/useTruckMarkers";
 import { useRequiredUserRegistration } from "src/contexts/registration.context";
 import { usePushNotification } from "src/hooks/usePushNotification";
 import { GoogleAutocompleteInput } from "src/components/GoogleAutocompleteInput";
@@ -28,10 +28,10 @@ export function HomeScreen() {
   const mapRef = useRef<MapView | null>(null);
   const unavailableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { TruckDistance, isConnected, connectionFailed, reconnect } = useTruckDistances({
+  const { truckETA, isConnected, connectionFailed, reconnect } = useTruckETA({
     phoneId: registration?.phoneId,
   });
-  const { truckIds, animatedRegions, bearings } = useTruckMapPositions();
+  const { truckIds, animatedRegions, bearings } = useTruckMarkers();
 
   usePushNotification({ phoneId: registration.phoneId, getHeaders: getAuthHeaders });
 
@@ -61,8 +61,8 @@ export function HomeScreen() {
       return;
     }
 
-    if (TruckDistance) {
-      setEtaStatus({ kind: "available", minutes: Math.round(TruckDistance.etaMinutes) });
+    if (truckETA) {
+      setEtaStatus({ kind: "available", minutes: Math.round(truckETA.etaMinutes) });
       return;
     }
 
@@ -75,7 +75,7 @@ export function HomeScreen() {
         text2: "Você será notificado quando um chegar na sua região.",
       });
     }, 10000);
-  }, [TruckDistance, isConnected, connectionFailed]);
+  }, [truckETA, isConnected, connectionFailed]);
 
   useEffect(() => {
     if (registration && mapRef.current) {

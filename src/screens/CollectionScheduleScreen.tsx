@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Logo from "src/components/Logo";
 import { RootStackParamList } from "src/types/navigation";
 import { CollectionDay, CollectionDayLabelPTBR, CollectionDaySchema, CollectionDays } from "src/types";
-import { useError } from "src/hooks/useModal";
+import { useError } from "src/contexts/modal.context";
 
 type CollectionScheduleRouteProp = RouteProp<RootStackParamList, "CollectionSchedule">;
 type CollectionScheduleScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "CollectionSchedule">;

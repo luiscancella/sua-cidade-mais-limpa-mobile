@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Logo from "src/components/Logo";
 import { RootStackParamList } from "src/types/navigation";
 import { CollectionShift, CollectionShiftLabelPTBR, CollectionShiftSchema } from "src/types";
-import { useError } from "src/hooks/useModal";
+import { useError } from "src/contexts/modal.context";
 import UserMapper from "src/mapper/UserMapper";
 import UserService from "src/service/UserService";
 import { useUserRegistration } from "src/contexts/registration.context";

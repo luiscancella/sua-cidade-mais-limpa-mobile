@@ -31,7 +31,7 @@ interface ModalProviderProps {
 }
 
 export function ModalProvider({ children }: ModalProviderProps) {
-    const [error, setError] = useState<ErrorState>({
+    const [ error, setError ] = useState<ErrorState>({
         visible: false,
         title: '',
         messages: [],
