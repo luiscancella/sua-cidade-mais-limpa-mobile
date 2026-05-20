@@ -1,4 +1,5 @@
-import messaging, { getToken } from "@react-native-firebase/messaging";
+import { getApp } from "@react-native-firebase/app";
+import messaging, { getMessaging, getToken } from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
@@ -53,8 +54,9 @@ class NotificacaoService {
         }
 
         try {
-            const app = await messaging();
-            const fcm_token = await getToken(app);
+            const app = await getApp();
+            const messaging = await getMessaging(app);
+            const fcm_token = await getToken(messaging);
             return fcm_token;
         } catch (error) {
             console.error("Erro ao obter FCM token:", error);

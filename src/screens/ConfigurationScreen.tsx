@@ -109,7 +109,7 @@ export function ConfigurationScreen() {
             />
             <ConfigurationSection
                 nameIcon="notifications"
-                title="Notificações"
+                title="Coleta"
                 description="Dias de coleta na sua rua"
             >
                 {CollectionDaySchema.options.map(day => (

@@ -17,9 +17,9 @@ export const CollectionShiftSchema = z.enum(["MORNING", "AFTERNOON", "NIGHT"]);
 export type CollectionShift = z.infer<typeof CollectionShiftSchema>;
 
 export const CollectionShiftLabelPTBR: Record<CollectionShift, string> = {
-    "MORNING":   "Manhã",
-    "AFTERNOON": "Tarde",
-    "NIGHT":     "Noite",
+    "MORNING":   "Manhã (06:00 - 11:00)",
+    "AFTERNOON": "Tarde (12:00 - 17:00)",
+    "NIGHT":     "Noite (18:00 - 05:00)",
 };
 
 export const CollectionDaysSchema = z.array(CollectionDaySchema).min(1);
