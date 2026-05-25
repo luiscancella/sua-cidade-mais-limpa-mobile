@@ -1,5 +1,5 @@
 import { getApp } from "@react-native-firebase/app";
-import messaging, { getMessaging, getToken } from "@react-native-firebase/messaging";
+import { getMessaging, getToken } from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 

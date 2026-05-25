@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { Address, CollectionDays, CollectionShift, HeadersRequired, UserRegistration, UserRegistrationSchema } from "src/types";
 import UserService from "src/service/UserService";
 import UserMapper from "src/mapper/UserMapper";
+import { AxiosError } from "axios";
 
 interface UserRegistrationContextData {
     registration?: UserRegistration,
@@ -74,12 +75,12 @@ export const UserRegistrationProvider = ({ children }: { children: React.ReactNo
             });
 
             setRegistration(saved);
-            setIsLoading(false);
             return true;
         } catch (error) {
             console.error("Failed to load registration:", error);
-            setIsLoading(false);
             return false;
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -141,7 +142,24 @@ export const UserRegistrationProvider = ({ children }: { children: React.ReactNo
     }
 
     React.useEffect(() => {
-        loadRegistration();
+        const initialize = async () => {
+            const hasRegistration = await loadRegistration();
+            if (!hasRegistration) {
+                clearRegistration();
+            }
+
+            if (registration) {
+                try {
+                    const data = await updateRegistration(registration);
+                } catch (error) {
+                    if (error instanceof AxiosError && error.response?.status === 403) {
+                        clearRegistration();
+                    }
+                }
+            }
+        }
+
+        initialize();
     }, []);
 
     return (
