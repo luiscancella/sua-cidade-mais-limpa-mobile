@@ -1,6 +1,10 @@
 import * as React from 'react';
-import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Animated, LayoutAnimation, Platform, StyleProp, StyleSheet, Text, TouchableOpacity, UIManager, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+if (Platform.OS === 'android') {
+    UIManager.setLayoutAnimationEnabledExperimental?.(true);
+}
 
 interface ConfigurationSectionProps {
     nameIcon: keyof typeof Ionicons.glyphMap,
@@ -13,13 +17,26 @@ interface ConfigurationSectionProps {
 
 export function ConfigurationSection({ nameIcon, title, description, styleProps, onPress, children }: ConfigurationSectionProps) {
     const [collapsed, setCollapsed] = React.useState(false);
-        
-    const uncollapseIconName = "caret-forward-outline";
-    const collapseIconName = "caret-down-outline";
+    const rotateAnim = React.useRef(new Animated.Value(0)).current;
+
+    const toggleCollapse = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        Animated.timing(rotateAnim, {
+            toValue: collapsed ? 0 : 1,
+            duration: 200,
+            useNativeDriver: true,
+        }).start();
+        setCollapsed(prev => !prev);
+    };
+
+    const rotate = rotateAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '90deg'],
+    });
 
     return (
         <>
-            <TouchableOpacity style={[styles.section, styleProps, collapsed && styles.sectionCollapsed]} onPress={() => onPress ? onPress() : setCollapsed(!collapsed)}>
+            <TouchableOpacity style={[styles.section, styleProps, collapsed && styles.sectionCollapsed]} onPress={() => onPress ? onPress() : toggleCollapse()}>
                 <View style={styles.iconContainer}>
                     <Ionicons name={nameIcon} size={18} color="white" style={styles.icon} />
                 </View>
@@ -27,14 +44,15 @@ export function ConfigurationSection({ nameIcon, title, description, styleProps,
                     <Text style={styles.topicTitle}>{title}</Text>
                     {description && <Text style={styles.topicDescription}>{description}</Text>}
                 </View>
-                <Ionicons name={collapsed ? collapseIconName : uncollapseIconName} size={24} color="black" style={styles.sectionCollapseIcon} />
+                <Animated.View style={[styles.sectionCollapseIcon, { transform: [{ rotate }] }]}>
+                    <Ionicons name="caret-forward-outline" size={24} color="black" />
+                </Animated.View>
             </TouchableOpacity>
             {collapsed && (
                 <View style={styles.childrenContainer}>
                     {children}
                 </View>
             )}
-
         </>
     );
 }
