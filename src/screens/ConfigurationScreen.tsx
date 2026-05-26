@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Toast from "react-native-toast-message";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Checkbox, RadioButton } from "react-native-paper";
@@ -20,8 +20,8 @@ type SetupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, '
 export function ConfigurationScreen() {
     const { showError } = useError();
     const { registration, updateRegistration } = useRequiredUserRegistration();
-    const [ collectionDays, setCollectionDays ] = useState<CollectionDays>(registration.collectionDays);
-    const [ collectionShift, setCollectionShift ] = useState<CollectionShift>(registration.collectionShift);
+    const [collectionDays, setCollectionDays] = useState<CollectionDays>(registration.collectionDays);
+    const [collectionShift, setCollectionShift] = useState<CollectionShift>(registration.collectionShift);
     const ref = useRef<GooglePlacesAutocompleteRef | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pendingDaysRef = useRef<CollectionDays>(registration.collectionDays);
@@ -107,57 +107,59 @@ export function ConfigurationScreen() {
                 updateCurrentLocationOnSelect={true}
                 onError={() => showError("Erro ao selecionar endereço", "Não foi possível processar o endereço selecionado. Por favor tente novamente ou contate o suporte.")}
             />
-            <ConfigurationSection
-                nameIcon="notifications"
-                title="Coleta"
-                description="Dias de coleta na sua rua"
-            >
-                {CollectionDaySchema.options.map(day => (
-                    <TouchableOpacity
-                        key={day}
-                        style={styles.itemContainer}
-                        onPress={() => handleDayToggle(day)}
-                    >
-                        <Text style={styles.daysListContainer}>{CollectionDayLabelPTBR[day].toUpperCase()}</Text>
-                        <View style={styles.itemSwitch}>
-                            <Checkbox
-                                status={collectionDays.includes(day) ? "checked" : "unchecked"}
-                                onPress={() => handleDayToggle(day)}
-                                color="#0FAD83"
-                            />
-                        </View>
-                    </TouchableOpacity>
-                ))}
-            </ConfigurationSection>
-            <ConfigurationSection
-                nameIcon="time"
-                title="Horário da coleta"
-                description="Período em que a coleta passa"
-            >
-                {CollectionShiftSchema.options.map(shift => (
-                    <TouchableOpacity
-                        key={shift}
-                        style={styles.itemContainer}
-                        onPress={() => handleShiftChange(shift)}
-                    >
-                        <Text style={styles.daysListContainer}>{CollectionShiftLabelPTBR[shift].toUpperCase()}</Text>
-                        <View style={styles.itemSwitch}>
-                            <RadioButton
-                                value={shift}
-                                status={collectionShift === shift ? "checked" : "unchecked"}
-                                onPress={() => handleShiftChange(shift)}
-                                color="#0FAD83"
-                            />
-                        </View>
-                    </TouchableOpacity>
-                ))}
-            </ConfigurationSection>
-            <ConfigurationSection
-                nameIcon="information-circle"
-                title="Termos e Serviços"
-                onPress={() => navigation.navigate("TermsOfService")}
-            >
-            </ConfigurationSection>
+            <ScrollView>
+                <ConfigurationSection
+                    nameIcon="notifications"
+                    title="Coleta"
+                    description="Dias de coleta na sua rua"
+                >
+                    {CollectionDaySchema.options.map(day => (
+                        <TouchableOpacity
+                            key={day}
+                            style={styles.itemContainer}
+                            onPress={() => handleDayToggle(day)}
+                        >
+                            <Text style={styles.daysListContainer}>{CollectionDayLabelPTBR[day].toUpperCase()}</Text>
+                            <View style={styles.itemSwitch}>
+                                <Checkbox
+                                    status={collectionDays.includes(day) ? "checked" : "unchecked"}
+                                    onPress={() => handleDayToggle(day)}
+                                    color="#0FAD83"
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </ConfigurationSection>
+                <ConfigurationSection
+                    nameIcon="time"
+                    title="Horário da coleta"
+                    description="Período em que a coleta passa"
+                >
+                    {CollectionShiftSchema.options.map(shift => (
+                        <TouchableOpacity
+                            key={shift}
+                            style={styles.itemContainer}
+                            onPress={() => handleShiftChange(shift)}
+                        >
+                            <Text style={styles.daysListContainer}>{CollectionShiftLabelPTBR[shift].toUpperCase()}</Text>
+                            <View style={styles.itemSwitch}>
+                                <RadioButton
+                                    value={shift}
+                                    status={collectionShift === shift ? "checked" : "unchecked"}
+                                    onPress={() => handleShiftChange(shift)}
+                                    color="#0FAD83"
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </ConfigurationSection>
+                <ConfigurationSection
+                    nameIcon="information-circle"
+                    title="Termos e Serviços"
+                    onPress={() => navigation.navigate("TermsOfService")}
+                >
+                </ConfigurationSection>
+            </ScrollView>
         </SafeAreaView>
     );
 }

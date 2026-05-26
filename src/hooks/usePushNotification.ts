@@ -5,34 +5,30 @@ import { useError } from "src/contexts/modal.context";
 import { HeadersRequired } from "src/types";
 
 interface Props {
-  phoneId: string;
-  getHeaders: () => HeadersRequired;
+	phoneId: string;
+	getHeaders: () => HeadersRequired;
 }
 
 export function usePushNotification({ phoneId, getHeaders }: Props) {
-  const { showError } = useError();
+	const { showError } = useError();
 
-  useEffect(() => {
-    async function register() {
-      try {
-        const token = await NotificationService.getDevicePushToken();
-        if (token) {
-          await UserService.registerPushToken(phoneId, token, getHeaders());
-          return;
-        }
-        showError(
-          "Erro de Notificação",
-          "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.",
-        );
-      } catch (error) {
-        console.error("Error obtaining device token:", error);
-        showError(
-          "Erro de Notificação",
-          "Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.",
-        );
-      }
+	useEffect(() => {
+		async function register() {
+			const token = await NotificationService.getDevicePushToken();
+			if (!token) {
+				showError(
+					"Erro de Notificação",
+					"Não foi possível obter permissão para notificações. Por favor, verifique as configurações do seu dispositivo.",
+				);
+				return;
+			}
+			try {
+				await UserService.registerPushToken(phoneId, token, getHeaders());
+			} catch (error) {
+				console.warn("Erro ao registrar token de push notification:", error);
+			}
     }
 
-    register();
-  }, []);
+		register();
+	}, []);
 }

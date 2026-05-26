@@ -49,17 +49,14 @@ class NotificacaoService {
     public async getDevicePushToken(): Promise<string | null> {
         const granted = await this.hasNotificationPermission();
         if (!granted) {
-            console.warn("Permissão não concedida");
             return null;
         }
-
         try {
-            const app = await getApp();
-            const messaging = await getMessaging(app);
-            const fcm_token = await getToken(messaging);
-            return fcm_token;
-        } catch (error) {
-            console.error("Erro ao obter FCM token:", error);
+            const app = getApp();
+            const messaging = getMessaging(app);
+            return await getToken(messaging);
+        } catch {
+            console.warn("Firebase failed to get push token");
             return null;
         }
     }
