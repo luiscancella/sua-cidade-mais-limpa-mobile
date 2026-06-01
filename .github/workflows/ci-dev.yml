@@ -1,0 +1,58 @@
+name: CI - Dev
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  android-build:
+    name: Build & Distribute Android
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Decodificar Keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/app/release.keystore
+
+      - name: Build APK (devRelease)
+        run: |
+          cd android && ./gradlew assembleDevRelease \
+            -PMYAPP_STORE_FILE=release.keystore \
+            -PMYAPP_STORE_PASSWORD="${{ secrets.ANDROID_STORE_PASSWORD }}" \
+            -PMYAPP_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}" \
+            -PMYAPP_KEY_PASSWORD="${{ secrets.ANDROID_KEY_PASSWORD }}"
+
+      - name: Localizar APK
+        id: find-apk
+        run: |
+          APK=$(find android/app/build/outputs/apk/dev/release -name "*.apk" | head -1)
+          echo "path=$APK" >> $GITHUB_OUTPUT
+
+      - name: Distribuir via Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: dev
+          file: ${{ steps.find-apk.outputs.path }}
+          releaseNotes: "Build automático da branch dev — commit ${{ github.sha }}"
