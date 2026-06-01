@@ -6,4 +6,5 @@ export type RootStackParamList = {
   CollectionShift: { selectedAddress: Address; selectedDays: CollectionDays };
   TermsOfService: undefined;
   Configuration: undefined;
+  Support: undefined;
 };

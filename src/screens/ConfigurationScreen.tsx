@@ -154,6 +154,12 @@ export function ConfigurationScreen() {
                     ))}
                 </ConfigurationSection>
                 <ConfigurationSection
+                    nameIcon="help-circle"
+                    title="Suporte"
+                    onPress={() => navigation.navigate("Support")}
+                >
+                </ConfigurationSection>
+                <ConfigurationSection
                     nameIcon="information-circle"
                     title="Termos e Serviços"
                     onPress={() => navigation.navigate("TermsOfService")}
